@@ -55,8 +55,14 @@ fn main() {
         &context, "shaders/metroid_demo.vert.glsl", "shaders/metroid_demo.frag.glsl"
     );
 
+    let in_color_vec = [255.0/255.0, 20.0/255.0, 147.0/255.0];
+    let in_color_location = unsafe {
+        gl::GetUniformLocation(shader_program, "in_color".as_ptr() as *const i8)
+    };
+    assert!(in_color_location != -1);
     unsafe {
         gl::UseProgram(shader_program);
+        gl::Uniform3f(in_color_location, in_color_vec[0], in_color_vec[1], in_color_vec[2]);
     }
 
     unsafe {
@@ -74,7 +80,7 @@ fn main() {
 
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
-            gl::ClearColor(0.3, 0.3, 0.3, 1.0);
+            gl::ClearColor(0.2, 0.2, 0.2, 1.0);
             gl::UseProgram(shader_program);
             gl::BindVertexArray(vao);
 
