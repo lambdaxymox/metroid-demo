@@ -1,6 +1,7 @@
 use chrono::prelude::Utc;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
+use std::fmt;
 
 
 pub struct Logger {
@@ -104,3 +105,11 @@ impl Drop for Logger {
     }
 }
 
+impl fmt::Write for Logger {
+    fn write_str(&mut self, s: &str) -> Result<(), fmt::Error> {
+        match self.log(s) {
+            true => Ok(()),
+            false => Err(fmt::Error),
+        }
+    }
+}
