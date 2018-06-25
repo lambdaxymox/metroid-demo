@@ -46,7 +46,7 @@ pub struct GLContext {
 ///
 pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // Initiate a logger.
-    let mut logger = Logger::from(log_file);
+    let logger = Logger::from(log_file);
     logger.restart();
 
     // Start GL context and O/S window using the GLFW helper library.
@@ -200,7 +200,7 @@ pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
     ShaderLog { index: shader_index, log: log }
 }
 
-pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
+pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
     log!(context.logger, "Creating shader from {}...\n", file_name);
 
     let mut shader_string = vec![0; MAX_SHADER_LENGTH];
@@ -304,10 +304,10 @@ pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
 ///
 /// Compile and link a shader program.
 ///
-pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: GLuint, program: &mut GLuint) -> bool {
+pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shader: GLuint, program: &mut GLuint) -> bool {
     unsafe {
         *program = gl::CreateProgram();
-        log!(logger, "Created programme {}. attaching shaders {} and {}...\n", 
+        log!(context.logger, "Created programme {}. attaching shaders {} and {}...\n", 
             program, vertex_shader, fragment_shader
         );
         gl::AttachShader(*program, vertex_shader);
@@ -318,12 +318,12 @@ pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: G
         let mut params = -1;
         gl::GetProgramiv(*program, gl::LINK_STATUS, &mut params);
         if params != gl::TRUE as i32 {
-            log_err!(logger, "ERROR: could not link shader programme GL index {}\n", *program);
-            log_err!(logger, "{}", program_info_log(*program));
+            log_err!(context.logger, "ERROR: could not link shader programme GL index {}\n", *program);
+            log_err!(context.logger, "{}", program_info_log(*program));
         
             return false;
         }
-        is_program_valid(logger, *program);
+        is_program_valid(&context.logger, *program);
         // Delete shaders here to free memory
         gl::DeleteShader(vertex_shader);
         gl::DeleteShader(fragment_shader);
@@ -331,3 +331,17 @@ pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: G
     }
 }
 
+///
+/// Compile and link a shader program directly from the files.
+///
+pub fn create_program_from_files(context: &GLContext, vert_file_name: &str, frag_file_name: &str) -> GLuint {
+    let mut vertex_shader = 0;
+    let mut fragment_shader = 0;
+    let mut program: GLuint = 0;
+    
+    create_shader(context, vert_file_name, &mut vertex_shader, gl::VERTEX_SHADER);
+    create_shader(context, frag_file_name, &mut fragment_shader, gl::FRAGMENT_SHADER);
+    create_program(context, vertex_shader, fragment_shader, &mut program);
+    
+    program
+}
