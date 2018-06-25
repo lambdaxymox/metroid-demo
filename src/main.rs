@@ -15,6 +15,7 @@ use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
+use math::{Mat4};
 
 
 fn main() {
@@ -31,7 +32,11 @@ fn main() {
         0.5, -0.5, 0.0, 0.0, 0.5, 0.0, -0.5, -0.5, 0.0
     ];
 
-    let mut points_vbo: GLuint = 0;
+    let colors: [GLfloat; 9] = [
+        1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0
+    ];
+
+    let mut points_vbo = 0;
     unsafe {
         gl::GenBuffers(1, &mut points_vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
@@ -42,13 +47,29 @@ fn main() {
     }
     assert!(points_vbo > 0);
 
-    let mut vao: GLuint = 0;
+    let mut colors_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut colors_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, colors_vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * colors.len()) as GLsizeiptr, 
+            colors.as_ptr() as *const GLvoid, gl::STATIC_DRAW
+        );
+    }
+    assert!(colors_vbo > 0);
+
+    let mut vao = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut vao);
         gl::BindVertexArray(vao);
-        gl::EnableVertexAttribArray(0);
+
         gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
         gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(0);
+
+        gl::BindBuffer(gl::ARRAY_BUFFER, colors_vbo);
+        gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(1);
     }
     assert!(vao > 0);
 
@@ -56,14 +77,46 @@ fn main() {
         &context, "shaders/metroid_demo.vert.glsl", "shaders/metroid_demo.frag.glsl"
     );
 
-    let in_color_vec = [255.0/255.0, 20.0/255.0, 147.0/255.0];
-    let in_color_location = unsafe {
-        gl::GetUniformLocation(shader_program, "in_color".as_ptr() as *const i8)
+    /*************************** CAMERA MODEL *****************************/
+    let near = 0.1;
+    let far = 100.0;
+    let fov = 67.0;
+    let aspect = context.width as f32 / context.height as f32;
+    let proj_mat = Mat4::perspective(fov, aspect, near, far);
+
+    // View matrix components.
+    let _cam_speed: GLfloat = 3.0;
+    let cam_yaw_speed: GLfloat = 50.0;
+    let mut cam_pos: [GLfloat; 3] = [0.0, 0.0, 2.0];
+    let mut cam_yaw: GLfloat = 0.0;
+    let mut trans_mat = Mat4::identity().translate(&math::vec3((-cam_pos[0], -cam_pos[1], -cam_pos[2])));
+    let mut rot_mat = Mat4::identity().rotate_y_deg(-cam_yaw);
+    let mut view_mat = rot_mat * trans_mat;
+
+    /*************************** ****** ***** *****************************/
+
+    let model_mat = Mat4::identity();
+
+    let model_mat_location = unsafe {
+        gl::GetUniformLocation(shader_program, "model".as_ptr() as *const i8)
     };
-    assert!(in_color_location != -1);
+    assert!(model_mat_location > -1);
+
+    let view_mat_location = unsafe {
+        gl::GetUniformLocation(shader_program, "view".as_ptr() as *const i8)
+    };
+    assert!(view_mat_location > -1);
+
+    let proj_mat_location = unsafe {
+        gl::GetUniformLocation(shader_program, "proj".as_ptr() as *const i8)
+    };
+    assert!(proj_mat_location > -1);
+
     unsafe {
         gl::UseProgram(shader_program);
-        gl::Uniform3f(in_color_location, in_color_vec[0], in_color_vec[1], in_color_vec[2]);
+        gl::UniformMatrix4fv(model_mat_location, 1, gl::FALSE, model_mat.as_ptr());
+        gl::UniformMatrix4fv(view_mat_location, 1, gl::FALSE, view_mat.as_ptr());
+        gl::UniformMatrix4fv(proj_mat_location, 1, gl::FALSE, proj_mat.as_ptr());
     }
 
     unsafe {
@@ -82,6 +135,8 @@ fn main() {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             gl::ClearColor(0.2, 0.2, 0.2, 1.0);
+            gl::Viewport(0, 0, context.width as i32, context.height as i32);
+            
             gl::UseProgram(shader_program);
             gl::BindVertexArray(vao);
 
