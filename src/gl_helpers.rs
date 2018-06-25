@@ -8,6 +8,7 @@ use std::fs::File;
 use std::io::{Read, BufReader};
 use std::sync::mpsc::Receiver;
 use std::ptr;
+use std::fmt;
 
 use logger::Logger;
 
@@ -140,6 +141,7 @@ pub fn update_fps_counter(context: &mut GLContext) {
     context.frame_count += 1;
 }
 
+
 pub fn parse_shader(file_name: &str, shader_str: &mut [u8], max_len: usize) -> Result<usize, String> {
     shader_str[0] = 0;
     let file = match File::open(file_name) {
@@ -161,6 +163,41 @@ pub fn parse_shader(file_name: &str, shader_str: &mut [u8], max_len: usize) -> R
     shader_str[bytes_read] = 0;
 
     Ok(bytes_read)
+}
+
+///
+/// A record containing all the relevant compilation log information for a
+/// given GLSL shader compiled at run time.
+///
+pub struct ShaderLog {
+    shader_index: GLuint,
+    log: String,
+}
+
+impl fmt::Display for ShaderLog {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Shader info log for GL index {}:", self.shader_index);
+        writeln!(f, "{}", self.log)
+    }
+}
+
+///
+/// Query the shader information log generated during shader compilation from
+/// OpenGL.
+/// 
+pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
+    let mut actual_length = 0;
+    let mut raw_log: [i8; 2048] = [0; 2048];
+    unsafe {
+        gl::GetShaderInfoLog(shader_index, raw_log.len() as i32, &mut actual_length, &mut raw_log[0]);
+    }
+    
+    let mut log = String::new();
+    for i in 0..actual_length as usize {
+        log.push(raw_log[i] as u8 as char);
+    }
+
+    ShaderLog { shader_index: shader_index, log: log }
 }
 
 pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
@@ -197,7 +234,7 @@ pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mu
 
     if params != gl::TRUE as i32 {
         context.logger.log_err(&format!("ERROR: GL shader index {} did not compile\n", *shader));
-        print_shader_info_log(*shader);
+        context.logger.log_err(&format!("{}", shader_info_log(*shader)));
         
         return false;
     }
@@ -206,21 +243,4 @@ pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mu
     return true;
 }
 
-///
-/// Print out the errors encountered during shader compilation.
-/// 
-pub fn print_shader_info_log(shader_index: GLuint) {
-    let max_length = 2048;
-    let mut actual_length = 0;
-    let mut log = [0; 2048];
-    
-    unsafe {
-        gl::GetShaderInfoLog(shader_index, max_length, &mut actual_length, &mut log[0]);
-    }
-    
-    println!("Shader info log for GL index {}:", shader_index);
-    for i in 0..actual_length as usize {
-        print!("{}", log[i] as u8 as char);
-    }
-    println!();
-}
+
