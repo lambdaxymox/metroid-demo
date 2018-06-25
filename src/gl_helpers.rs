@@ -52,6 +52,11 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     /*******************************************************/
     /* TODO: INSERT APPLE SPECIFIC GL STARTUP CODE HERE.   */
     /*******************************************************/
+    // glfw.window_hint(glfw::WindowHint::ContextVersionMajor(3);
+    // glfw.window_hint(glfw::WindowHint::ContextVersionMinor(2);
+    // glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+    // glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
+    /*******************************************************/
 
     logger.log(&format!("Started GLFW"));
     let (mut window, events) = glfw.create_window(
