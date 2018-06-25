@@ -59,6 +59,9 @@ fn main() {
     }
 
     while !context.window.should_close() {
+        glh::update_timers(&mut context);
+        glh::update_fps_counter(&mut context);
+
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);

@@ -102,3 +102,34 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
         frame_count: 0,
     })
 }
+
+///
+/// Updates the timers in a GL context. It returns the elapsed time since the last call to
+/// `update_timers`.
+///
+#[inline]
+pub fn update_timers(context: &mut GLContext) -> f64 {
+    let current_seconds = context.glfw.get_time();
+    let elapsed_seconds = current_seconds - context.running_time_seconds;
+    context.running_time_seconds = current_seconds;
+
+    elapsed_seconds
+}
+
+///
+/// Update the framerate and display in the window titlebar.
+///
+#[inline]
+pub fn update_fps_counter(context: &mut GLContext) {     
+    let current_time_seconds = context.glfw.get_time();
+    let elapsed_seconds = current_time_seconds - context.framerate_time_seconds;
+    if elapsed_seconds > 0.5 {
+        context.framerate_time_seconds = current_time_seconds;
+        let fps = context.frame_count as f64 / elapsed_seconds;
+        let title = format!("OpenGL @ FPS: {:.2}", fps);
+        context.window.set_title(&title);
+        context.frame_count = 0;
+    }
+
+    context.frame_count += 1;
+}
