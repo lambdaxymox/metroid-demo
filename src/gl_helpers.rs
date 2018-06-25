@@ -46,12 +46,12 @@ pub struct GLContext {
 ///
 pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // Initiate a logger.
-    let logger = Logger::from(log_file);
+    let mut logger = Logger::from(log_file);
     logger.restart();
 
     // Start GL context and O/S window using the GLFW helper library.
-    logger.log(&format!("Starting GLFW"));
-    logger.log(&format!("Using GLFW version {}", glfw::get_version_string()));
+    log!(logger, "Starting GLFW");
+    log!(logger, "Using GLFW version {}", glfw::get_version_string());
 
     // Start a GL context and OS window using the GLFW helper library.
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -67,14 +67,14 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
     /*******************************************************/
 
-    logger.log(&format!("Started GLFW successfully\n"));
+    log!(logger, "Started GLFW successfully");
     let maybe_glfw_window = glfw.create_window(
         640, 480, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
     );
     let (mut window, events) = match maybe_glfw_window {
         Some(tuple) => tuple,
         None => {
-            logger.log("Failed to create GLFW window");
+            log!(logger, "Failed to create GLFW window");
             return Err(format!("Failed to create GLFW window."));
         }
     };
@@ -91,11 +91,11 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // Get renderer and version information.
     let renderer = glubyte_ptr_to_string(unsafe { gl::GetString(gl::RENDERER) });
     println!("Renderer: {}", renderer);
-    logger.log(&format!("Renderer: {}", renderer));
+    log!(logger, "Renderer: {}", renderer);
 
     let version = glubyte_ptr_to_string(unsafe { gl::GetString(gl::VERSION) });
     println!("OpenGL version supported: {}", version);
-    logger.log(&format!("OpenGL version supported: {}", version));
+    log!(logger, "OpenGL version supported: {}", version);
 
     Ok(GLContext {
         glfw: glfw, 
@@ -201,22 +201,22 @@ pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
 }
 
 pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
-    context.logger.log(&format!("Creating shader from {}...\n", file_name));
+    log!(context.logger, "Creating shader from {}...\n", file_name);
 
     let mut shader_string = vec![0; MAX_SHADER_LENGTH];
     let bytes_read = match parse_shader(file_name, &mut shader_string, MAX_SHADER_LENGTH) {
         Ok(val) => val,
         Err(st) => {
-            context.logger.log_err(&st);
+            log_err!(context.logger, &st);
             return false;
         }
     };
 
     if bytes_read >= (MAX_SHADER_LENGTH - 1) {
-        context.logger.log(&format!(
+        log!(context.logger,
             "WARNING: The shader was truncated because the shader code 
             was longer than MAX_SHADER_LENGTH {} bytes.", MAX_SHADER_LENGTH
-        ));
+        );
     }
 
     *shader = unsafe { gl::CreateShader(gl_type) };
@@ -233,12 +233,12 @@ pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mu
     }
 
     if params != gl::TRUE as i32 {
-        context.logger.log_err(&format!("ERROR: GL shader index {} did not compile\n", *shader));
-        context.logger.log_err(&format!("{}", shader_info_log(*shader)));
+        log_err!(context.logger, "ERROR: GL shader index {} did not compile\n", *shader);
+        log_err!(context.logger, "{}", shader_info_log(*shader));
         
         return false;
     }
-    context.logger.log(&format!("Shader compiled with index {}\n", *shader));
+    log!(context.logger, "Shader compiled with index {}\n", *shader);
     
     return true;
 }
@@ -255,7 +255,7 @@ pub struct ProgramLog {
 
 impl fmt::Display for ProgramLog {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "Program info log for GL index {}:", self.index);
+        writeln!(f, "Program info log for GL index {}:", self.index).unwrap();
         writeln!(f, "{}", self.log)
     }
 }
@@ -290,13 +290,13 @@ pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
     }
 
     if params != gl::TRUE as i32 {
-        logger.log_err(&format!("Program {} GL_VALIDATE_STATUS = GL_FALSE\n", sp));
-        logger.log_err(&format!("{}", program_info_log(sp)));
+        log_err!(logger, "Program {} GL_VALIDATE_STATUS = GL_FALSE\n", sp);
+        log_err!(logger, "{}", program_info_log(sp));
         
         return false;
     }
 
-    logger.log(&format!("Program {} GL_VALIDATE_STATUS = {}\n", sp, params));
+    log!(logger, "Program {} GL_VALIDATE_STATUS = {}\n", sp, params);
     
     return true;
 }
@@ -307,9 +307,8 @@ pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
 pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: GLuint, program: &mut GLuint) -> bool {
     unsafe {
         *program = gl::CreateProgram();
-        logger.log(&format!(
-            "Created programme {}. attaching shaders {} and {}...\n", 
-            program, vertex_shader, fragment_shader)
+        log!(logger, "Created programme {}. attaching shaders {} and {}...\n", 
+            program, vertex_shader, fragment_shader
         );
         gl::AttachShader(*program, vertex_shader);
         gl::AttachShader(*program, fragment_shader);
@@ -319,10 +318,8 @@ pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: G
         let mut params = -1;
         gl::GetProgramiv(*program, gl::LINK_STATUS, &mut params);
         if params != gl::TRUE as i32 {
-            logger.log_err(&format!(
-                "ERROR: could not link shader programme GL index {}\n", *program)
-            );
-            logger.log_err(&format!("{}", program_info_log(*program)));
+            log_err!(logger, "ERROR: could not link shader programme GL index {}\n", *program);
+            log_err!(logger, "{}", program_info_log(*program));
         
             return false;
         }

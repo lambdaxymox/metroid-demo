@@ -113,3 +113,23 @@ impl fmt::Write for Logger {
         }
     }
 }
+
+#[macro_export]
+macro_rules! log {
+    ($logger:expr, $format:expr) => {
+        $logger.log($format);
+    };
+    ($logger:expr, $format:expr, $($arg:expr), *) => {
+        $logger.log(&format!($format, $($arg,)*));
+    };
+}
+
+#[macro_export]
+macro_rules! log_err {
+    ($logger:expr, $format:expr) => {
+        $logger.log_err($format);
+    };
+    ($logger:expr, $format:expr, $($arg:expr), *) => {
+        $logger.log_err(&format!($format, $($arg,)*));
+    };    
+}

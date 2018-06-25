@@ -2,8 +2,10 @@ extern crate gl;
 extern crate glfw;
 extern crate chrono;
 
-mod gl_helpers;
+#[macro_use]
 mod logger;
+
+mod gl_helpers;
 
 use glfw::{Action, Context, Key};
 use gl::types::{GLfloat, GLsizeiptr, GLvoid, GLuint};
