@@ -6,6 +6,7 @@ extern crate chrono;
 mod logger;
 
 mod gl_helpers;
+mod math;
 
 use glfw::{Action, Context, Key};
 use gl::types::{GLfloat, GLsizeiptr, GLvoid, GLuint};
