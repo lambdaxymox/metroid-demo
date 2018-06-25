@@ -42,7 +42,8 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     logger.restart();
 
     // Start GL context and O/S window using the GLFW helper library.
-    logger.log(&format!("Starting GLFW\n{}\n", glfw::get_version_string()));
+    logger.log(&format!("Starting GLFW"));
+    logger.log(&format!("Using GLFW version {}", glfw::get_version_string()));
 
     // Start a GL context and OS window using the GLFW helper library.
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
@@ -58,11 +59,17 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
     /*******************************************************/
 
-    logger.log(&format!("Started GLFW"));
-    let (mut window, events) = glfw.create_window(
+    logger.log(&format!("Started GLFW successfully\n"));
+    let maybe_glfw_window = glfw.create_window(
         640, 480, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
-    )
-    .expect("Failed to create GLFW window.");
+    );
+    let (mut window, events) = match maybe_glfw_window {
+        Some(tuple) => tuple,
+        None => {
+            logger.log("Failed to create GLFW window");
+            return Err(format!("Failed to create GLFW window."));
+        }
+    };
 
     window.make_current();
     window.set_key_polling(true);
