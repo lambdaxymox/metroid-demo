@@ -176,7 +176,7 @@ pub struct ShaderLog {
 
 impl fmt::Display for ShaderLog {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "Shader info log for GL index {}:", self.index);
+        writeln!(f, "Shader info log for GL index {}:", self.index).unwrap();
         writeln!(f, "{}", self.log)
     }
 }
