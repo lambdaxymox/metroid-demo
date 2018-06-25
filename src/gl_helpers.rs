@@ -142,7 +142,7 @@ pub fn update_fps_counter(context: &mut GLContext) {
 }
 
 
-pub fn parse_shader(file_name: &str, shader_str: &mut [u8], max_len: usize) -> Result<usize, String> {
+pub fn parse_shader(file_name: &str, shader_str: &mut [u8]) -> Result<usize, String> {
     shader_str[0] = 0;
     let file = match File::open(file_name) {
         Ok(val) => val,
@@ -204,7 +204,7 @@ pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, 
     log!(context.logger, "Creating shader from {}...\n", file_name);
 
     let mut shader_string = vec![0; MAX_SHADER_LENGTH];
-    let bytes_read = match parse_shader(file_name, &mut shader_string, MAX_SHADER_LENGTH) {
+    let bytes_read = match parse_shader(file_name, &mut shader_string) {
         Ok(val) => val,
         Err(st) => {
             log_err!(context.logger, &st);
