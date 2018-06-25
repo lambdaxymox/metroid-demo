@@ -89,7 +89,6 @@ fn main() {
         }
 
         context.glfw.poll_events();
-        context.window.swap_buffers();
 
         // Check whether the user signaled GLFW to close the window.
         match context.window.get_key(Key::Escape) {
@@ -98,5 +97,7 @@ fn main() {
             }
             _ => {}
         }
+
+        context.window.swap_buffers();
     }
 }
