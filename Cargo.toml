@@ -7,3 +7,4 @@ authors = ["Stallmanifold <stallmanifold@gmail.com>"]
 glfw = "0.23.0"
 gl = "0.10.0"
 stb_image = "0.2.2"
+chrono = "0.4.4"

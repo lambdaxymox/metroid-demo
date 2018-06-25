@@ -6,6 +6,8 @@ use glfw::{Context};
 use std::ffi::CStr;
 use std::sync::mpsc::Receiver;
 
+use logger::Logger;
+
 
 #[inline]
 pub fn glubyte_ptr_to_string(cstr: *const GLubyte) -> String {
@@ -22,6 +24,7 @@ pub struct GLContext {
     pub glfw: glfw::Glfw,
     pub window: glfw::Window,
     pub events: Receiver<(f64, glfw::WindowEvent)>,
+    pub logger: Logger,
     pub width: u32,
     pub height: u32,
     pub channel_depth: u32,
@@ -34,11 +37,23 @@ pub struct GLContext {
 /// Initialize a new OpenGL context and start a new GLFW window. 
 ///
 pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
+    // Initiate a logger.
+    let logger = Logger::from(log_file);
+    logger.restart();
+
+    // Start GL context and O/S window using the GLFW helper library.
+    logger.log(&format!("Starting GLFW\n{}\n", glfw::get_version_string()));
+
     // Start a GL context and OS window using the GLFW helper library.
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::Samples(Some(4)));
 
+    /*******************************************************/
+    /* TODO: INSERT APPLE SPECIFIC GL STARTUP CODE HERE.   */
+    /*******************************************************/
+
+    logger.log(&format!("Started GLFW"));
     let (mut window, events) = glfw.create_window(
         640, 480, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
     )
@@ -56,15 +71,17 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     // Get renderer and version information.
     let renderer = glubyte_ptr_to_string(unsafe { gl::GetString(gl::RENDERER) });
     println!("Renderer: {}", renderer);
-    
+    logger.log(&format!("Renderer: {}", renderer));
+
     let version = glubyte_ptr_to_string(unsafe { gl::GetString(gl::VERSION) });
     println!("OpenGL version supported: {}", version);
-
+    logger.log(&format!("OpenGL version supported: {}", version));
 
     Ok(GLContext {
         glfw: glfw, 
         window: window, 
         events: events,
+        logger: logger,
         width: 640,
         height: 480,
         channel_depth: 3,
