@@ -1,12 +1,19 @@
 use gl;
-use gl::types::{GLubyte};
+use gl::types::{GLchar, GLenum, GLubyte, GLuint};
 use glfw;
 use glfw::{Context};
 
 use std::ffi::CStr;
+use std::fs::File;
+use std::io::{Read, BufReader};
 use std::sync::mpsc::Receiver;
+use std::ptr;
 
 use logger::Logger;
+
+
+// 256 Kilobytes.
+const MAX_SHADER_LENGTH: usize = 262144;
 
 
 #[inline]
@@ -126,10 +133,94 @@ pub fn update_fps_counter(context: &mut GLContext) {
     if elapsed_seconds > 0.5 {
         context.framerate_time_seconds = current_time_seconds;
         let fps = context.frame_count as f64 / elapsed_seconds;
-        let title = format!("OpenGL @ FPS: {:.2}", fps);
-        context.window.set_title(&title);
+        context.window.set_title(&format!("Metroid DEMO @ {:.2} FPS", fps));
         context.frame_count = 0;
     }
 
     context.frame_count += 1;
+}
+
+pub fn parse_shader(file_name: &str, shader_str: &mut [u8], max_len: usize) -> Result<usize, String> {
+    shader_str[0] = 0;
+    let file = match File::open(file_name) {
+        Ok(val) => val,
+        Err(_) => {
+            return Err(format!("ERROR: opening file for reading: {}\n", file_name));
+        }
+    };
+
+    let mut reader = BufReader::new(file);
+    let bytes_read = match reader.read(shader_str) {
+        Ok(val) => val,
+        Err(_) => {
+            return Err(format!("ERROR: reading shader file {}\n", file_name));
+        }
+    };
+
+    // Append \0 character to end of the shader string to mark the end of a C string.
+    shader_str[bytes_read] = 0;
+
+    Ok(bytes_read)
+}
+
+pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
+    context.logger.log(&format!("Creating shader from {}...\n", file_name));
+
+    let mut shader_string = vec![0; MAX_SHADER_LENGTH];
+    let bytes_read = match parse_shader(file_name, &mut shader_string, MAX_SHADER_LENGTH) {
+        Ok(val) => val,
+        Err(st) => {
+            context.logger.log_err(&st);
+            return false;
+        }
+    };
+
+    if bytes_read >= (MAX_SHADER_LENGTH - 1) {
+        context.logger.log(&format!(
+            "WARNING: The shader was truncated because the shader code 
+            was longer than MAX_SHADER_LENGTH {} bytes.", MAX_SHADER_LENGTH
+        ));
+    }
+
+    *shader = unsafe { gl::CreateShader(gl_type) };
+    let p = shader_string.as_ptr() as *const GLchar;
+    unsafe {
+        gl::ShaderSource(*shader, 1, &p, ptr::null());
+        gl::CompileShader(*shader);
+    }
+
+    // Check for shader compile errors.
+    let mut params = -1;
+    unsafe {
+        gl::GetShaderiv(*shader, gl::COMPILE_STATUS, &mut params);
+    }
+
+    if params != gl::TRUE as i32 {
+        context.logger.log_err(&format!("ERROR: GL shader index {} did not compile\n", *shader));
+        print_shader_info_log(*shader);
+        
+        return false;
+    }
+    context.logger.log(&format!("Shader compiled with index {}\n", *shader));
+    
+    return true;
+}
+
+///
+/// Print out the errors encountered during shader compilation.
+/// 
+pub fn print_shader_info_log(shader_index: GLuint) {
+    let max_length = 2048;
+    let mut actual_length = 0;
+    let mut log = [0; 2048];
+    
+    unsafe {
+        gl::GetShaderInfoLog(shader_index, max_length, &mut actual_length, &mut log[0]);
+    }
+    
+    println!("Shader info log for GL index {}:", shader_index);
+    for i in 0..actual_length as usize {
+        print!("{}", log[i] as u8 as char);
+    }
+    println!();
 }
