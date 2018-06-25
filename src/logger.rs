@@ -18,13 +18,32 @@ impl Logger {
     }
 
     ///
+    /// Finish writing to a log. This function is used to place any final
+    /// information in a log file before the logger goes out of scope.
+    ///
+    fn finalize(&self) -> bool {
+        let file = OpenOptions::new().write(true).append(true).open(&self.log_file);
+        if file.is_err() {
+            eprintln!("ERROR: Could not open GL_LOG_FILE {} file for appending.", &self.log_file);
+            return false;
+        }
+
+        let mut file = file.unwrap();
+        let date = Utc::now();
+        writeln!(file, "Logging finished at local time {}", date).unwrap();
+        writeln!(file, "END LOG").unwrap();
+
+        true
+    }
+
+    ///
     /// Start a new log file with the time and date at the top.
     ///
     pub fn restart(&self) -> bool {
         let file = File::create(&self.log_file);
         if file.is_err() {
             eprintln!(
-                "ERROR: The GL_LOG_FILE log file {} could not be opened for writing.", self.log_file
+                "ERROR: The OpenGL log file \"{}\" could not be opened for writing.", self.log_file
             );
 
             return false;
@@ -33,10 +52,10 @@ impl Logger {
         let mut file = file.unwrap();
 
         let date = Utc::now();
-        write!(file, "GL_LOG_FILE log. local time {}", date).unwrap();
-        write!(file, "build version: ??? ?? ???? ??:??:??\n\n").unwrap();
+        writeln!(file, "OpenGL application log.\nStarted at local time {}", date).unwrap();
+        writeln!(file, "build version: ??? ?? ???? ??:??:??\n\n").unwrap();
 
-        return true;
+        true
     }
 
     ///
@@ -52,7 +71,7 @@ impl Logger {
         let mut file = file.unwrap();
         writeln!(file, "{}", message).unwrap();
 
-        return true;
+        true
     }
 
     ///
@@ -69,7 +88,7 @@ impl Logger {
         writeln!(file, "{}", message).unwrap();
         eprintln!("{}", message);
 
-        return true;
+        true
     }
 }
 
@@ -78,3 +97,10 @@ impl<'a> From<&'a str> for Logger {
         Logger::new(log_file)
     }
 }
+
+impl Drop for Logger {
+    fn drop(&mut self) {
+        self.finalize();
+    }
+}
+
