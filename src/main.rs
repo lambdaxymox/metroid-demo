@@ -51,6 +51,14 @@ fn main() {
     }
     assert!(vao > 0);
 
+    let shader_program = glh::create_program_from_files(
+        &context, "shaders/metroid_demo.vert.glsl", "shaders/metroid_demo.frag.glsl"
+    );
+
+    unsafe {
+        gl::UseProgram(shader_program);
+    }
+
     unsafe {
         // Enable depth-testing.
         gl::Enable(gl::DEPTH_TEST);
@@ -67,10 +75,10 @@ fn main() {
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
-            //gl::UseProgram(shader_programme);
-            //gl::BindVertexArray(vao);
+            gl::UseProgram(shader_program);
+            gl::BindVertexArray(vao);
 
-            //gl::DrawArrays(gl::TRIANGLES, 0, points.len() / 3);
+            gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
 
         context.glfw.poll_events();
