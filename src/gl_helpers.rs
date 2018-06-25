@@ -170,13 +170,13 @@ pub fn parse_shader(file_name: &str, shader_str: &mut [u8], max_len: usize) -> R
 /// given GLSL shader compiled at run time.
 ///
 pub struct ShaderLog {
-    shader_index: GLuint,
+    index: GLuint,
     log: String,
 }
 
 impl fmt::Display for ShaderLog {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "Shader info log for GL index {}:", self.shader_index);
+        writeln!(f, "Shader info log for GL index {}:", self.index);
         writeln!(f, "{}", self.log)
     }
 }
@@ -197,7 +197,7 @@ pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
         log.push(raw_log[i] as u8 as char);
     }
 
-    ShaderLog { shader_index: shader_index, log: log }
+    ShaderLog { index: shader_index, log: log }
 }
 
 pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
@@ -243,4 +243,94 @@ pub fn compile_and_load_shader(context: &GLContext, file_name: &str, shader: &mu
     return true;
 }
 
+
+///
+/// A record containing all the relevant compilation log information for a
+/// given GLSL shader program compiled at run time.
+///
+pub struct ProgramLog {
+    index: GLuint,
+    log: String,
+}
+
+impl fmt::Display for ProgramLog {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "Program info log for GL index {}:", self.index);
+        writeln!(f, "{}", self.log)
+    }
+}
+
+///
+/// Query the shader program information log generated during shader compilation 
+/// from OpenGL.
+/// 
+pub fn program_info_log(index: GLuint) -> ProgramLog {
+    let mut actual_length = 0;
+    let mut raw_log = [0 as i8; 2048];
+    unsafe {
+        gl::GetProgramInfoLog(index, raw_log.len() as i32, &mut actual_length, &mut raw_log[0]);
+    }
+    
+    let mut log = String::new();
+    for i in 0..actual_length as usize {
+        log.push(raw_log[i] as u8 as char);
+    }
+
+    ProgramLog { index: index, log: log }
+}
+
+///
+/// Validate a shader program.
+///
+pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
+    let mut params = -1;
+    unsafe {
+        gl::ValidateProgram(sp);
+        gl::GetProgramiv(sp, gl::VALIDATE_STATUS, &mut params);
+    }
+
+    if params != gl::TRUE as i32 {
+        logger.log_err(&format!("Program {} GL_VALIDATE_STATUS = GL_FALSE\n", sp));
+        logger.log_err(&format!("{}", program_info_log(sp)));
+        
+        return false;
+    }
+
+    logger.log(&format!("Program {} GL_VALIDATE_STATUS = {}\n", sp, params));
+    
+    return true;
+}
+
+///
+/// Compile and link a shader program.
+///
+pub fn create_program(logger: &Logger, vertex_shader: GLuint, fragment_shader: GLuint, program: &mut GLuint) -> bool {
+    unsafe {
+        *program = gl::CreateProgram();
+        logger.log(&format!(
+            "Created programme {}. attaching shaders {} and {}...\n", 
+            program, vertex_shader, fragment_shader)
+        );
+        gl::AttachShader(*program, vertex_shader);
+        gl::AttachShader(*program, fragment_shader);
+
+        // Link the shader programme. If binding input attributes do that before linking.
+        gl::LinkProgram(*program);
+        let mut params = -1;
+        gl::GetProgramiv(*program, gl::LINK_STATUS, &mut params);
+        if params != gl::TRUE as i32 {
+            logger.log_err(&format!(
+                "ERROR: could not link shader programme GL index {}\n", *program)
+            );
+            logger.log_err(&format!("{}", program_info_log(*program)));
+        
+            return false;
+        }
+        is_program_valid(logger, *program);
+        // Delete shaders here to free memory
+        gl::DeleteShader(vertex_shader);
+        gl::DeleteShader(fragment_shader);
+        return true;
+    }
+}
 
