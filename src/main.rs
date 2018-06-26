@@ -10,7 +10,7 @@ mod gl_helpers;
 mod math;
 
 use glfw::{Action, Context, Key};
-use gl::types::{GLchar, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
+use gl::types::{GLchar, GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 
 use stb_image::image;
 use stb_image::image::LoadResult;
@@ -25,6 +25,131 @@ use math::{Mat4, Versor};
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
+const FRONT: &str = "assets/skybox-panel.png";
+const BACK: &str = "assets/skybox-panel.png";
+const LEFT: &str = "assets/skybox-panel.png";
+const RIGHT: &str = "assets/skybox-panel.png";
+const TOP: &str = "assets/skybox-panel.png";
+const BOTTOM: &str = "assets/skybox-panel.png";
+
+///
+/// Load the vertex buffer object for the skybox.
+///
+fn make_cube_map_mesh() -> GLuint {
+    let cube_map_points: [GLfloat; 108] = [
+        -10.0,  10.0, -10.0, -10.0, -10.0, -10.0,  10.0, -10.0, -10.0,
+         10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,  10.0, -10.0,
+
+        -10.0, -10.0,  10.0, -10.0, -10.0, -10.0, -10.0,  10.0, -10.0,
+        -10.0,  10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,  10.0,
+
+         10.0, -10.0, -10.0,  10.0, -10.0,  10.0,  10.0,  10.0,  10.0,
+         10.0,  10.0,  10.0,  10.0,  10.0, -10.0,  10.0, -10.0, -10.0,
+
+        -10.0, -10.0,  10.0, -10.0,  10.0,  10.0,  10.0,  10.0,  10.0,
+         10.0,  10.0,  10.0,  10.0, -10.0,  10.0, -10.0, -10.0,  10.0,
+
+        -10.0,  10.0, -10.0,  10.0,  10.0, -10.0,  10.0,  10.0,  10.0,
+         10.0,  10.0,  10.0, -10.0,  10.0,  10.0, -10.0,  10.0, -10.0,
+
+        -10.0, -10.0, -10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,
+         10.0, -10.0, -10.0, -10.0, -10.0,  10.0,  10.0, -10.0,  10.0
+    ];
+
+    let mut cube_map_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut cube_map_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, cube_map_vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER, (3 * 36 * mem::size_of::<GLfloat>()) as GLsizeiptr,
+            cube_map_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
+        );
+    }
+
+    let mut cube_map_vao = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut cube_map_vao);
+        gl::BindVertexArray(cube_map_vao);
+        gl::EnableVertexAttribArray(0);
+        gl::BindBuffer(gl::ARRAY_BUFFER, cube_map_vbo);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+    }
+
+    cube_map_vao
+}
+
+///
+/// Load one of the cube map sides into a cube map texture.
+///
+fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &str) -> bool {
+    unsafe {
+        gl::BindTexture(gl::TEXTURE_CUBE_MAP, texture);
+    }
+
+    let force_channels = 4;
+    let image_data = match image::load_with_depth(file_name, force_channels, false) {
+        LoadResult::ImageU8(image_data) => image_data,
+        LoadResult::Error(_) => {
+            eprintln!("ERROR: could not load {}", file_name);
+            return false;
+        }
+        LoadResult::ImageF32(_) => {
+            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", file_name);
+            return false;
+        }
+    };
+
+    let width = image_data.width;
+    let height = image_data.height;
+
+    // Check that the image size is a power of two.
+    if (width & (width - 1)) != 0 || (height & (height - 1)) != 0 {
+        eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", file_name);
+    }
+
+    // copy image data into 'target' side of cube map
+    unsafe {
+        gl::TexImage2D(
+            side_target, 0, gl::RGBA as i32, width as i32, height as i32, 0, 
+            gl::RGBA, gl::UNSIGNED_BYTE,
+            image_data.data.as_ptr() as *const GLvoid
+        );
+    }
+
+    true
+}
+
+///
+/// Create a cube map texture. Load all 6 sides of a cube map from images, 
+/// and then format texture.
+///
+fn create_cube_map(
+    front: &str, back: &str, top: &str,
+    bottom: &str, left: &str, right: &str, tex_cube: &mut GLuint) {
+    
+    // Generate a cube map texture.
+    unsafe {
+        gl::ActiveTexture(gl::TEXTURE0);
+        gl::GenTextures(1, tex_cube);
+    }
+
+    // Load each image and copy it into a side of the cube-map texture.
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_Z, front);
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_Z, back);
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_Y, top);
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_Y, bottom);
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_X, left);
+    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_X, right);
+    
+    // Format the cube map texture.
+    unsafe {
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_MIN_FILTER, gl::LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_R, gl::CLAMP_TO_EDGE as i32);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
+        gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
+    }
+}
 
 fn create_ground_plane_shaders(view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
@@ -72,6 +197,7 @@ fn create_ground_plane_shaders(view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GL
         (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
     }
 }
+
 
 fn load_texture(file_name: &str, tex: &mut GLuint) -> bool {
     let force_channels = 4;
@@ -141,19 +267,11 @@ fn main() {
             process::exit(1);
         }
     };
-    /*
-    let triangle_points: [GLfloat; 9] = [ 
-        0.5, -0.5, 1.0, 0.0, 0.5, 1.0, -0.5, -0.5, 1.0
-    ];
 
-    let triangle_colors: [GLfloat; 9] = [
-        1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0
-    ];
-    */
     
     let ground_plane_points: [GLfloat; 18] = [
-         10.0,  10.0, 0.0, -10.0,  10.0, 0.0, -10.0, -10.0, 0.0, 
-        -10.0, -10.0, 0.0,  10.0, -10.0, 0.0,  10.0,  10.0, 0.0
+         20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
+        -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
     ];
 
     let mut ground_plane_points_vbo = 0;
@@ -177,49 +295,36 @@ fn main() {
         gl::EnableVertexAttribArray(0);
     }
     assert!(vao > 0);
-    /*
-    let mut points_vbo = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut points_vbo);
-        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
-        gl::BufferData(
-            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * triangle_points.len()) as GLsizeiptr, 
-            triangle_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
-        );
-    }
-    assert!(points_vbo > 0);
-
-    let mut colors_vbo = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut colors_vbo);
-        gl::BindBuffer(gl::ARRAY_BUFFER, colors_vbo);
-        gl::BufferData(
-            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * triangle_colors.len()) as GLsizeiptr, 
-            triangle_colors.as_ptr() as *const GLvoid, gl::STATIC_DRAW
-        );
-    }
-    assert!(colors_vbo > 0);
-
-    let mut vao = 0;
-    unsafe {
-        gl::GenVertexArrays(1, &mut vao);
-        gl::BindVertexArray(vao);
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(0);
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, colors_vbo);
-        gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(1);
-    }
-    assert!(vao > 0);
     
+    /* ****************************CUBE MAP ***************************** */
+    let cube_vao = make_cube_map_mesh();
+    assert!(cube_vao > 0);
+
+    let mut cube_map_texture = 0;
+    create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
+    assert!(cube_map_texture > 0);
+
+    /* ************************* END CUBE MAP *************************** */
+    // Cube map shaders
+    let cube_sp = glh::create_program_from_files(
+        &context, "shaders/cube.vert.glsl", "shaders/cube.frag.glsl"
+    );
+    assert!(cube_sp > 0);
+    // NOTE: This view matrix should *NOT* contain camera translation.
+    let cube_view_mat_location = unsafe {
+        gl::GetUniformLocation(cube_sp, "view".as_ptr() as *const i8)
+    };
+    assert!(cube_view_mat_location > -1);
+    let cube_proj_mat_location = unsafe {
+        gl::GetUniformLocation(cube_sp, "proj".as_ptr() as *const i8)
+    };
+    assert!(cube_proj_mat_location > -1);
+
 
     let shader_program = glh::create_program_from_files(
         &context, "shaders/metroid_demo.vert.glsl", "shaders/metroid_demo.frag.glsl"
     );
-    */
+
     /*************************** CAMERA MODEL *****************************/
     let near = 0.1;
     let far = 100.0;
@@ -241,49 +346,25 @@ fn main() {
     let mut rot_mat_inv = q.to_mat4();
 
     let mut view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
+    /************************ END CAMERA MODEL *****************************/
 
-    /*************************** ****** ***** *****************************/
-    /*
-    let model_mat = Mat4::identity();
-
-    let model_mat_location = unsafe {
-        gl::GetUniformLocation(shader_program, "model".as_ptr() as *const i8)
-    };
-    assert!(model_mat_location > -1);
-
-    let view_mat_location = unsafe {
-        gl::GetUniformLocation(shader_program, "view".as_ptr() as *const i8)
-    };
-    assert!(view_mat_location > -1);
-
-    let proj_mat_location = unsafe {
-        gl::GetUniformLocation(shader_program, "proj".as_ptr() as *const i8)
-    };
-    assert!(proj_mat_location > -1);
-    */
 
     // Load the shader program for the ground plane.
     let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&view_mat, &proj_mat);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture("assets/tile2-diamonds256x256.png", &mut gp_tex);
+    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex);
     assert!(gp_tex > 0);
     
     unsafe {
         gl::UseProgram(gp_sp);
         gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
         gl::UniformMatrix4fv(gp_proj_mat_loc, 1, gl::FALSE, proj_mat.as_ptr());
+        gl::UseProgram(cube_sp);
+        gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, rot_mat_inv.inverse().as_ptr());
+        gl::UniformMatrix4fv(cube_proj_mat_location, 1, gl::FALSE, proj_mat.as_ptr());
     }
-
-    /*
-    unsafe {
-        gl::UseProgram(shader_program);
-        gl::UniformMatrix4fv(model_mat_location, 1, gl::FALSE, model_mat.as_ptr());
-        gl::UniformMatrix4fv(view_mat_location, 1, gl::FALSE, view_mat.as_ptr());
-        gl::UniformMatrix4fv(proj_mat_location, 1, gl::FALSE, proj_mat.as_ptr());
-    }
-    */
 
     unsafe {
         // Enable depth-testing.
@@ -292,8 +373,11 @@ fn main() {
         gl::Enable(gl::CULL_FACE);
         gl::CullFace(gl::BACK);
         gl::FrontFace(gl::CCW);
+        gl::ClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
+        gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
 
+    /*********************** RENDERING LOOP *******************************/
     while !context.window.should_close() {
         let elapsed_seconds = glh::update_timers(&mut context);
         glh::update_fps_counter(&mut context);
@@ -303,21 +387,26 @@ fn main() {
             gl::ClearColor(0.2, 0.2, 0.2, 1.0);
             gl::Viewport(0, 0, context.width as i32, context.height as i32);
             
+            // Draw the sky box using the cube map texture.
+            gl::DepthMask(gl::FALSE);
+            gl::UseProgram(cube_sp);
+            gl::ActiveTexture(gl::TEXTURE0);
+            gl::BindTexture(gl::TEXTURE_CUBE_MAP, cube_map_texture);
+            gl::BindVertexArray(cube_vao);
+            gl::DrawArrays(gl::TRIANGLES, 0, 36);
+            gl::DepthMask(gl::TRUE);
+
             // Draw the ground plane.
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, gp_tex);
             gl::UseProgram(gp_sp);
             gl::BindVertexArray(vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
-
-            // Draw the triangle above the ground plane.
-            //gl::UseProgram(shader_program);
-            //gl::BindVertexArray(vao);
-            //gl::DrawArrays(gl::TRIANGLES, 0, 3);
         }
 
         context.glfw.poll_events();
 
+        /*********************** UPDATE GAME STATE **************************/
         // control keys
         let mut cam_moved = false;
         let mut move_to = math::vec3((0.0, 0.0, 0.0));
@@ -438,6 +527,10 @@ fn main() {
             unsafe {
                 gl::UseProgram(gp_sp);
                 gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
+
+                // Cube map view matrix has rotation, but not translation. It moves with the camera.
+                gl::UseProgram(cube_sp);
+                gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, rot_mat_inv.inverse().as_ptr());
             }
         }
 
@@ -448,7 +541,9 @@ fn main() {
             }
             _ => {}
         }
+        /********************** END UPDATE GAME STATE **************************/
 
         context.window.swap_buffers();
     }
+    /******************** END RENDERING LOOP *******************************/
 }
