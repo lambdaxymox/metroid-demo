@@ -1,5 +1,5 @@
 use gl;
-use gl::types::{GLchar, GLenum, GLubyte, GLuint};
+use gl::types::{GLchar, GLenum, GLint, GLubyte, GLuint};
 use glfw;
 use glfw::{Context};
 
@@ -21,6 +21,84 @@ const MAX_SHADER_LENGTH: usize = 262144;
 pub fn glubyte_ptr_to_string(cstr: *const GLubyte) -> String {
     unsafe {
         CStr::from_ptr(cstr as *const i8).to_string_lossy().into_owned()
+    }
+}
+
+///
+/// A record containing a description of the GL capabilities on a local machine.
+/// The contents of this record can be used for debugging OpenGL problems on
+/// different machines.
+/// 
+struct GLParameters {
+    params: Vec<(String, String)>
+}
+
+impl fmt::Display for GLParameters {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "GL Context Params:").unwrap();
+        for &(ref param, ref value) in self.params.iter() {
+            writeln!(f, "{} = {}", param, value).unwrap();
+        }
+        writeln!(f)
+    }
+}
+
+///
+/// Print out the GL capabilities on a local machine. This is handy for debugging
+/// OpenGL program problems on other people's machines.
+///
+fn gl_params() -> GLParameters {
+    let params: [GLenum; 12] = [
+        gl::MAX_COMBINED_TEXTURE_IMAGE_UNITS,
+        gl::MAX_CUBE_MAP_TEXTURE_SIZE,
+        gl::MAX_DRAW_BUFFERS,
+        gl::MAX_FRAGMENT_UNIFORM_COMPONENTS,
+        gl::MAX_TEXTURE_IMAGE_UNITS,
+        gl::MAX_TEXTURE_SIZE,
+        gl::MAX_VARYING_FLOATS,
+        gl::MAX_VERTEX_ATTRIBS,
+        gl::MAX_VERTEX_TEXTURE_IMAGE_UNITS,
+        gl::MAX_VERTEX_UNIFORM_COMPONENTS,
+        gl::MAX_VIEWPORT_DIMS,
+        gl::STEREO,
+    ];
+    let names: [&str; 12] = [
+        "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_CUBE_MAP_TEXTURE_SIZE",
+        "GL_MAX_DRAW_BUFFERS",
+        "GL_MAX_FRAGMENT_UNIFORM_COMPONENTS",
+        "GL_MAX_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_TEXTURE_SIZE",
+        "GL_MAX_VARYING_FLOATS",
+        "GL_MAX_VERTEX_ATTRIBS",
+        "GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS",
+        "GL_MAX_VERTEX_UNIFORM_COMPONENTS",
+        "GL_MAX_VIEWPORT_DIMS",
+        "GL_STEREO",
+    ];
+    let mut vec: Vec<(String, String)> = vec![];
+    // Integers: this only works if the order is 0-10 integer return types.
+    for i in 0..10 {
+        let mut v = 0;
+        unsafe { 
+            gl::GetIntegerv(params[i], &mut v);
+        }
+        vec.push((format!("{}", names[i]), format!("{}", v)));
+    }
+    // others
+    let mut v: [GLint; 2] = [0; 2];
+    unsafe {    
+        gl::GetIntegerv(params[10], &mut v[0]);
+    }
+    vec.push((format!("{}", names[10]), format!("{} {}", v[0], v[1])));
+    let mut s = 0;
+    unsafe {
+        gl::GetBooleanv(params[11], &mut s);
+    }
+    vec.push((format!("{}", names[11]), format!("{}", s as usize)));
+
+    GLParameters {
+        params: vec,
     }
 }
 
@@ -96,6 +174,7 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
     let version = glubyte_ptr_to_string(unsafe { gl::GetString(gl::VERSION) });
     println!("OpenGL version supported: {}", version);
     log!(logger, "OpenGL version supported: {}", version);
+    log!(logger, "{}", gl_params());
 
     Ok(GLContext {
         glfw: glfw, 

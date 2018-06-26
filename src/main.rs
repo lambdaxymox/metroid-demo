@@ -156,12 +156,12 @@ fn create_ground_plane_shaders(view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GL
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let mut gp_vs_str = vec![0; 1024];
-    if glh::parse_shader("shaders/gp_vs.glsl", &mut gp_vs_str).is_err() {
+    if glh::parse_shader("shaders/gp.vert.glsl", &mut gp_vs_str).is_err() {
         panic!("Failed to parse ground plane vertex shader file.");
     }
 
     let mut gp_fs_str = vec![0; 1024];
-    if glh::parse_shader("shaders/gp_fs.glsl", &mut gp_fs_str).is_err() {
+    if glh::parse_shader("shaders/gp.frag.glsl", &mut gp_fs_str).is_err() {
         panic!("Failed to parse ground plane fragment shader file.");
     }
     
