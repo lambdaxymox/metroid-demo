@@ -25,6 +25,7 @@ use math::{Mat4, Versor};
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
+const GL_LOG_FILE: &str = "gl.log";
 const FRONT: &str = "assets/skybox-panel.png";
 const BACK: &str = "assets/skybox-panel.png";
 const LEFT: &str = "assets/skybox-panel.png";
@@ -199,7 +200,7 @@ fn create_ground_plane_shaders(view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GL
 }
 
 
-fn load_texture(file_name: &str, tex: &mut GLuint) -> bool {
+fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
     let force_channels = 4;
     let mut image_data = match image::load_with_depth(file_name, force_channels, false) {
         LoadResult::ImageU8(image_data) => image_data,
@@ -241,10 +242,10 @@ fn load_texture(file_name: &str, tex: &mut GLuint) -> bool {
             image_data.data.as_ptr() as *const GLvoid
         );
         gl::GenerateMipmap(gl::TEXTURE_2D);
-        //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
-        //gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as i32);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, wrapping_mode as GLint);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, wrapping_mode as GLint);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
+        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
     }
 
     let mut max_aniso = 0.0;
@@ -259,7 +260,7 @@ fn load_texture(file_name: &str, tex: &mut GLuint) -> bool {
 }
 
 fn main() {
-    let mut context = match glh::start_gl("gl.log") {
+    let mut context = match glh::start_gl(GL_LOG_FILE) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
@@ -354,7 +355,7 @@ fn main() {
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex);
+    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
     
     unsafe {
