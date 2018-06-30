@@ -121,8 +121,8 @@ fn text_to_vbo(
     start_x: f32, start_y: f32, scale_px: f32,
     points_vbo: &mut GLuint, texcoords_vbo: &mut GLuint, point_count: &mut usize) {
 
-    let mut points_temp = vec![0.0; 6 * 3 * mem::size_of::<GLfloat>() * st.len()];
-    let mut texcoords_temp = vec![0.0; 6 * 2 * mem::size_of::<GLfloat>() * st.len()];
+    let mut points_temp = vec![0.0; 12 * st.len()];
+    let mut texcoords_temp = vec![0.0; 12 * st.len()];
 
     // TODO:
     // Loop through string and generate texture coordinates from the
@@ -148,6 +148,7 @@ fn text_to_vbo(
         points_temp[12 * i + 6]  = x_pos + scale_px / (context.width as f32);
         points_temp[12 * i + 7]  = y_pos - scale_px / (context.height as f32);
         points_temp[12 * i + 8]  = x_pos + scale_px / (context.width as f32);
+        points_temp[12 * i + 9]  = y_pos;
         points_temp[12 * i + 10] = x_pos;
         points_temp[12 * i + 11] = y_pos;
 
@@ -178,6 +179,9 @@ fn text_to_vbo(
             texcoords_temp.as_ptr() as *const GLvoid, gl::DYNAMIC_DRAW
         );
     }
+
+    println!("points_temp = {:?}", points_temp);
+    println!("texcoords_temp = {:?}", texcoords_temp);
 
     *point_count = 6 * st.len();
 }
@@ -463,7 +467,7 @@ fn main() {
     let x_pos: GLfloat = -0.75;
     let y_pos: GLfloat = 0.2;
     let pixel_scale: GLfloat = 64.0;
-    let st = "Press ENTER to continue";
+    let st = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     let mut string_points = 0;
     text_to_vbo(
         &context, &st, &font_atlas, 
