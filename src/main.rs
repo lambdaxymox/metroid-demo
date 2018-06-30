@@ -460,11 +460,6 @@ fn main() {
     };
     assert!(cube_proj_mat_location > -1);
 
-
-    let shader_program = glh::create_program_from_files(
-        &context, "shaders/metroid_demo.vert.glsl", "shaders/metroid_demo.frag.glsl"
-    );
-
     /*************************** CAMERA MODEL *****************************/
     let near = 0.1;
     let far = 100.0;
