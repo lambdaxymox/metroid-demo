@@ -33,7 +33,7 @@ const LEFT: &str = "assets/skybox-panel.png";
 const RIGHT: &str = "assets/skybox-panel.png";
 const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
-const FONT_SHEET: &str = "asserts/font1684x1684.png";
+const FONT_SHEET: &str = "assets/font1684x1684.png";
 
 
 struct FontAtlas {
@@ -104,8 +104,9 @@ fn load_font_atlas() -> FontAtlas {
 
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     let sp = glh::create_program_from_files(
-        context, "shaders/title_screen.vert.glsl", "title_screen.frag.glsl"
+        context, "shaders/title_screen.vert.glsl", "shaders/title_screen.frag.glsl"
     );
+    assert!(sp > 0);
 
     let sp_text_color_loc = unsafe { 
         gl::GetUniformLocation(sp, "text_color".as_ptr() as *const i8)
