@@ -123,20 +123,19 @@ fn text_to_vbo(
 
     let mut points_temp = vec![0.0; 12 * st.len()];
     let mut texcoords_temp = vec![0.0; 12 * st.len()];
+    let mut at_x = start_x;
+    let at_y = start_y;
 
-    // TODO:
-    // Loop through string and generate texture coordinates from the
-    // gylph offset table and glyph width table. The glyph offset table
-    // calculates where the top left corner of a glyph is.
-    // The glyph width table calculates how wide each glyph is.
     for (i, ch_i) in st.chars().enumerate() {
         let (atlas_row, atlas_col) = atlas.coords[&ch_i];
         
         let s = (atlas_col as f32) * (1.0 / (atlas.columns as f32));
         let t = ((atlas_row + 1) as f32) * (1.0 / (atlas.rows as f32));
 
-        let x_pos = start_x;
-        let y_pos = start_y - (scale_px / (context.height as f32)) * atlas.glyph_y_offsets[&ch_i];
+        let x_pos = at_x;
+        let y_pos = at_y - (scale_px / (context.height as f32)) * atlas.glyph_y_offsets[&ch_i];
+
+        at_x +=  atlas.glyph_widths[&ch_i] * (scale_px / (context.width as f32));
 
         points_temp[12 * i]     = x_pos;
         points_temp[12 * i + 1] = y_pos;
@@ -462,9 +461,9 @@ fn main() {
     }
 
     let x_pos: GLfloat = -0.75;
-    let y_pos: GLfloat = 0.2;
-    let pixel_scale: GLfloat = 64.0;
-    let st = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let y_pos: GLfloat = -0.4;
+    let pixel_scale: GLfloat = 42.0;
+    let st = "Press ENTER to continue";
     let mut string_points = 0;
     text_to_vbo(
         &context, &st, &font_atlas, 
