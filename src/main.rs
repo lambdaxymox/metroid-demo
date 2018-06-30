@@ -136,7 +136,7 @@ fn text_to_vbo(
         let t = ((atlas_row + 1) as f32) * (1.0 / (atlas.rows as f32));
 
         let x_pos = start_x;
-        let y_pos = start_y - scale_px / (context.height as f32) * atlas.glyph_y_offsets[&ch_i];
+        let y_pos = start_y - (scale_px / (context.height as f32)) * atlas.glyph_y_offsets[&ch_i];
 
         points_temp[12 * i]     = x_pos;
         points_temp[12 * i + 1] = y_pos;
@@ -179,9 +179,6 @@ fn text_to_vbo(
             texcoords_temp.as_ptr() as *const GLvoid, gl::DYNAMIC_DRAW
         );
     }
-
-    println!("points_temp = {:?}", points_temp);
-    println!("texcoords_temp = {:?}", texcoords_temp);
 
     *point_count = 6 * st.len();
 }
