@@ -433,7 +433,7 @@ fn main() {
     let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
 
     let mut title_screen_tex = 0;
-    load_texture("assets/font1684x1684.png", &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
 
     /* ******************* END TEXT BOX GEOMETRY ************************ */
