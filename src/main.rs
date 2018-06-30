@@ -49,9 +49,17 @@ fn load_font_atlas() -> FontAtlas {
     unimplemented!()
 }
 
+fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
+    let sp = glh::create_program_from_files(
+        context, "shaders/title_screen.vert.glsl", "title_screen.frag.glsl"
+    );
 
-fn create_title_screen_shaders() -> (GLuint, GLint) {
-    unimplemented!()
+    let sp_text_color_loc = unsafe { 
+        gl::GetUniformLocation(sp, "text_color".as_ptr() as *const i8)
+    };
+    assert!(sp_text_color_loc > -1);
+
+    (sp, sp_text_color_loc)
 }
 
 fn text_to_vbo(
@@ -420,8 +428,13 @@ fn main() {
         gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
         gl::EnableVertexAttribArray(1);
     }
+    assert!(string_vao > 0);
 
-    let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders();
+    let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
+
+    let mut title_screen_tex = 0;
+    load_texture("assets/font1684x1684.png", &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    assert!(title_screen_tex > 0);
 
     /* ******************* END TEXT BOX GEOMETRY ************************ */
     /* ****************************CUBE MAP ***************************** */
@@ -534,6 +547,9 @@ fn main() {
             // alpha blending to do so.
             gl::Disable(gl::DEPTH_TEST);
             gl::Enable(gl::BLEND);
+            gl::ActiveTexture(gl::TEXTURE0);
+            gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
+            gl::UseProgram(title_screen_sp);
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_colour_loc, 1.0, 0.0, 1.0, 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
