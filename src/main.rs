@@ -35,6 +35,8 @@ const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
 const FONT_SHEET: &str = "assets/font1684x1684.png";
 
+const TEXT_COLOR: [f32; 3] = [194 as f32 / 255 as f32, 210 as f32 / 255 as f32, 234 as f32 / 255 as f32];
+
 
 struct FontAtlas {
     glyph_y_offsets: HashMap<char, f32>,
@@ -601,7 +603,7 @@ fn main() {
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
             gl::BindVertexArray(string_vao);
-            gl::Uniform4f(title_screen_sp_colour_loc, 1.0, 0.0, 1.0, 1.0);
+            gl::Uniform4f(title_screen_sp_colour_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
             gl::Enable(gl::DEPTH_TEST);
             gl::Disable(gl::BLEND);
