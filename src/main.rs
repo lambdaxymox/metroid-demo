@@ -444,7 +444,7 @@ fn main() {
     let mut cube_map_texture = 0;
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
-    /* ************************* END CUBE MAP *************************** */
+
     // Cube map shaders
     let cube_sp = glh::create_program_from_files(
         &context, "shaders/cube.vert.glsl", "shaders/cube.frag.glsl"
@@ -460,6 +460,7 @@ fn main() {
     };
     assert!(cube_proj_mat_location > -1);
 
+    /* ************************* END CUBE MAP *************************** */
     /*************************** CAMERA MODEL *****************************/
     let near = 0.1;
     let far = 100.0;
@@ -548,6 +549,8 @@ fn main() {
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_colour_loc, 1.0, 0.0, 1.0, 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
+            gl::Enable(gl::DEPTH_TEST);
+            gl::Disable(gl::BLEND);
         }
 
         context.glfw.poll_events();
