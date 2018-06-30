@@ -15,12 +15,13 @@ use gl::types::{GLchar, GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 use stb_image::image;
 use stb_image::image::LoadResult;
 
+use std::collections::HashMap;
 use std::mem;
 use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
-use math::{Mat4, Versor};
+use math::{Vec3, Mat4, Versor};
 
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
@@ -32,6 +33,92 @@ const LEFT: &str = "assets/skybox-panel.png";
 const RIGHT: &str = "assets/skybox-panel.png";
 const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
+const FONT_SHEET: &str = "asserts/font1684x1684.png";
+
+
+struct FontAtlas {
+    glyph_y_offsets: HashMap<char, f32>,
+    glyph_widths: HashMap<char, f32>,
+    coords: HashMap<char, (usize, usize)>,
+    bitmap: Vec<u8>,
+    rows: usize,
+    columns: usize,
+}
+
+fn load_font_atlas() -> FontAtlas {
+    unimplemented!()
+}
+
+
+fn create_title_screen_shaders() -> (GLuint, GLint) {
+    unimplemented!()
+}
+
+fn text_to_vbo(
+    context: &glh::GLContext, st: &str, atlas: &FontAtlas,
+    start_x: f32, start_y: f32, scale_px: f32,
+    points_vbo: &mut GLuint, texcoords_vbo: &mut GLuint, point_count: &mut usize) {
+
+    let mut points_temp = vec![0.0; 6 * 3 * mem::size_of::<GLfloat>() * st.len()];
+    let mut texcoords_temp = vec![0.0; 6 * 2 * mem::size_of::<GLfloat>() * st.len()];
+
+    // TODO:
+    // Loop through string and generate texture coordinates from the
+    // gylph offset table and glyph width table. The glyph offset table
+    // calculates where the top left corner of a glyph is.
+    // The glyph width table calculates how wide each glyph is.
+    for (i, ch_i) in st.chars().enumerate() {
+        let (atlas_row, atlas_col) = atlas.coords[&ch_i];
+        
+        let s = (atlas_col as f32) * (1.0 / (atlas.columns as f32));
+        let t = ((atlas_row + 1) as f32) * (1.0 / (atlas.rows as f32));
+
+        let x_pos = start_x;
+        let y_pos = start_y - scale_px / (context.height as f32) * atlas.glyph_y_offsets[&ch_i];
+
+        points_temp[12 * i]     = x_pos;
+        points_temp[12 * i + 1] = y_pos;
+        points_temp[12 * i + 2] = x_pos;
+        points_temp[12 * i + 3] = y_pos - scale_px / (context.height as f32);
+        points_temp[12 * i + 4] = x_pos + scale_px / (context.width as f32);
+        points_temp[12 * i + 5] = y_pos - scale_px / (context.height as f32);
+
+        points_temp[12 * i + 6]  = x_pos + scale_px / (context.width as f32);
+        points_temp[12 * i + 7]  = y_pos - scale_px / (context.height as f32);
+        points_temp[12 * i + 8]  = x_pos + scale_px / (context.width as f32);
+        points_temp[12 * i + 10] = x_pos;
+        points_temp[12 * i + 11] = y_pos;
+
+        texcoords_temp[12 * i]     = s;
+        texcoords_temp[12 * i + 1] = 1.0 - t + 1.0 / (atlas.rows as f32);
+        texcoords_temp[12 * i + 2] = s;
+        texcoords_temp[12 * i + 3] = 1.0 - t;
+        texcoords_temp[12 * i + 4] = s + 1.0 / (atlas.columns as f32);
+        texcoords_temp[12 * i + 5] = 1.0 - t;
+
+        texcoords_temp[12 * i + 6]  = s + 1.0 / (atlas.columns as f32);
+        texcoords_temp[12 * i + 7]  = 1.0 - t;
+        texcoords_temp[12 * i + 8]  = s + 1.0 / (atlas.columns as f32);
+        texcoords_temp[12 * i + 9]  = 1.0 - t + 1.0 / (atlas.rows as f32);
+        texcoords_temp[12 * i + 10] = s;
+        texcoords_temp[12 * i + 11] = 1.0 - t + 1.0 / (atlas.rows as f32);
+    }
+
+    unsafe {
+        gl::BindBuffer(gl::ARRAY_BUFFER, *points_vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER, (12 * st.len() * mem::size_of::<GLfloat>()) as GLsizeiptr,
+            points_temp.as_ptr() as *const GLvoid, gl::DYNAMIC_DRAW
+        );
+        gl::BindBuffer(gl::ARRAY_BUFFER, *texcoords_vbo);
+        gl::BufferData(
+            gl::ARRAY_BUFFER, (12 * st.len() * mem::size_of::<GLfloat>()) as GLsizeiptr, 
+            texcoords_temp.as_ptr() as *const GLvoid, gl::DYNAMIC_DRAW
+        );
+    }
+
+    *point_count = 6 * st.len();
+}
 
 ///
 /// Load the vertex buffer object for the skybox.
@@ -269,7 +356,9 @@ fn main() {
         }
     };
 
-    
+    let font_atlas = load_font_atlas();
+
+    /* ******************* GROUND PLANE GEOMETRY *************************/
     let ground_plane_points: [GLfloat; 18] = [
          20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
         -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
@@ -296,7 +385,45 @@ fn main() {
         gl::EnableVertexAttribArray(0);
     }
     assert!(vao > 0);
-    
+
+    /* ******************* END GROUND PLANE GEOMETRY ******************** */
+    /* ******************* TEXT BOX GEOMETRY **************************** */
+    let mut string_vp_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut string_vp_vbo);
+    }
+
+    let mut string_vt_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut string_vt_vbo);
+    }
+
+    let x_pos: GLfloat = -0.75;
+    let y_pos: GLfloat = 0.2;
+    let pixel_scale: GLfloat = 64.0;
+    let st = "Press ENTER to continue";
+    let mut string_points = 0;
+    text_to_vbo(
+        &context, &st, &font_atlas, 
+        x_pos, y_pos, pixel_scale, 
+        &mut string_vp_vbo, &mut string_vt_vbo, &mut string_points
+    );
+
+    let mut string_vao = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut string_vao);
+        gl::BindVertexArray(string_vao);
+        gl::BindBuffer(gl::ARRAY_BUFFER, string_vp_vbo);
+        gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(0);
+        gl::BindBuffer(gl::ARRAY_BUFFER, string_vt_vbo);
+        gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(1);
+    }
+
+    let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders();
+
+    /* ******************* END TEXT BOX GEOMETRY ************************ */
     /* ****************************CUBE MAP ***************************** */
     let cube_vao = make_cube_map_mesh();
     assert!(cube_vao > 0);
@@ -304,7 +431,6 @@ fn main() {
     let mut cube_map_texture = 0;
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
-
     /* ************************* END CUBE MAP *************************** */
     // Cube map shaders
     let cube_sp = glh::create_program_from_files(
@@ -403,6 +529,14 @@ fn main() {
             gl::UseProgram(gp_sp);
             gl::BindVertexArray(vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
+
+            // Draw the title screen. Disable depth testing and enable 
+            // alpha blending to do so.
+            gl::Disable(gl::DEPTH_TEST);
+            gl::Enable(gl::BLEND);
+            gl::BindVertexArray(string_vao);
+            gl::Uniform4f(title_screen_sp_colour_loc, 1.0, 0.0, 1.0, 1.0);
+            gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
         }
 
         context.glfw.poll_events();
