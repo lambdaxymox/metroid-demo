@@ -470,7 +470,7 @@ fn main() {
     // View matrix components.
     let cam_speed: GLfloat = 3.0;
     let cam_yaw_speed: GLfloat = 50.0;
-    let mut cam_yaw: GLfloat = 0.0;
+
     let mut fwd = math::vec4((0.0, 0.0, -1.0, 0.0));
     let mut rgt = math::vec4((1.0, 0.0,  0.0, 0.0));
     let mut up  = math::vec4((0.0, 1.0,  0.0, 0.0));
@@ -532,9 +532,9 @@ fn main() {
             gl::DepthMask(gl::TRUE);
 
             // Draw the ground plane.
+            gl::UseProgram(gp_sp);
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, gp_tex);
-            gl::UseProgram(gp_sp);
             gl::BindVertexArray(vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
 
@@ -542,9 +542,9 @@ fn main() {
             // alpha blending to do so.
             gl::Disable(gl::DEPTH_TEST);
             gl::Enable(gl::BLEND);
+            gl::UseProgram(title_screen_sp);
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
-            gl::UseProgram(title_screen_sp);
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_colour_loc, 1.0, 0.0, 1.0, 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
