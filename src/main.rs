@@ -34,6 +34,7 @@ const RIGHT: &str = "assets/skybox-panel.png";
 const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
 const FONT_SHEET: &str = "assets/font1684x1684.png";
+const GROUND_PLANE_TEX: &str = "assets/tile-rock-planet256x256.png";
 
 const TEXT_COLOR: [f32; 3] = [194 as f32 / 255 as f32, 210 as f32 / 255 as f32, 234 as f32 / 255 as f32];
 
@@ -493,7 +494,7 @@ fn main() {
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex, gl::REPEAT);
+    load_texture(GROUND_PLANE_TEX, &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
     /* ******************* END GROUND PLANE ******************** */
