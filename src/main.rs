@@ -225,7 +225,7 @@ fn text_to_vbo(
 ///
 /// Load the vertex buffer object for the skybox.
 ///
-fn make_cube_map_mesh() -> GLuint {
+fn create_cube_map_geometry() -> GLuint {
     let cube_map_points: [GLfloat; 108] = [
         -10.0,  10.0, -10.0, -10.0, -10.0, -10.0,  10.0, -10.0, -10.0,
          10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,  10.0, -10.0,
@@ -503,9 +503,12 @@ fn main() {
     /* ******************* END TEXT BOX GEOMETRY ************************ */
     /* ****************************CUBE MAP ***************************** */
     // Cube map shaders.
-    let (cube_sp, cube_view_mat_location, cube_proj_mat_location) = create_cube_map_shaders(&context);
+    let (
+        cube_sp, 
+        cube_view_mat_location,
+        cube_proj_mat_location) = create_cube_map_shaders(&context);
 
-    let cube_vao = make_cube_map_mesh();
+    let cube_vao = create_cube_map_geometry();
     assert!(cube_vao > 0);
 
     let mut cube_map_texture = 0;
@@ -607,7 +610,7 @@ fn main() {
         context.glfw.poll_events();
 
         /* ********************** UPDATE GAME STATE ************************* */
-        // control keys
+        // Camera control keys.
         let mut cam_moved = false;
         let mut move_to = math::vec3((0.0, 0.0, 0.0));
         let mut cam_yaw = 0.0; // y-rotation in degrees
