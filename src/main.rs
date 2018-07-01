@@ -118,7 +118,7 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     (sp, sp_text_color_loc)
 }
 
-fn create_title_screen_geometry(context: &glh::GLContext) -> (GLuint, GLuint, GLuint) {
+fn create_title_screen_geometry(context: &glh::GLContext, font_atlas: &FontAtlas) -> (GLuint, GLuint, GLuint, usize) {
     let mut string_vp_vbo = 0;
     unsafe {
         gl::GenBuffers(1, &mut string_vp_vbo);
@@ -133,11 +133,11 @@ fn create_title_screen_geometry(context: &glh::GLContext) -> (GLuint, GLuint, GL
     let y_pos: GLfloat = -0.4;
     let pixel_scale: GLfloat = 42.0;
     let st = "Press ENTER to continue";
-    let mut string_points = 0;
+    let mut string_point_count = 0;
     text_to_vbo(
         &context, &st, &font_atlas, 
         x_pos, y_pos, pixel_scale, 
-        &mut string_vp_vbo, &mut string_vt_vbo, &mut string_points
+        &mut string_vp_vbo, &mut string_vt_vbo, &mut string_point_count
     );
 
     let mut string_vao = 0;
@@ -153,7 +153,7 @@ fn create_title_screen_geometry(context: &glh::GLContext) -> (GLuint, GLuint, GL
     }
     assert!(string_vao > 0);
 
-    (string_vp_vbo, string_vt_vbo, string_vao)
+    (string_vp_vbo, string_vt_vbo, string_vao, string_point_count)
 }
 
 fn text_to_vbo(
@@ -376,7 +376,8 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLi
     (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
 }
 
-fn create_ground_plane() -> (GLuint, GLuint) {
+#[allow(unused_variables)]
+fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     let ground_plane_points: [GLfloat; 18] = [
          20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
         -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
@@ -456,7 +457,7 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
     }
 
     let mut max_aniso = 0.0;
-    // TODO: Check this against my dependencies.
+    // TODO: Check this against my OpenGL extension dependencies.
     unsafe {
         gl::GetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mut max_aniso);
         // Set the maximum!
@@ -479,13 +480,21 @@ fn main() {
     let font_atlas = load_font_atlas();
 
     /* ******************* GROUND PLANE GEOMETRY *************************/
-    let (ground_plane_points_vbo, ground_plane_points_vao) = create_ground_plane();
+    let (
+        ground_plane_points_vbo,
+        ground_plane_points_vao) = create_ground_plane_geometry(&context);
 
     /* ******************* END GROUND PLANE GEOMETRY ******************** */
     /* ******************* TEXT BOX GEOMETRY **************************** */
-    let (string_vp_vbo, string_vt_vbo, string_vao) = create_title_screen_geometry(&context);
+    let (
+        string_vp_vbo,
+        string_vt_vbo,
+        string_vao,
+        string_points) = create_title_screen_geometry(&context, &font_atlas);
 
-    let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
+    let (
+        title_screen_sp,
+        title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
 
     let mut title_screen_tex = 0;
     load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
