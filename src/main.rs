@@ -118,7 +118,9 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     (sp, sp_text_color_loc)
 }
 
-fn create_title_screen_geometry(context: &glh::GLContext, font_atlas: &FontAtlas) -> (GLuint, GLuint, GLuint, usize) {
+fn create_title_screen_geometry(
+    context: &glh::GLContext, font_atlas: &FontAtlas, text: &str) -> (GLuint, GLuint, GLuint, usize) {
+    
     let mut string_vp_vbo = 0;
     unsafe {
         gl::GenBuffers(1, &mut string_vp_vbo);
@@ -132,10 +134,9 @@ fn create_title_screen_geometry(context: &glh::GLContext, font_atlas: &FontAtlas
     let x_pos: GLfloat = -0.75;
     let y_pos: GLfloat = -0.4;
     let pixel_scale: GLfloat = 42.0;
-    let st = "Press ENTER to continue";
     let mut string_point_count = 0;
     text_to_vbo(
-        &context, &st, &font_atlas, 
+        &context, text, &font_atlas, 
         x_pos, y_pos, pixel_scale, 
         &mut string_vp_vbo, &mut string_vt_vbo, &mut string_point_count
     );
@@ -505,7 +506,7 @@ fn main() {
         string_vp_vbo,
         string_vt_vbo,
         string_vao,
-        string_points) = create_title_screen_geometry(&context, &font_atlas);
+        string_points) = create_title_screen_geometry(&context, &font_atlas, "Press ENTER to continue");
 
     let mut title_screen_tex = 0;
     load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
