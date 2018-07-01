@@ -8,9 +8,10 @@ mod logger;
 
 mod gl_helpers;
 mod math;
+mod camera;
 
 use glfw::{Action, Context, Key};
-use gl::types::{GLchar, GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
+use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 
 use stb_image::image;
 use stb_image::image::LoadResult;
@@ -22,6 +23,7 @@ use std::process;
 
 use gl_helpers as glh;
 use math::{Vec3, Mat4, Versor};
+use camera::Camera;
 
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
@@ -469,6 +471,7 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
     return true;
 }
 
+#[allow(unused_variables)]
 fn main() {
     let mut context = match glh::start_gl(GL_LOG_FILE) {
         Ok(val) => val,
@@ -501,7 +504,7 @@ fn main() {
     /* ******************* TITLE SCREEN **************************** */
     let (
         title_screen_sp,
-        title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
+        title_screen_sp_color_loc) = create_title_screen_shaders(&context);
 
     let (
         string_vp_vbo,
@@ -605,7 +608,7 @@ fn main() {
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
             gl::BindVertexArray(string_vao);
-            gl::Uniform4f(title_screen_sp_colour_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
+            gl::Uniform4f(title_screen_sp_color_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
             gl::Enable(gl::DEPTH_TEST);
             gl::Disable(gl::BLEND);
