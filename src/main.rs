@@ -303,28 +303,71 @@ fn create_cube_map(
     }
 }
 
-fn create_ground_plane_shaders(context: &glh::GLContext, view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GLint, GLint) {
+fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
+    let cube_sp = glh::create_program_from_files(
+        &context, "shaders/cube.vert.glsl", "shaders/cube.frag.glsl"
+    );
+    assert!(cube_sp > 0);
+    // NOTE: This view matrix should *NOT* contain camera translation.
+    let cube_view_mat_location = unsafe {
+        gl::GetUniformLocation(cube_sp, "view".as_ptr() as *const i8)
+    };
+    assert!(cube_view_mat_location > -1);
+
+    let cube_proj_mat_location = unsafe {
+        gl::GetUniformLocation(cube_sp, "proj".as_ptr() as *const i8)
+    };
+    assert!(cube_proj_mat_location > -1);
+
+    (cube_sp, cube_view_mat_location, cube_proj_mat_location)
+}
+
+fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let gp_sp = glh::create_program_from_files(context, "shaders/gp.vert.glsl", "shaders/gp.frag.glsl");
-    unsafe {
-        // Get uniform locations of camera view and projection matrices.
-        let gp_view_mat_loc = gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8);
-        assert!(gp_view_mat_loc > -1);
 
-        let gp_proj_mat_loc = gl::GetUniformLocation(gp_sp, "proj".as_ptr() as *const i8);
-        assert!(gp_proj_mat_loc > -1);
+    // Get uniform locations of camera view and projection matrices.
+    let gp_view_mat_loc = unsafe { gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8) };
+    assert!(gp_view_mat_loc > -1);
 
-        // Set defaults for matrices
-        gl::UseProgram(gp_sp);
-        gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
-        gl::UniformMatrix4fv(gp_proj_mat_loc, 1, gl::FALSE, proj_mat.as_ptr());
+    let gp_proj_mat_loc = unsafe { gl::GetUniformLocation(gp_sp, "proj".as_ptr() as *const i8) };
+    assert!(gp_proj_mat_loc > -1);
 
-        (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
-    }
+    (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
 }
 
+fn create_ground_plane() -> (GLuint, GLuint) {
+    let ground_plane_points: [GLfloat; 18] = [
+         20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
+        -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
+    ];
+
+    let mut points_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut points_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
+        gl::BufferData( 
+            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * ground_plane_points.len()) as GLsizeiptr,
+            ground_plane_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
+        );
+    }
+    assert!(points_vbo > 0);
+
+    let mut points_vao = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut points_vao);
+        gl::BindVertexArray(points_vao);
+
+        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
+        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(0);
+    }
+    assert!(points_vao > 0);
+
+    (points_vbo, points_vao)
+}
 
 fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
     let force_channels = 4;
@@ -398,32 +441,7 @@ fn main() {
     let font_atlas = load_font_atlas();
 
     /* ******************* GROUND PLANE GEOMETRY *************************/
-    let ground_plane_points: [GLfloat; 18] = [
-         20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
-        -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
-    ];
-
-    let mut ground_plane_points_vbo = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut ground_plane_points_vbo);
-        gl::BindBuffer(gl::ARRAY_BUFFER, ground_plane_points_vbo);
-        gl::BufferData( 
-            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * ground_plane_points.len()) as GLsizeiptr,
-            ground_plane_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
-        );
-    }
-    assert!(ground_plane_points_vbo > 0);
-
-    let mut vao = 0;
-    unsafe {
-        gl::GenVertexArrays(1, &mut vao);
-        gl::BindVertexArray(vao);
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, ground_plane_points_vbo);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(0);
-    }
-    assert!(vao > 0);
+    let (ground_plane_points_vbo, ground_plane_points_vao) = create_ground_plane();
 
     /* ******************* END GROUND PLANE GEOMETRY ******************** */
     /* ******************* TEXT BOX GEOMETRY **************************** */
@@ -469,6 +487,9 @@ fn main() {
 
     /* ******************* END TEXT BOX GEOMETRY ************************ */
     /* ****************************CUBE MAP ***************************** */
+    // Cube map shaders.
+    let (cube_sp, cube_view_mat_location, cube_proj_mat_location) = create_cube_map_shaders(&context);
+
     let cube_vao = make_cube_map_mesh();
     assert!(cube_vao > 0);
 
@@ -476,23 +497,8 @@ fn main() {
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
 
-    // Cube map shaders
-    let cube_sp = glh::create_program_from_files(
-        &context, "shaders/cube.vert.glsl", "shaders/cube.frag.glsl"
-    );
-    assert!(cube_sp > 0);
-    // NOTE: This view matrix should *NOT* contain camera translation.
-    let cube_view_mat_location = unsafe {
-        gl::GetUniformLocation(cube_sp, "view".as_ptr() as *const i8)
-    };
-    assert!(cube_view_mat_location > -1);
-    let cube_proj_mat_location = unsafe {
-        gl::GetUniformLocation(cube_sp, "proj".as_ptr() as *const i8)
-    };
-    assert!(cube_proj_mat_location > -1);
-
     /* ************************* END CUBE MAP *************************** */
-    /*************************** CAMERA MODEL *****************************/
+    /* ************************** CAMERA MODEL ************************** */
     let near = 0.1;
     let far = 100.0;
     let fov = 67.0;
@@ -513,11 +519,10 @@ fn main() {
     let mut rot_mat_inv = q.to_mat4();
 
     let mut view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
-    /************************ END CAMERA MODEL *****************************/
-
+    /* ********************** END CAMERA MODEL *************************** */
 
     // Load the shader program for the ground plane.
-    let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&context, &view_mat, &proj_mat);
+    let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&context);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
@@ -544,7 +549,7 @@ fn main() {
         gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
 
-    /*********************** RENDERING LOOP *******************************/
+    /* ********************** RENDERING LOOP ****************************** */
     while !context.window.should_close() {
         let elapsed_seconds = glh::update_timers(&mut context);
         glh::update_fps_counter(&mut context);
@@ -567,7 +572,7 @@ fn main() {
             gl::UseProgram(gp_sp);
             gl::ActiveTexture(gl::TEXTURE0);
             gl::BindTexture(gl::TEXTURE_2D, gp_tex);
-            gl::BindVertexArray(vao);
+            gl::BindVertexArray(ground_plane_points_vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
 
             // Draw the title screen. Disable depth testing and enable 
@@ -586,7 +591,7 @@ fn main() {
 
         context.glfw.poll_events();
 
-        /*********************** UPDATE GAME STATE **************************/
+        /* ********************** UPDATE GAME STATE ************************* */
         // control keys
         let mut cam_moved = false;
         let mut move_to = math::vec3((0.0, 0.0, 0.0));
@@ -721,9 +726,9 @@ fn main() {
             }
             _ => {}
         }
-        /********************** END UPDATE GAME STATE **************************/
+        /* ********************* END UPDATE GAME STATE ************************* */
 
         context.window.swap_buffers();
     }
-    /******************** END RENDERING LOOP *******************************/
+    /* ******************* END RENDERING LOOP ****************************** */
 }
