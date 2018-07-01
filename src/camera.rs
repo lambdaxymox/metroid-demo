@@ -22,7 +22,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    fn new(
+    pub fn new(
         near: f32, far: f32, fov: f32, aspect: f32, 
         cam_speed: f32, cam_yaw_speed: f32, cam_pos: Vec3,
         fwd: Vec4, rgt: Vec4, up: Vec4, axis: Versor) -> Camera {

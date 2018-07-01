@@ -412,6 +412,25 @@ fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     (points_vbo, points_vao)
 }
 
+fn create_camera(context: &glh::GLContext) -> Camera {
+    let near = 0.1;
+    let far = 100.0;
+    let fov = 67.0;
+    let aspect = context.width as f32 / context.height as f32;
+
+    let cam_speed: GLfloat = 3.0;
+    let cam_yaw_speed: GLfloat = 50.0;
+
+    let fwd = math::vec4((0.0, 0.0, -1.0, 0.0));
+    let rgt = math::vec4((1.0, 0.0,  0.0, 0.0));
+    let up  = math::vec4((0.0, 1.0,  0.0, 0.0));
+    let cam_pos = math::vec3((0.0, 0.0, 5.0));
+    
+    let axis = Versor::from_axis_deg(0.0, 1.0, 0.0, 0.0);
+
+    Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
+}
+
 fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
     let force_channels = 4;
     let mut image_data = match image::load_with_depth(file_name, force_channels, false) {
@@ -532,35 +551,17 @@ fn main() {
 
     /* ************************* END CUBE MAP *************************** */
     /* ************************** CAMERA MODEL ************************** */
-    let near = 0.1;
-    let far = 100.0;
-    let fov = 67.0;
-    let aspect = context.width as f32 / context.height as f32;
-    let proj_mat = Mat4::perspective(fov, aspect, near, far);
+    let mut camera = create_camera(&context);
 
-    // View matrix components.
-    let cam_speed: GLfloat = 3.0;
-    let cam_yaw_speed: GLfloat = 50.0;
-
-    let mut fwd = math::vec4((0.0, 0.0, -1.0, 0.0));
-    let mut rgt = math::vec4((1.0, 0.0,  0.0, 0.0));
-    let mut up  = math::vec4((0.0, 1.0,  0.0, 0.0));
-    let mut cam_pos = math::vec3((0.0, 0.0, 5.0));
-    let mut trans_mat_inv = Mat4::identity().translate(&cam_pos);
-    
-    let mut q = Versor::from_axis_deg(0.0, 1.0, 0.0, 0.0);
-    let mut rot_mat_inv = q.to_mat4();
-
-    let mut view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
     /* ********************** END CAMERA MODEL *************************** */
 
     unsafe {
         gl::UseProgram(gp_sp);
-        gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
-        gl::UniformMatrix4fv(gp_proj_mat_loc, 1, gl::FALSE, proj_mat.as_ptr());
+        gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, camera.view_mat.as_ptr());
+        gl::UniformMatrix4fv(gp_proj_mat_loc, 1, gl::FALSE, camera.proj_mat.as_ptr());
         gl::UseProgram(cube_sp);
-        gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, rot_mat_inv.inverse().as_ptr());
-        gl::UniformMatrix4fv(cube_proj_mat_location, 1, gl::FALSE, proj_mat.as_ptr());
+        gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, camera.rot_mat_inv.inverse().as_ptr());
+        gl::UniformMatrix4fv(cube_proj_mat_location, 1, gl::FALSE, camera.proj_mat.as_ptr());
     }
 
     unsafe {
@@ -625,97 +626,97 @@ fn main() {
         let mut cam_roll = 0.0;
         match context.window.get_key(Key::A) {
             Action::Press | Action::Repeat => {
-                move_to.v[0] -= cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[0] -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::D) {
             Action::Press | Action::Repeat => {
-                move_to.v[0] += cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[0] += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::Q) {
             Action::Press | Action::Repeat => {
-                move_to.v[1] += cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[1] += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::E) {
             Action::Press | Action::Repeat => {
-                move_to.v[1] -= cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[1] -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::W) {
             Action::Press | Action::Repeat => {
-                move_to.v[2] -= cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[2] -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::S) {
             Action::Press | Action::Repeat => {
-                move_to.v[2] += cam_speed * (elapsed_seconds as GLfloat);
+                move_to.v[2] += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::Left) {
             Action::Press | Action::Repeat => {
-                cam_yaw += cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, up.v[0], up.v[1], up.v[2]);
-                q = q_yaw * &q;
+                let q_yaw = Versor::from_axis_deg(cam_yaw, camera.up.v[0], camera.up.v[1], camera.up.v[2]);
+                camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
         }
         match context.window.get_key(Key::Right) {
             Action::Press | Action::Repeat => {
-                cam_yaw -= cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, up.v[0], up.v[1], up.v[2]);
-                q = q_yaw * &q;
+                let q_yaw = Versor::from_axis_deg(cam_yaw, camera.up.v[0], camera.up.v[1], camera.up.v[2]);
+                camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
         }
         match context.window.get_key(Key::Up) {
             Action::Press | Action::Repeat => {
-                cam_pitch += cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, rgt.v[0], rgt.v[1], rgt.v[2]);
-                q = q_pitch * &q;
+                let q_pitch = Versor::from_axis_deg(cam_pitch, camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2]);
+                camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
         }
         match context.window.get_key(Key::Down) {
             Action::Press | Action::Repeat => {
-                cam_pitch -= cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, rgt.v[0], rgt.v[1], rgt.v[2]);
-                q = q_pitch * &q;
+                let q_pitch = Versor::from_axis_deg(cam_pitch, camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2]);
+                camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
         }
         match context.window.get_key(Key::Z) {
             Action::Press | Action::Repeat => {
-                cam_roll -= cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, fwd.v[0], fwd.v[1], fwd.v[2]);
-                q = q_roll * &q;
+                let q_roll = Versor::from_axis_deg(cam_roll, camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2]);
+                camera.axis = q_roll * &camera.axis;
             }
             _ => {}
         }
         match context.window.get_key(Key::C) {
             Action::Press | Action::Repeat => {
-                cam_roll += cam_yaw_speed * (elapsed_seconds as GLfloat);
+                cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, fwd.v[0], fwd.v[1], fwd.v[2]);
-                q = q_roll * &q;        
+                let q_roll = Versor::from_axis_deg(cam_roll, camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2]);
+                camera.axis = q_roll * &camera.axis;
             }
             _ => {}
         }
@@ -723,24 +724,24 @@ fn main() {
         // update view matrix
         if cam_moved {
             // re-calculate local axes so can move fwd in dir cam is pointing
-            rot_mat_inv = q.to_mat4();
-            fwd = rot_mat_inv * math::vec4((0.0, 0.0, -1.0, 0.0));
-            rgt = rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
-            up  = rot_mat_inv * math::vec4((0.0, 1.0,  0.0, 0.0));
+            camera.rot_mat_inv = camera.axis.to_mat4();
+            camera.fwd = camera.rot_mat_inv * math::vec4((0.0, 0.0, -1.0, 0.0));
+            camera.rgt = camera.rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
+            camera.up  = camera.rot_mat_inv * math::vec4((0.0, 1.0,  0.0, 0.0));
 
-            cam_pos += math::vec3(fwd) * -move_to.v[2];
-            cam_pos += math::vec3(up)  *  move_to.v[1];
-            cam_pos += math::vec3(rgt) *  move_to.v[0];
-            trans_mat_inv = Mat4::identity().translate(&cam_pos);
+            camera.cam_pos += math::vec3(camera.fwd) * -move_to.v[2];
+            camera.cam_pos += math::vec3(camera.up)  *  move_to.v[1];
+            camera.cam_pos += math::vec3(camera.rgt) *  move_to.v[0];
+            camera.trans_mat_inv = Mat4::identity().translate(&camera.cam_pos);
 
-            view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
+            camera.view_mat = camera.rot_mat_inv.inverse() * camera.trans_mat_inv.inverse();
             unsafe {
                 gl::UseProgram(gp_sp);
-                gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
+                gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, camera.view_mat.as_ptr());
 
                 // Cube map view matrix has rotation, but not translation. It moves with the camera.
                 gl::UseProgram(cube_sp);
-                gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, rot_mat_inv.inverse().as_ptr());
+                gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, camera.rot_mat_inv.inverse().as_ptr());
             }
         }
 
