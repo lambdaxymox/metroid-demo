@@ -479,30 +479,40 @@ fn main() {
 
     let font_atlas = load_font_atlas();
 
-    /* ******************* GROUND PLANE GEOMETRY *************************/
+    /* ******************* GROUND PLANE ************************ */
+    // Load the shader program for the ground plane.
+    let (
+        gp_sp,
+        gp_view_mat_loc,
+        gp_proj_mat_loc) = create_ground_plane_shaders(&context);
+
     let (
         ground_plane_points_vbo,
         ground_plane_points_vao) = create_ground_plane_geometry(&context);
 
-    /* ******************* END GROUND PLANE GEOMETRY ******************** */
-    /* ******************* TEXT BOX GEOMETRY **************************** */
+    // Texture for the ground plane.
+    let mut gp_tex = 0;
+    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex, gl::REPEAT);
+    assert!(gp_tex > 0);
+
+    /* ******************* END GROUND PLANE ******************** */
+    /* ******************* TITLE SCREEN **************************** */
+    let (
+        title_screen_sp,
+        title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
+
     let (
         string_vp_vbo,
         string_vt_vbo,
         string_vao,
         string_points) = create_title_screen_geometry(&context, &font_atlas);
 
-    let (
-        title_screen_sp,
-        title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
-
     let mut title_screen_tex = 0;
     load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
 
-    /* ******************* END TEXT BOX GEOMETRY ************************ */
+    /* ******************* END TITLE SCREEN ************************ */
     /* ****************************CUBE MAP ***************************** */
-    // Cube map shaders.
     let (
         cube_sp, 
         cube_view_mat_location,
@@ -539,14 +549,6 @@ fn main() {
     let mut view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
     /* ********************** END CAMERA MODEL *************************** */
 
-    // Load the shader program for the ground plane.
-    let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&context);
-
-    // Texture for the ground plane.
-    let mut gp_tex = 0;
-    load_texture("assets/tile-rock-planet256x256.png", &mut gp_tex, gl::REPEAT);
-    assert!(gp_tex > 0);
-    
     unsafe {
         gl::UseProgram(gp_sp);
         gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, view_mat.as_ptr());
