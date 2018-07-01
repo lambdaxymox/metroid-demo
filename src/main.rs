@@ -118,6 +118,44 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     (sp, sp_text_color_loc)
 }
 
+fn create_title_screen_geometry(context: &glh::GLContext) -> (GLuint, GLuint, GLuint) {
+    let mut string_vp_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut string_vp_vbo);
+    }
+
+    let mut string_vt_vbo = 0;
+    unsafe {
+        gl::GenBuffers(1, &mut string_vt_vbo);
+    }
+
+    let x_pos: GLfloat = -0.75;
+    let y_pos: GLfloat = -0.4;
+    let pixel_scale: GLfloat = 42.0;
+    let st = "Press ENTER to continue";
+    let mut string_points = 0;
+    text_to_vbo(
+        &context, &st, &font_atlas, 
+        x_pos, y_pos, pixel_scale, 
+        &mut string_vp_vbo, &mut string_vt_vbo, &mut string_points
+    );
+
+    let mut string_vao = 0;
+    unsafe {
+        gl::GenVertexArrays(1, &mut string_vao);
+        gl::BindVertexArray(string_vao);
+        gl::BindBuffer(gl::ARRAY_BUFFER, string_vp_vbo);
+        gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(0);
+        gl::BindBuffer(gl::ARRAY_BUFFER, string_vt_vbo);
+        gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(1);
+    }
+    assert!(string_vao > 0);
+
+    (string_vp_vbo, string_vt_vbo, string_vao)
+}
+
 fn text_to_vbo(
     context: &glh::GLContext, st: &str, atlas: &FontAtlas,
     start_x: f32, start_y: f32, scale_px: f32,
@@ -445,39 +483,7 @@ fn main() {
 
     /* ******************* END GROUND PLANE GEOMETRY ******************** */
     /* ******************* TEXT BOX GEOMETRY **************************** */
-    let mut string_vp_vbo = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut string_vp_vbo);
-    }
-
-    let mut string_vt_vbo = 0;
-    unsafe {
-        gl::GenBuffers(1, &mut string_vt_vbo);
-    }
-
-    let x_pos: GLfloat = -0.75;
-    let y_pos: GLfloat = -0.4;
-    let pixel_scale: GLfloat = 42.0;
-    let st = "Press ENTER to continue";
-    let mut string_points = 0;
-    text_to_vbo(
-        &context, &st, &font_atlas, 
-        x_pos, y_pos, pixel_scale, 
-        &mut string_vp_vbo, &mut string_vt_vbo, &mut string_points
-    );
-
-    let mut string_vao = 0;
-    unsafe {
-        gl::GenVertexArrays(1, &mut string_vao);
-        gl::BindVertexArray(string_vao);
-        gl::BindBuffer(gl::ARRAY_BUFFER, string_vp_vbo);
-        gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(0);
-        gl::BindBuffer(gl::ARRAY_BUFFER, string_vt_vbo);
-        gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(1);
-    }
-    assert!(string_vao > 0);
+    let (string_vp_vbo, string_vt_vbo, string_vao) = create_title_screen_geometry(&context);
 
     let (title_screen_sp, title_screen_sp_colour_loc) = create_title_screen_shaders(&context);
 
