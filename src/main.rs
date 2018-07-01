@@ -303,37 +303,12 @@ fn create_cube_map(
     }
 }
 
-fn create_ground_plane_shaders(view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GLint, GLint) {
+fn create_ground_plane_shaders(context: &glh::GLContext, view_mat: &Mat4, proj_mat: &Mat4) -> (GLuint,  GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
-    let mut gp_vs_str = vec![0; 1024];
-    if glh::parse_shader("shaders/gp.vert.glsl", &mut gp_vs_str).is_err() {
-        panic!("Failed to parse ground plane vertex shader file.");
-    }
-
-    let mut gp_fs_str = vec![0; 1024];
-    if glh::parse_shader("shaders/gp.frag.glsl", &mut gp_fs_str).is_err() {
-        panic!("Failed to parse ground plane fragment shader file.");
-    }
-    
+    let gp_sp = glh::create_program_from_files(context, "shaders/gp.vert.glsl", "shaders/gp.frag.glsl");
     unsafe {
-        let gp_vs = gl::CreateShader(gl::VERTEX_SHADER);
-        gl::ShaderSource(gp_vs, 1, &(gp_vs_str.as_ptr() as *const GLchar), ptr::null());
-        gl::CompileShader(gp_vs);
-        assert!(gp_vs > 0);
-
-        let gp_fs = gl::CreateShader(gl::FRAGMENT_SHADER);
-        gl::ShaderSource(gp_fs, 1, &(gp_fs_str.as_ptr() as *const GLchar), ptr::null());
-        gl::CompileShader(gp_fs);
-        assert!(gp_fs > 0);
-
-        let gp_sp = gl::CreateProgram();
-        gl::AttachShader(gp_sp, gp_vs);
-        gl::AttachShader(gp_sp, gp_fs);
-        gl::LinkProgram(gp_sp);
-        assert!(gp_sp > 0);
-
         // Get uniform locations of camera view and projection matrices.
         let gp_view_mat_loc = gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8);
         assert!(gp_view_mat_loc > -1);
@@ -542,7 +517,7 @@ fn main() {
 
 
     // Load the shader program for the ground plane.
-    let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&view_mat, &proj_mat);
+    let (gp_sp, gp_view_mat_loc, gp_proj_mat_loc) = create_ground_plane_shaders(&context, &view_mat, &proj_mat);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
