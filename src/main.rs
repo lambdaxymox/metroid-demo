@@ -611,7 +611,7 @@ fn main() {
         // Camera control keys.
         let mut cam_moved = false;
         let mut move_to = math::vec3((0.0, 0.0, 0.0));
-        let mut cam_yaw = 0.0; // y-rotation in degrees
+        let mut cam_yaw = 0.0;
         let mut cam_pitch = 0.0;
         let mut cam_roll = 0.0;
         match context.window.get_key(Key::A) {
