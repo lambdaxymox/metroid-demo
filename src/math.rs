@@ -386,7 +386,7 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector2 {
 /// A representation of three-dimensional vectors, with a
 /// Euclidean metric.
 ///
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, PartialEq)]
 pub struct Vector3 {
     pub x: f32,
     pub y: f32,
@@ -478,6 +478,83 @@ pub fn vec3<T: Into<Vector3>>(v: T) -> Vector3 {
     v.into()
 }
 
+impl AsRef<[f32; 3]> for Vector3 {
+    fn as_ref(&self) -> &[f32; 3] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsRef<(f32, f32, f32)> for Vector3 {
+    fn as_ref(&self) -> &(f32, f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<[f32; 3]> for Vector3 {
+    fn as_mut(&mut self) -> &mut [f32; 3] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<(f32, f32, f32)> for Vector3 {
+    fn as_mut(&mut self) -> &mut (f32, f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl ops::Index<usize> for Vector3 {
+    type Output = f32;
+
+    #[inline]
+    fn index(&self, index: usize) -> &Self::Output {
+        let v: &[f32; 3] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::Range<usize>> for Vector3 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::Range<usize>) -> &Self::Output {
+        let v: &[f32; 3] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeTo<usize>> for Vector3 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeTo<usize>) -> &Self::Output {
+        let v: &[f32; 3] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeFrom<usize>> for Vector3 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeFrom<usize>) -> &Self::Output {
+        let v: &[f32; 3] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl fmt::Debug for Vector3 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        try!(write!(f, "Vector3 "));
+        <[f32; 3] as fmt::Debug>::fmt(self.as_ref(), f)
+    }
+}
+
+impl fmt::Display for Vector3 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{:.2}, {:.2}, {:.2}]", self.x, self.y, self.z)
+    }
+}
+
 impl From<(f32, f32, f32)> for Vector3 {
     #[inline]
     fn from((x, y, z): (f32, f32, f32)) -> Vector3 {
@@ -510,12 +587,6 @@ impl<'a> From<&'a Vector4> for Vector3 {
     #[inline]
     fn from(v: &'a Vector4) -> Vector3 {
         Vector3::new(v.v[0], v.v[1], v.v[2])
-    }
-}
-
-impl fmt::Display for Vector3 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:.2}, {:.2}, {:.2}]", self.x, self.y, self.z)
     }
 }
 
