@@ -1758,7 +1758,7 @@ impl cmp::PartialEq for Matrix4 {
     }
 }
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct Quaternion {
     w: f32,
     x: f32,
@@ -1880,6 +1880,65 @@ impl Quaternion {
         result.z = q.z * a + r.z * b;
 
         result
+    }
+}
+
+impl AsRef<[f32; 4]> for Quaternion {
+    fn as_ref(&self) -> &[f32; 4] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsRef<(f32, f32, f32, f32)> for Quaternion {
+    fn as_ref(&self) -> &(f32, f32, f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl ops::Index<usize> for Quaternion {
+    type Output = f32;
+
+    #[inline]
+    fn index(&self, index: usize) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::Range<usize>> for Quaternion {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::Range<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeTo<usize>> for Quaternion {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeTo<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeFrom<usize>> for Quaternion {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeFrom<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl fmt::Debug for Quaternion {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Vector4 ")?;
+        writeln!(f, "[{}, [{}, {}, {}]]", self.w, self.x, self.y, self.z)
     }
 }
 
