@@ -487,7 +487,7 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
         gl::TexParameterf(gl::TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_aniso);
     }
 
-    return true;
+    true
 }
 
 #[allow(unused_variables)]
@@ -662,7 +662,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3((camera.up.v[0], camera.up.v[1], camera.up.v[2])));
+                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -671,7 +671,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3((camera.up.v[0], camera.up.v[1], camera.up.v[2])));
+                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -680,7 +680,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3((camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2])));
+                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -689,7 +689,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3((camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2])));
+                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -698,7 +698,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3((camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2])));
+                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -707,7 +707,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3((camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2])));
+                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
