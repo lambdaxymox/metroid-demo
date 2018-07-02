@@ -503,8 +503,6 @@ fn main() {
 
     let font_atlas = load_font_atlas();
 
-    /* ******************* GROUND PLANE ************************ */
-    // Load the shader program for the ground plane.
     let (
         gp_sp,
         gp_view_mat_loc,
@@ -519,8 +517,6 @@ fn main() {
     load_texture(GROUND_PLANE_TEX, &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
-    /* ******************* END GROUND PLANE ******************** */
-    /* ******************* TITLE SCREEN **************************** */
     let (
         title_screen_sp,
         title_screen_sp_color_loc) = create_title_screen_shaders(&context);
@@ -535,8 +531,6 @@ fn main() {
     load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
 
-    /* ******************* END TITLE SCREEN ************************ */
-    /* ****************************CUBE MAP ***************************** */
     let (
         cube_sp, 
         cube_view_mat_location,
@@ -549,11 +543,7 @@ fn main() {
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
 
-    /* ************************* END CUBE MAP *************************** */
-    /* ************************** CAMERA MODEL ************************** */
     let mut camera = create_camera(&context);
-
-    /* ********************** END CAMERA MODEL *************************** */
 
     unsafe {
         gl::UseProgram(gp_sp);
