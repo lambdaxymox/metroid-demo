@@ -2,9 +2,9 @@
 
 in vec2 st;
 uniform sampler2D tex;
-out vec4 frag_colour;
+out vec4 frag_color;
 
 
 void main() {
-    frag_colour = texture (tex, st);
+    frag_color = texture (tex, st);
 }

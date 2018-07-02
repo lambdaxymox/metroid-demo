@@ -1,11 +1,11 @@
-#version 410
+#version 420
 
 in vec3 vp;
-uniform mat4 proj, view;
+uniform mat4 view, proj;
 out vec3 texcoords;
 
 
-void main () {
+void main() {
 	texcoords = vp;
 	gl_Position = proj * view * vec4 (vp, 1.0);
 }

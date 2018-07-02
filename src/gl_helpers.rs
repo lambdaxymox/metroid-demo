@@ -319,7 +319,7 @@ pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, 
     }
     log!(context.logger, "Shader compiled with index {}\n", *shader);
     
-    return true;
+    true
 }
 
 
@@ -377,7 +377,7 @@ pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
 
     log!(logger, "Program {} GL_VALIDATE_STATUS = {}\n", sp, params);
     
-    return true;
+    true
 }
 
 ///
@@ -394,6 +394,7 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
 
         // Link the shader programme. If binding input attributes do that before linking.
         gl::LinkProgram(*program);
+        
         let mut params = -1;
         gl::GetProgramiv(*program, gl::LINK_STATUS, &mut params);
         if params != gl::TRUE as i32 {
@@ -406,7 +407,8 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
         // Delete shaders here to free memory
         gl::DeleteShader(vertex_shader);
         gl::DeleteShader(fragment_shader);
-        return true;
+        
+        true
     }
 }
 
@@ -416,11 +418,11 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
 pub fn create_program_from_files(context: &GLContext, vert_file_name: &str, frag_file_name: &str) -> GLuint {
     let mut vertex_shader = 0;
     let mut fragment_shader = 0;
-    let mut program: GLuint = 0;
+    let mut program = 0;
     
     create_shader(context, vert_file_name, &mut vertex_shader, gl::VERTEX_SHADER);
     create_shader(context, frag_file_name, &mut fragment_shader, gl::FRAGMENT_SHADER);
     create_program(context, vertex_shader, fragment_shader, &mut program);
-    
+
     program
 }

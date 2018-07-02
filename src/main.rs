@@ -371,7 +371,7 @@ fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
 ///
 /// Create the ground plane shaders.
 ///
-fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLint) {
+fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
@@ -380,7 +380,6 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLi
     );
     assert!(gp_sp > 0);
 
-    // Get uniform locations of camera view and projection matrices.
     let gp_view_mat_loc = unsafe { 
         gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8)
     };
@@ -521,7 +520,7 @@ fn main() {
         gp_sp,
         gp_view_mat_loc,
         gp_proj_mat_loc) = create_ground_plane_shaders(&context);
-
+    
     let (
         ground_plane_points_vbo,
         ground_plane_points_vao) = create_ground_plane_geometry(&context);
@@ -565,6 +564,9 @@ fn main() {
         gl::UseProgram(gp_sp);
         gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, camera.view_mat.as_ptr());
         gl::UniformMatrix4fv(gp_proj_mat_loc, 1, gl::FALSE, camera.proj_mat.as_ptr());
+    }
+
+    unsafe {
         gl::UseProgram(cube_sp);
         gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, camera.rot_mat_inv.inverse().as_ptr());
         gl::UniformMatrix4fv(cube_proj_mat_location, 1, gl::FALSE, camera.proj_mat.as_ptr());
@@ -590,7 +592,7 @@ fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             gl::ClearColor(0.2, 0.2, 0.2, 1.0);
             gl::Viewport(0, 0, context.width as i32, context.height as i32);
-            
+
             // Draw the sky box using the cube map texture.
             gl::DepthMask(gl::FALSE);
             gl::UseProgram(cube_sp);
@@ -606,7 +608,7 @@ fn main() {
             gl::BindTexture(gl::TEXTURE_2D, gp_tex);
             gl::BindVertexArray(ground_plane_points_vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);
-
+            
             // Draw the title screen. Disable depth testing and enable 
             // alpha blending to do so.
             gl::Disable(gl::DEPTH_TEST);
