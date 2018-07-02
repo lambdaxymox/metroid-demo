@@ -579,14 +579,14 @@ impl<'a> From<(&'a Vector2, f32)> for Vector3 {
 impl<'a> From<Vector4> for Vector3 {
     #[inline]
     fn from(v: Vector4) -> Vector3 {
-        Vector3::new(v.v[0], v.v[1], v.v[2])
+        Vector3::new(v.x, v.y, v.z)
     }
 }
 
 impl<'a> From<&'a Vector4> for Vector3 {
     #[inline]
     fn from(v: &'a Vector4) -> Vector3 {
-        Vector3::new(v.v[0], v.v[1], v.v[2])
+        Vector3::new(v.x, v.y, v.z)
     }
 }
 
@@ -857,16 +857,19 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector3 {
 
 #[derive(Copy, Clone)]
 pub struct Vector4 {
-    pub v: [f32; 4],
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
 }
 
 impl Vector4 {
     pub fn new(x: f32, y: f32, z: f32, w: f32) -> Vector4 {
-        Vector4 { v: [x, y, z, w] }
+        Vector4 { x: x, y: y, z: z, w: w }
     }
 
     pub fn zero() -> Vector4 {
-        Vector4 { v: [0.0, 0.0, 0.0, 0.0] }
+        Vector4 { x: 0.0, y: 0.0, z: 0.0, w: 0.0 }
     }
 }
 
@@ -983,18 +986,309 @@ impl fmt::Debug for Vector4 {
 
 impl fmt::Display for Vector4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:.2}, {:.2}, {:.2}, {:.2}]", self.v[0], self.v[1], self.v[2], self.v[3])
+        write!(f, "[{:.2}, {:.2}, {:.2}, {:.2}]", self.x, self.y, self.z, self.w)
     }
 }
 
 impl cmp::PartialEq for Vector4 {
     fn eq(&self, other: &Vector4) -> bool {
-        (f32::abs(self.v[0] - other.v[0]) < EPSILON) &&
-        (f32::abs(self.v[1] - other.v[1]) < EPSILON) &&
-        (f32::abs(self.v[2] - other.v[2]) < EPSILON) &&
-        (f32::abs(self.v[3] - other.v[3]) < EPSILON)
+        (f32::abs(self.x - other.x) < EPSILON) &&
+        (f32::abs(self.y - other.y) < EPSILON) &&
+        (f32::abs(self.z - other.z) < EPSILON) &&
+        (f32::abs(self.w - other.w) < EPSILON)
     }
 }
+
+impl<'a> ops::Add<Vector4> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn add(self, other: Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl ops::Add<Vector4> for Vector4 {
+    type Output = Vector4;
+
+    fn add(self, other: Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl<'a> ops::Add<&'a Vector4> for Vector4 {
+    type Output = Vector4;
+
+    fn add(self, other: &'a Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,   
+            w: self.w + other.w,            
+        }
+    }
+}
+
+impl<'a, 'b> ops::Add<&'b Vector4> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn add(self, other: &'b Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl ops::Add<f32> for Vector4 {
+    type Output = Vector4;
+
+    fn add(self, other: f32) -> Self::Output {
+        Vector4 {
+            x: self.x + other,
+            y: self.y + other,
+            z: self.z + other,
+            w: self.w + other,
+        }
+    }
+}
+
+impl<'a> ops::Sub<Vector4> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn sub(self, other: Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
+    }
+}
+
+impl ops::Sub<Vector4> for Vector4 {
+    type Output = Vector4;
+
+    fn sub(self, other: Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
+    }
+}
+
+impl<'a> ops::Sub<&'a Vector4> for Vector4 {
+    type Output = Vector4;
+
+    fn sub(self, other: &'a Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
+    }
+}
+
+impl<'a, 'b> ops::Sub<&'b Vector4> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn sub(self, other: &'b Vector4) -> Self::Output {
+        Vector4 {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
+    }
+}
+
+impl ops::Sub<f32> for Vector4 {
+    type Output = Vector4;
+
+    fn sub(self, other: f32) -> Self::Output {
+        Vector4 {
+            x: self.x - other,
+            y: self.y - other,
+            z: self.z - other,
+            w: self.w - other,
+        }
+    }
+}
+
+impl ops::AddAssign<Vector4> for Vector4 {
+    fn add_assign(&mut self, other: Vector4) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+        self.w += other.w;
+    }
+}
+
+impl<'a> ops::AddAssign<&'a Vector4> for Vector4 {
+    fn add_assign(&mut self, other: &'a Vector4) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+        self.w += other.w;
+    }
+}
+
+impl<'a> ops::AddAssign<Vector4> for &'a mut Vector4 {
+    fn add_assign(&mut self, other: Vector4) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+        self.w += other.w;
+    }
+}
+
+impl<'a, 'b> ops::AddAssign<&'a Vector4> for &'b mut Vector4 {
+    fn add_assign(&mut self, other: &'a Vector4) {
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
+        self.w += other.w;
+    }
+}
+
+impl ops::AddAssign<f32> for Vector4 {
+    fn add_assign(&mut self, other: f32) {
+        self.x += other;
+        self.y += other;
+        self.z += other;
+        self.w += other;
+    }
+}
+
+impl ops::SubAssign<Vector4> for Vector4 {
+    fn sub_assign(&mut self, other: Vector4) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
+        self.w -= other.w;
+    }
+}
+
+impl<'a> ops::SubAssign<&'a Vector4> for Vector4 {
+    fn sub_assign(&mut self, other: &'a Vector4) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
+        self.w -= other.w;
+    }
+}
+
+impl<'a> ops::SubAssign<Vector4> for &'a mut Vector4 {
+    fn sub_assign(&mut self, other: Vector4) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
+        self.w -= other.w;
+    }
+}
+
+impl<'a, 'b> ops::SubAssign<&'a Vector4> for &'b mut Vector4 {
+    fn sub_assign(&mut self, other: &'a Vector4) {
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
+        self.w -= other.w;
+    }
+}
+
+impl ops::SubAssign<f32> for Vector4 {
+    fn sub_assign(&mut self, other: f32) {
+        self.x -= other;
+        self.y -= other;
+        self.z -= other;
+        self.w -= other;
+    }
+}
+
+impl ops::Mul<f32> for Vector4 {
+    type Output = Vector4;
+
+    fn mul(self, other: f32) -> Vector4 {
+        Vector4 {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+            w: self.w * other,
+        }
+    }
+}
+
+impl<'a> ops::Mul<f32> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn mul(self, other: f32) -> Vector4 {
+        Vector4 {
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
+            w: self.w * other,
+        }
+    }
+}
+
+impl ops::Div<f32> for Vector4 {
+    type Output = Vector4;
+
+    fn div(self, other: f32) -> Vector4 {
+        Vector4 {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+            w: self.w / other,
+        }
+    }
+}
+
+impl<'a> ops::Div<f32> for &'a Vector4 {
+    type Output = Vector4;
+
+    fn div(self, other: f32) -> Vector4 {
+        Vector4 {
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
+            w: self.w / other,
+        }
+    }
+}
+
+impl ops::DivAssign<f32> for Vector4 {
+    fn div_assign(&mut self, other: f32) {
+        self.x /= other;
+        self.y /= other;
+        self.z /= other;
+        self.w /= other;
+    }
+}
+
+impl<'a> ops::DivAssign<f32> for &'a mut Vector4 {
+    fn div_assign(&mut self, other: f32) {
+        self.x /= other;
+        self.y /= other;
+        self.z /= other;
+        self.w /= other;
+    }
+}
+
 
 ///
 /// The `Matrix3` type represents 3x3 matrices in column-major order.
@@ -1354,10 +1648,10 @@ impl ops::Mul<Vector4> for Matrix4 {
     type Output = Vector4;
 
     fn mul(self, other: Vector4) -> Self::Output {
-        let x = self.m[0] * other.v[0] + self.m[4] * other.v[1] + self.m[8]  * other.v[2] + self.m[12] * other.v[3];
-        let y = self.m[1] * other.v[0] + self.m[5] * other.v[1] + self.m[9]  * other.v[2] + self.m[13] * other.v[3];
-        let z = self.m[2] * other.v[0] + self.m[6] * other.v[1] + self.m[10] * other.v[2] + self.m[14] * other.v[3];
-        let w = self.m[3] * other.v[0] + self.m[7] * other.v[1] + self.m[11] * other.v[2] + self.m[15] * other.v[3];
+        let x = self.m[0] * other[0] + self.m[4] * other[1] + self.m[8]  * other[2] + self.m[12] * other[3];
+        let y = self.m[1] * other[0] + self.m[5] * other[1] + self.m[9]  * other[2] + self.m[13] * other[3];
+        let z = self.m[2] * other[0] + self.m[6] * other[1] + self.m[10] * other[2] + self.m[14] * other[3];
+        let w = self.m[3] * other[0] + self.m[7] * other[1] + self.m[11] * other[2] + self.m[15] * other[3];
         
         Vector4::new(x, y, z, w)
     }
