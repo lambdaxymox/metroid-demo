@@ -1,5 +1,6 @@
 use std::cmp;
 use std::fmt;
+use std::mem;
 use std::ops;
 use std::convert::From;
 use std::convert;
@@ -17,29 +18,367 @@ pub const EPSILON: f32 = 0.00001;
 /// A representation of two-dimensional vectors, with a
 /// Euclidean metric.
 ///
-#[derive(Copy, Clone, Debug)]
-pub struct Vec2 {
-    v: [f32; 2],
+#[derive(Copy, Clone)]
+pub struct Vector2 {
+    x: f32,
+    y: f32,
 }
 
-impl Vec2 {
-    pub fn new(x: f32, y: f32) -> Vec2 {
-        Vec2 { v: [x, y] }
+impl Vector2 {
+    pub fn new(x: f32, y: f32) -> Vector2 {
+        Vector2 { x: x, y: y }
     }
 
-    pub fn zero() -> Vec2 { 
-        Vec2 { v: [0.0, 0.0] }
+    pub fn zero() -> Vector2 { 
+        Vector2 { x: 0.0, y: 0.0 }
     }
 }
 
 #[inline]
-pub fn vec2(x: f32, y: f32) -> Vec2 {
-    Vec2::new(x, y)
+pub fn vec2(x: f32, y: f32) -> Vector2 {
+    Vector2::new(x, y)
 }
 
-impl fmt::Display for Vec2 {
+impl AsRef<[f32; 2]> for Vector2 {
+    fn as_ref(&self) -> &[f32; 2] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsRef<(f32, f32)> for Vector2 {
+    fn as_ref(&self) -> &(f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<[f32; 2]> for Vector2 {
+    fn as_mut(&mut self) -> &mut [f32; 2] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<(f32, f32)> for Vector2 {
+    fn as_mut(&mut self) -> &mut (f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl ops::Index<usize> for Vector2 {
+    type Output = f32;
+
+    #[inline]
+    fn index(&self, index: usize) -> &Self::Output {
+        let v: &[f32; 2] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::Range<usize>> for Vector2 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::Range<usize>) -> &Self::Output {
+        let v: &[f32; 2] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeTo<usize>> for Vector2 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeTo<usize>) -> &Self::Output {
+        let v: &[f32; 2] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeFrom<usize>> for Vector2 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeFrom<usize>) -> &Self::Output {
+        let v: &[f32; 2] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl fmt::Debug for Vector2 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:.2}, {:.2}]", self.v[0], self.v[1])
+        try!(write!(f, "Vector2 "));
+        <[f32; 2] as fmt::Debug>::fmt(self.as_ref(), f)
+    }
+}
+
+impl fmt::Display for Vector2 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "[{:.2}, {:.2}]", self.x, self.y)
+    }
+}
+
+impl From<(f32, f32)> for Vector2 {
+    #[inline]
+    fn from((x, y): (f32, f32)) -> Vector2 {
+        Vector2 { x: x, y: y }
+    }
+}
+
+impl From<[f32; 2]> for Vector2 {
+    #[inline]
+    fn from(v: [f32; 2]) -> Vector2 {
+        Vector2 { x: v[0], y: v[1] }
+    }
+}
+
+impl<'a> From<&'a [f32; 2]> for Vector2 {
+    #[inline]
+    fn from(v: &'a [f32; 2]) -> Vector2 {
+        Vector2 { x: v[0], y: v[1] }
+    }
+}
+
+impl<'a> From<&'a [f32; 2]> for &'a Vector2 {
+    #[inline]
+    fn from(v: &'a [f32; 2]) -> &'a Vector2 {
+        unsafe { mem::transmute(v) }
+    }
+}
+
+impl<'a> ops::Add<Vector2> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn add(self, other: Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl ops::Add<Vector2> for Vector2 {
+    type Output = Vector2;
+
+    fn add(self, other: Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl<'a> ops::Add<&'a Vector2> for Vector2 {
+    type Output = Vector2;
+
+    fn add(self, other: &'a Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl<'a, 'b> ops::Add<&'b Vector2> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn add(self, other: &'b Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
+    }
+}
+
+impl ops::Add<f32> for Vector2 {
+    type Output = Vector2;
+
+    fn add(self, other: f32) -> Self::Output {
+        Vector2 {
+            x: self.x + other,
+            y: self.y + other,
+        }
+    }
+}
+
+impl<'a> ops::Sub<Vector2> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn sub(self, other: Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x - other.y,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl ops::Sub<Vector2> for Vector2 {
+    type Output = Vector2;
+
+    fn sub(self, other: Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x - other.y,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl<'a> ops::Sub<&'a Vector2> for Vector2 {
+    type Output = Vector2;
+
+    fn sub(self, other: &'a Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x - other.y,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl<'a, 'b> ops::Sub<&'b Vector2> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn sub(self, other: &'b Vector2) -> Self::Output {
+        Vector2 {
+            x: self.x - other.y,
+            y: self.y - other.y,
+        }
+    }
+}
+
+impl ops::Sub<f32> for Vector2 {
+    type Output = Vector2;
+
+    fn sub(self, other: f32) -> Self::Output {
+        Vector2 {
+            x: self.x - other,
+            y: self.y - other,
+        }
+    }
+}
+
+impl ops::AddAssign<Vector2> for Vector2 {
+    fn add_assign(&mut self, other: Vector2) {
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+impl<'a> ops::AddAssign<&'a Vector2> for Vector2 {
+    fn add_assign(&mut self, other: &'a Vector2) {
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+impl<'a> ops::AddAssign<Vector2> for &'a mut Vector2 {
+    fn add_assign(&mut self, other: Vector2) {
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+impl<'a, 'b> ops::AddAssign<&'a Vector2> for &'b mut Vector2 {
+    fn add_assign(&mut self, other: &'a Vector2) {
+        self.x = self.x + other.x;
+        self.y = self.y + other.y;
+    }
+}
+
+impl ops::AddAssign<f32> for Vector2 {
+    fn add_assign(&mut self, other: f32) {
+        self.x = self.x + other;
+        self.y = self.y + other;
+    }
+}
+
+impl ops::SubAssign<Vector2> for Vector2 {
+    fn sub_assign(&mut self, other: Vector2) {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+    }
+}
+
+impl<'a> ops::SubAssign<&'a Vector2> for Vector2 {
+    fn sub_assign(&mut self, other: &'a Vector2) {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+    }
+}
+
+impl<'a> ops::SubAssign<Vector2> for &'a mut Vector2 {
+    fn sub_assign(&mut self, other: Vector2) {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+    }
+}
+
+impl<'a, 'b> ops::SubAssign<&'a Vector2> for &'b mut Vector2 {
+    fn sub_assign(&mut self, other: &'a Vector2) {
+        self.x = self.x - other.x;
+        self.y = self.y - other.y;
+    }
+}
+
+impl ops::SubAssign<f32> for Vector2 {
+    fn sub_assign(&mut self, other: f32) {
+        self.x = self.x - other;
+        self.y = self.y - other;
+    }
+}
+
+impl ops::Mul<f32> for Vector2 {
+    type Output = Vector2;
+
+    fn mul(self, other: f32) -> Vector2 {
+        Vector2 {
+            x: self.x * other,
+            y: self.y * other,
+        }
+    }
+}
+
+impl<'a> ops::Mul<f32> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn mul(self, other: f32) -> Vector2 {
+        Vector2 {
+            x: self.x * other,
+            y: self.y * other,
+        }
+    }
+}
+
+impl ops::Div<f32> for Vector2 {
+    type Output = Vector2;
+
+    fn div(self, other: f32) -> Vector2 {
+        Vector2 {
+            x: self.x / other,
+            y: self.y / other,
+        }
+    }
+}
+
+impl<'a> ops::Div<f32> for &'a Vector2 {
+    type Output = Vector2;
+
+    fn div(self, other: f32) -> Vector2 {
+        Vector2 {
+            x: self.x / other,
+            y: self.y / other,
+        }
+    }
+}
+
+impl ops::DivAssign<f32> for Vector2 {
+    fn div_assign(&mut self, other: f32) {
+        self.x = self.x / other;
+        self.y = self.y / other;
+    }
+}
+
+impl<'a> ops::DivAssign<f32> for &'a mut Vector2 {
+    fn div_assign(&mut self, other: f32) {
+        self.x = self.x / other;
+        self.y = self.y / other;
     }
 }
 
@@ -144,17 +483,17 @@ impl From<(f32, f32, f32)> for Vec3 {
     }
 }
 
-impl From<(Vec2, f32)> for Vec3 {
+impl From<(Vector2, f32)> for Vec3 {
     #[inline]
-    fn from((v, z): (Vec2, f32)) -> Vec3 {
-        Vec3::new(v.v[0], v.v[1], z)
+    fn from((v, z): (Vector2, f32)) -> Vec3 {
+        Vec3::new(v.x, v.y, z)
     }
 }
 
-impl<'a> From<(&'a Vec2, f32)> for Vec3 {
+impl<'a> From<(&'a Vector2, f32)> for Vec3 {
     #[inline]
-    fn from((v, z): (&'a Vec2, f32)) -> Vec3 {
-        Vec3::new(v.v[0], v.v[1], z)
+    fn from((v, z): (&'a Vector2, f32)) -> Vec3 {
+        Vec3::new(v.x, v.y, z)
     }
 }
 
@@ -546,17 +885,17 @@ impl From<(f32, f32, f32, f32)> for Vec4 {
     }
 }
 
-impl From<(Vec2, f32, f32)> for Vec4 {
+impl From<(Vector2, f32, f32)> for Vec4 {
     #[inline]
-    fn from((v, z, w): (Vec2, f32, f32)) -> Vec4 {
-        Vec4::new(v.v[0], v.v[1], z, w)
+    fn from((v, z, w): (Vector2, f32, f32)) -> Vec4 {
+        Vec4::new(v.x, v.y, z, w)
     }
 }
 
-impl<'a> From<(&'a Vec2, f32, f32)> for Vec4 {
+impl<'a> From<(&'a Vector2, f32, f32)> for Vec4 {
     #[inline]
-    fn from((v, z, w): (&'a Vec2, f32, f32)) -> Vec4 {
-        Vec4::new(v.v[0], v.v[1], z, w)
+    fn from((v, z, w): (&'a Vector2, f32, f32)) -> Vec4 {
+        Vec4::new(v.x, v.y, z, w)
     }
 }
 

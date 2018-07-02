@@ -527,6 +527,7 @@ fn main() {
         string_vao,
         string_points) = create_title_screen_geometry(&context, &font_atlas, "Press ENTER to continue");
 
+    // Font sheet for the title screen text.
     let mut title_screen_tex = 0;
     load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
@@ -539,6 +540,7 @@ fn main() {
     let cube_vao = create_cube_map_geometry();
     assert!(cube_vao > 0);
 
+    // Texture for the cube map.
     let mut cube_map_texture = 0;
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
