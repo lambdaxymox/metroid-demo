@@ -368,7 +368,10 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLi
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
-    let gp_sp = glh::create_program_from_files(context, "shaders/gp.vert.glsl", "shaders/gp.frag.glsl");
+    let gp_sp = glh::create_program_from_files(
+        context, "shaders/ground_plane.vert.glsl", "shaders/ground_plane.frag.glsl"
+    );
+    assert!(gp_sp > 0);
 
     // Get uniform locations of camera view and projection matrices.
     let gp_view_mat_loc = unsafe { gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8) };
