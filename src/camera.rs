@@ -1,4 +1,4 @@
-use math::{Vector3, Vector4, Mat4, Versor};
+use math::{Vector3, Vector4, Matrix4, Versor};
 
 
 pub struct Camera {
@@ -6,7 +6,7 @@ pub struct Camera {
     pub far: f32,
     pub fov: f32,
     pub aspect: f32,
-    pub proj_mat: Mat4,
+    pub proj_mat: Matrix4,
 
     pub cam_speed: f32,
     pub cam_yaw_speed: f32,
@@ -15,10 +15,10 @@ pub struct Camera {
     pub rgt: Vector4,
     pub up: Vector4,
 
-    pub trans_mat_inv: Mat4,
+    pub trans_mat_inv: Matrix4,
     pub axis: Versor,
-    pub rot_mat_inv: Mat4,
-    pub view_mat: Mat4,
+    pub rot_mat_inv: Matrix4,
+    pub view_mat: Matrix4,
 }
 
 impl Camera {
@@ -27,8 +27,8 @@ impl Camera {
         cam_speed: f32, cam_yaw_speed: f32, cam_pos: Vector3,
         fwd: Vector4, rgt: Vector4, up: Vector4, axis: Versor) -> Camera {
 
-        let proj_mat = Mat4::perspective(fov, aspect, near, far);
-        let trans_mat_inv = Mat4::identity().translate(&cam_pos);
+        let proj_mat = Matrix4::perspective(fov, aspect, near, far);
+        let trans_mat_inv = Matrix4::identity().translate(&cam_pos);
         let rot_mat_inv = axis.to_mat4();
         let view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
 

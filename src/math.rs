@@ -1000,21 +1000,21 @@ impl convert::AsMut<[f32; 9]> for Matrix3 {
 }
 
 ///
-/// The `Mat4` type represents 4x4 matrices in column-major order.
+/// The `Matrix4` type represents 4x4 matrices in column-major order.
 ///
 #[derive(Copy, Clone, Debug)]
-pub struct Mat4 {
+pub struct Matrix4 {
     pub m: [f32; 16],
 }
 
-impl Mat4 {
+impl Matrix4 {
     pub fn new(
         m11: f32, m12: f32, m13: f32, m14: f32,
         m21: f32, m22: f32, m23: f32, m24: f32,
         m31: f32, m32: f32, m33: f32, m34: f32,
-        m41: f32, m42: f32, m43: f32, m44: f32) -> Mat4 {
+        m41: f32, m42: f32, m43: f32, m44: f32) -> Matrix4 {
 
-        Mat4 {
+        Matrix4 {
             m: [
                 m11, m12, m13, m14, // Column 1
                 m21, m22, m23, m24, // Column 2
@@ -1024,8 +1024,8 @@ impl Mat4 {
         }
     }
 
-    pub fn zero() -> Mat4 {
-        Mat4::new(
+    pub fn zero() -> Matrix4 {
+        Matrix4::new(
             0.0, 0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 0.0, 
             0.0, 0.0, 0.0, 0.0, 
@@ -1033,8 +1033,8 @@ impl Mat4 {
         )
     }
 
-    pub fn identity() -> Mat4 {
-        Mat4::new(
+    pub fn identity() -> Matrix4 {
+        Matrix4::new(
             1.0, 0.0, 0.0, 0.0, 
             0.0, 1.0, 0.0, 0.0, 
             0.0, 0.0, 1.0, 0.0, 
@@ -1042,8 +1042,8 @@ impl Mat4 {
         )
     }
 
-    pub fn transpose(&self) -> Mat4 {
-        Mat4::new(
+    pub fn transpose(&self) -> Matrix4 {
+        Matrix4::new(
             self.m[0], self.m[4], self.m[8],  self.m[12],
             self.m[1], self.m[5], self.m[9],  self.m[13], 
             self.m[2], self.m[6], self.m[10], self.m[14], 
@@ -1051,8 +1051,8 @@ impl Mat4 {
         )
     }
 
-    pub fn translate(&self, v: &Vector3) -> Mat4 {
-        let mut m_t = Mat4::identity();
+    pub fn translate(&self, v: &Vector3) -> Matrix4 {
+        let mut m_t = Matrix4::identity();
         m_t.m[12] = v.v[0];
         m_t.m[13] = v.v[1];
         m_t.m[14] = v.v[2];
@@ -1061,10 +1061,10 @@ impl Mat4 {
     }
 
     // Rotate around x axis by an angle in degrees.
-    pub fn rotate_x_deg(&self, deg: f32) -> Mat4 {
+    pub fn rotate_x_deg(&self, deg: f32) -> Matrix4 {
         // Convert to radians.
         let rad = deg * ONE_DEG_IN_RAD;
-        let mut m_r = Mat4::identity();
+        let mut m_r = Matrix4::identity();
         m_r.m[5]  =  f32::cos(rad);
         m_r.m[9]  = -f32::sin(rad);
         m_r.m[6]  =  f32::sin(rad);
@@ -1074,10 +1074,10 @@ impl Mat4 {
     }
 
     // Rotate around y axis by an angle in degrees.
-    pub fn rotate_y_deg(&self, deg: f32) -> Mat4 {
+    pub fn rotate_y_deg(&self, deg: f32) -> Matrix4 {
         // Convert to radians.
         let rad = deg * ONE_DEG_IN_RAD;
-        let mut m_r = Mat4::identity();
+        let mut m_r = Matrix4::identity();
         m_r.m[0]  =  f32::cos(rad);
         m_r.m[8]  =  f32::sin(rad);
         m_r.m[2]  = -f32::sin(rad);
@@ -1087,10 +1087,10 @@ impl Mat4 {
     }
 
     // Rotate around z axis by an angle in degrees.
-    pub fn rotate_z_deg(&self, deg: f32) -> Mat4 {
+    pub fn rotate_z_deg(&self, deg: f32) -> Matrix4 {
         // Convert to radians.
         let rad = deg * ONE_DEG_IN_RAD;
-        let mut m_r = Mat4::identity();
+        let mut m_r = Matrix4::identity();
         m_r.m[0] =  f32::cos(rad);
         m_r.m[4] = -f32::sin(rad);
         m_r.m[1] =  f32::sin(rad);
@@ -1100,8 +1100,8 @@ impl Mat4 {
     }
 
     // scale a matrix by [x, y, z]
-    pub fn scale(&self, v: &Vector3) -> Mat4 {
-        let mut m_s = Mat4::identity();
+    pub fn scale(&self, v: &Vector3) -> Matrix4 {
+        let mut m_s = Matrix4::identity();
         m_s.m[0]  = v.v[0];
         m_s.m[5]  = v.v[1];
         m_s.m[10] = v.v[2];
@@ -1147,7 +1147,7 @@ impl Mat4 {
     matrix). see
     http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
     */
-    pub fn inverse(&self) -> Mat4 {
+    pub fn inverse(&self) -> Matrix4 {
         let det = self.determinant();
         /* there is no inverse if determinant is zero (not likely unless scale is
         broken) */
@@ -1214,14 +1214,14 @@ impl Mat4 {
     /// Compute the perspective matrix for converting from camera space to 
     /// normalized device coordinates.
     ///
-    pub fn perspective(fovy: f32, aspect: f32, near: f32, far: f32) -> Mat4 {
+    pub fn perspective(fovy: f32, aspect: f32, near: f32, far: f32) -> Matrix4 {
         let fov_rad = fovy * ONE_DEG_IN_RAD;
         let range = f32::tan(fov_rad * 0.5) * near;
         let sx = (2.0 * near) / (range * aspect + range * aspect);
         let sy = near / range;
         let sz = -(far + near) / (far - near);
         let pz = -(2.0 * far * near) / (far - near);
-        let mut m = Mat4::zero(); // make sure bottom-right corner is zero
+        let mut m = Matrix4::zero(); // make sure bottom-right corner is zero
         m.m[0] = sx;
         m.m[5] = sy;
         m.m[10] = sz;
@@ -1244,7 +1244,7 @@ impl Mat4 {
     }
 }
 
-impl fmt::Display for Mat4 {
+impl fmt::Display for Matrix4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, 
             "\n[{:.2}][{:.2}][{:.2}][{:.2}]\n[{:.2}][{:.2}][{:.2}][{:.2}]\n[{:.2}][{:.2}][{:.2}][{:.2}]\n[{:.2}][{:.2}][{:.2}][{:.2}]", 
@@ -1260,9 +1260,9 @@ pub fn mat4(
         m11: f32, m12: f32, m13: f32, m14: f32, 
         m21: f32, m22: f32, m23: f32, m24: f32,
         m31: f32, m32: f32, m33: f32, m34: f32,
-        m41: f32, m42: f32, m43: f32, m44: f32) -> Mat4 {
+        m41: f32, m42: f32, m43: f32, m44: f32) -> Matrix4 {
 
-    Mat4::new(
+    Matrix4::new(
         m11, m12, m13, m14, 
         m21, m22, m23, m24, 
         m31, m32, m33, m34, 
@@ -1270,19 +1270,19 @@ pub fn mat4(
     )
 }
 
-impl convert::AsRef<[f32; 16]> for Mat4 {
+impl convert::AsRef<[f32; 16]> for Matrix4 {
     fn as_ref(&self) -> &[f32; 16] {
         &self.m
     }
 }
 
-impl convert::AsMut<[f32; 16]> for Mat4 {
+impl convert::AsMut<[f32; 16]> for Matrix4 {
     fn as_mut(&mut self) -> &mut [f32; 16] {
         &mut self.m
     }
 }
 
-impl ops::Mul<Vector4> for Mat4 {
+impl ops::Mul<Vector4> for Matrix4 {
     type Output = Vector4;
 
     fn mul(self, other: Vector4) -> Self::Output {
@@ -1295,38 +1295,11 @@ impl ops::Mul<Vector4> for Mat4 {
     }
 }
 
-impl<'a> ops::Mul<&'a Mat4> for Mat4 {
-    type Output = Mat4;
+impl<'a> ops::Mul<&'a Matrix4> for Matrix4 {
+    type Output = Matrix4;
 
-    fn mul(self, other: &'a Mat4) -> Mat4 {
-        let mut mm = Mat4::zero();
-
-        mm.m[0]  = self.m[0]*other.m[0]  + self.m[4]*other.m[1]  + self.m[8]*other.m[2]   + self.m[12]*other.m[3];
-        mm.m[1]  = self.m[1]*other.m[0]  + self.m[5]*other.m[1]  + self.m[9]*other.m[2]   + self.m[13]*other.m[3];
-        mm.m[2]  = self.m[2]*other.m[0]  + self.m[6]*other.m[1]  + self.m[10]*other.m[2]  + self.m[14]*other.m[3];
-        mm.m[3]  = self.m[3]*other.m[0]  + self.m[7]*other.m[1]  + self.m[11]*other.m[2]  + self.m[15]*other.m[3];
-        mm.m[4]  = self.m[0]*other.m[4]  + self.m[4]*other.m[5]  + self.m[8]*other.m[6]   + self.m[12]*other.m[7];
-        mm.m[5]  = self.m[1]*other.m[4]  + self.m[5]*other.m[5]  + self.m[9]*other.m[6]   + self.m[13]*other.m[7];
-        mm.m[6]  = self.m[2]*other.m[4]  + self.m[6]*other.m[5]  + self.m[10]*other.m[6]  + self.m[14]*other.m[7];
-        mm.m[7]  = self.m[3]*other.m[4]  + self.m[7]*other.m[5]  + self.m[11]*other.m[6]  + self.m[15]*other.m[7];
-        mm.m[8]  = self.m[0]*other.m[8]  + self.m[4]*other.m[9]  + self.m[8]*other.m[10]  + self.m[12]*other.m[11];
-        mm.m[9]  = self.m[1]*other.m[8]  + self.m[5]*other.m[9]  + self.m[9]*other.m[10]  + self.m[13]*other.m[11];
-        mm.m[10] = self.m[2]*other.m[8]  + self.m[6]*other.m[9]  + self.m[10]*other.m[10] + self.m[14]*other.m[11];
-        mm.m[11] = self.m[3]*other.m[8]  + self.m[7]*other.m[9]  + self.m[11]*other.m[10] + self.m[15]*other.m[11];
-        mm.m[12] = self.m[0]*other.m[12] + self.m[4]*other.m[13] + self.m[8]*other.m[14]  + self.m[12]*other.m[15];
-        mm.m[13] = self.m[1]*other.m[12] + self.m[5]*other.m[13] + self.m[9]*other.m[14]  + self.m[13]*other.m[15];
-        mm.m[14] = self.m[2]*other.m[12] + self.m[6]*other.m[13] + self.m[10]*other.m[14] + self.m[14]*other.m[15];
-        mm.m[15] = self.m[3]*other.m[12] + self.m[7]*other.m[13] + self.m[11]*other.m[14] + self.m[15]*other.m[15];
-
-        mm
-    }
-}
-
-impl<'a, 'b> ops::Mul<&'a Mat4> for &'b Mat4 {
-    type Output = Mat4;
-
-    fn mul(self, other: &'a Mat4) -> Mat4 {
-        let mut mm = Mat4::zero();
+    fn mul(self, other: &'a Matrix4) -> Matrix4 {
+        let mut mm = Matrix4::zero();
 
         mm.m[0]  = self.m[0]*other.m[0]  + self.m[4]*other.m[1]  + self.m[8]*other.m[2]   + self.m[12]*other.m[3];
         mm.m[1]  = self.m[1]*other.m[0]  + self.m[5]*other.m[1]  + self.m[9]*other.m[2]   + self.m[13]*other.m[3];
@@ -1349,11 +1322,11 @@ impl<'a, 'b> ops::Mul<&'a Mat4> for &'b Mat4 {
     }
 }
 
-impl ops::Mul<Mat4> for Mat4 {
-    type Output = Mat4;
+impl<'a, 'b> ops::Mul<&'a Matrix4> for &'b Matrix4 {
+    type Output = Matrix4;
 
-    fn mul(self, other: Mat4) -> Mat4 {
-        let mut mm = Mat4::zero();
+    fn mul(self, other: &'a Matrix4) -> Matrix4 {
+        let mut mm = Matrix4::zero();
 
         mm.m[0]  = self.m[0]*other.m[0]  + self.m[4]*other.m[1]  + self.m[8]*other.m[2]   + self.m[12]*other.m[3];
         mm.m[1]  = self.m[1]*other.m[0]  + self.m[5]*other.m[1]  + self.m[9]*other.m[2]   + self.m[13]*other.m[3];
@@ -1376,8 +1349,35 @@ impl ops::Mul<Mat4> for Mat4 {
     }
 }
 
-impl cmp::PartialEq for Mat4 {
-    fn eq(&self, other: &Mat4) -> bool {
+impl ops::Mul<Matrix4> for Matrix4 {
+    type Output = Matrix4;
+
+    fn mul(self, other: Matrix4) -> Matrix4 {
+        let mut mm = Matrix4::zero();
+
+        mm.m[0]  = self.m[0]*other.m[0]  + self.m[4]*other.m[1]  + self.m[8]*other.m[2]   + self.m[12]*other.m[3];
+        mm.m[1]  = self.m[1]*other.m[0]  + self.m[5]*other.m[1]  + self.m[9]*other.m[2]   + self.m[13]*other.m[3];
+        mm.m[2]  = self.m[2]*other.m[0]  + self.m[6]*other.m[1]  + self.m[10]*other.m[2]  + self.m[14]*other.m[3];
+        mm.m[3]  = self.m[3]*other.m[0]  + self.m[7]*other.m[1]  + self.m[11]*other.m[2]  + self.m[15]*other.m[3];
+        mm.m[4]  = self.m[0]*other.m[4]  + self.m[4]*other.m[5]  + self.m[8]*other.m[6]   + self.m[12]*other.m[7];
+        mm.m[5]  = self.m[1]*other.m[4]  + self.m[5]*other.m[5]  + self.m[9]*other.m[6]   + self.m[13]*other.m[7];
+        mm.m[6]  = self.m[2]*other.m[4]  + self.m[6]*other.m[5]  + self.m[10]*other.m[6]  + self.m[14]*other.m[7];
+        mm.m[7]  = self.m[3]*other.m[4]  + self.m[7]*other.m[5]  + self.m[11]*other.m[6]  + self.m[15]*other.m[7];
+        mm.m[8]  = self.m[0]*other.m[8]  + self.m[4]*other.m[9]  + self.m[8]*other.m[10]  + self.m[12]*other.m[11];
+        mm.m[9]  = self.m[1]*other.m[8]  + self.m[5]*other.m[9]  + self.m[9]*other.m[10]  + self.m[13]*other.m[11];
+        mm.m[10] = self.m[2]*other.m[8]  + self.m[6]*other.m[9]  + self.m[10]*other.m[10] + self.m[14]*other.m[11];
+        mm.m[11] = self.m[3]*other.m[8]  + self.m[7]*other.m[9]  + self.m[11]*other.m[10] + self.m[15]*other.m[11];
+        mm.m[12] = self.m[0]*other.m[12] + self.m[4]*other.m[13] + self.m[8]*other.m[14]  + self.m[12]*other.m[15];
+        mm.m[13] = self.m[1]*other.m[12] + self.m[5]*other.m[13] + self.m[9]*other.m[14]  + self.m[13]*other.m[15];
+        mm.m[14] = self.m[2]*other.m[12] + self.m[6]*other.m[13] + self.m[10]*other.m[14] + self.m[14]*other.m[15];
+        mm.m[15] = self.m[3]*other.m[12] + self.m[7]*other.m[13] + self.m[11]*other.m[14] + self.m[15]*other.m[15];
+
+        mm
+    }
+}
+
+impl cmp::PartialEq for Matrix4 {
+    fn eq(&self, other: &Matrix4) -> bool {
         for i in 0..self.m.len() {
             if f32::abs(self.m[i] - other.m[i]) > EPSILON {
                 return false;
@@ -1413,28 +1413,28 @@ impl Versor {
         self.q[0] * r.q[0] + self.q[1] * r.q[1] + self.q[2] * r.q[2] + self.q[3] * r.q[3]
     }
 
-    pub fn from_axis_rad(radians: f32, x: f32, y: f32, z: f32) -> Versor {
+    pub fn from_axis_rad(radians: f32, axis: Vector3) -> Versor {
         Versor {
             q: [
-                f32::cos(radians / 2.0),
-                f32::sin(radians / 2.0) * x,
-                f32::sin(radians / 2.0) * y,
-                f32::sin(radians / 2.0) * z,
+                f32::cos(0.5 * radians),
+                f32::sin(0.5 * radians) * axis.v[0],
+                f32::sin(0.5 * radians) * axis.v[1],
+                f32::sin(0.5 * radians) * axis.v[2],
             ]
         }
     }
 
-    pub fn from_axis_deg(degrees: f32, x: f32, y: f32, z: f32) -> Versor {
-        Self::from_axis_rad(ONE_DEG_IN_RAD * degrees, x, y, z)
+    pub fn from_axis_deg(degrees: f32, axis: Vector3) -> Versor {
+        Self::from_axis_rad(ONE_DEG_IN_RAD * degrees, axis)
     }
 
-    pub fn to_mat4(&self) -> Mat4 {
+    pub fn to_mat4(&self) -> Matrix4 {
         let w = self.q[0];
         let x = self.q[1];
         let y = self.q[2];
         let z = self.q[3];
     
-        Mat4::new(
+        Matrix4::new(
             1.0 - 2.0 * y * y - 2.0 * z * z, 2.0 * x * y + 2.0 * w * z,       2.0 * x * z - 2.0 * w * y,       0.0, 
             2.0 * x * y - 2.0 * w * z,       1.0 - 2.0 * x * x - 2.0 * z * z, 2.0 * y * z + 2.0 * w * x,       0.0, 
             2.0 * x * z + 2.0 * w * y,       2.0 * y * z - 2.0 * w * x,       1.0 - 2.0 * x * x - 2.0 * y * y, 0.0, 
@@ -1442,7 +1442,7 @@ impl Versor {
         )
     }
 
-    pub fn to_mut_mat4(&self, m: &mut Mat4) {
+    pub fn to_mut_mat4(&self, m: &mut Matrix4) {
         let w = self.q[0];
         let x = self.q[1];
         let y = self.q[2];
@@ -1702,12 +1702,12 @@ mod vec3_tests {
 
 mod mat4_tests {
     use std::slice::Iter;
-    use super::{Vector3, Mat4};
+    use super::{Vector3, Matrix4};
 
     struct TestCase {
         c: f32,
-        a_mat: Mat4,
-        b_mat: Mat4,
+        a_mat: Matrix4,
+        b_mat: Matrix4,
     }
 
     struct Test {
@@ -1754,13 +1754,13 @@ mod mat4_tests {
                 },
                 TestCase {
                     c: 6.2396,
-                    a_mat: Mat4::identity(),
-                    b_mat: Mat4::identity(),
+                    a_mat: Matrix4::identity(),
+                    b_mat: Matrix4::identity(),
                 },
                 TestCase {
                     c: 6.2396,
-                    a_mat: Mat4::zero(),
-                    b_mat: Mat4::zero(),
+                    a_mat: Matrix4::zero(),
+                    b_mat: Matrix4::zero(),
                 },
                 TestCase {
                     c:  14.5093,
@@ -1784,8 +1784,8 @@ mod mat4_tests {
     #[test]
     fn test_mat_times_identity_equals_mat() {
         for test in test_cases().iter() {
-            let a_mat_times_identity = test.a_mat * Mat4::identity();
-            let b_mat_times_identity = test.b_mat * Mat4::identity();
+            let a_mat_times_identity = test.a_mat * Matrix4::identity();
+            let b_mat_times_identity = test.b_mat * Matrix4::identity();
 
             assert_eq!(a_mat_times_identity, test.a_mat);
             assert_eq!(b_mat_times_identity, test.b_mat);
@@ -1795,32 +1795,32 @@ mod mat4_tests {
     #[test]
     fn test_mat_times_zero_equals_zero() {
         for test in test_cases().iter() {
-            let a_mat_times_zero = test.a_mat * Mat4::zero();
-            let b_mat_times_zero = test.b_mat * Mat4::zero();
+            let a_mat_times_zero = test.a_mat * Matrix4::zero();
+            let b_mat_times_zero = test.b_mat * Matrix4::zero();
 
-            assert_eq!(a_mat_times_zero, Mat4::zero());
-            assert_eq!(b_mat_times_zero, Mat4::zero());
+            assert_eq!(a_mat_times_zero, Matrix4::zero());
+            assert_eq!(b_mat_times_zero, Matrix4::zero());
         }
     }
 
     #[test]
     fn test_zero_times_mat_equals_zero() {
         for test in test_cases().iter() {
-            let zero_times_a_mat = Mat4::zero() * test.a_mat;
-            let zero_times_b_mat = Mat4::zero() * test.b_mat;
+            let zero_times_a_mat = Matrix4::zero() * test.a_mat;
+            let zero_times_b_mat = Matrix4::zero() * test.b_mat;
 
-            assert_eq!(zero_times_a_mat, Mat4::zero());
-            assert_eq!(zero_times_b_mat, Mat4::zero());
+            assert_eq!(zero_times_a_mat, Matrix4::zero());
+            assert_eq!(zero_times_b_mat, Matrix4::zero());
         }
     }
 
     #[test]
     fn test_mat_times_identity_equals_identity_times_mat() {
         for test in test_cases().iter() {
-            let a_mat_times_identity = test.a_mat * Mat4::identity();
-            let identity_times_a_mat = Mat4::identity() * test.a_mat;
-            let b_mat_times_identity = test.b_mat * Mat4::identity();
-            let identity_times_b_mat = Mat4::identity() * test.b_mat;
+            let a_mat_times_identity = test.a_mat * Matrix4::identity();
+            let identity_times_a_mat = Matrix4::identity() * test.a_mat;
+            let b_mat_times_identity = test.b_mat * Matrix4::identity();
+            let identity_times_b_mat = Matrix4::identity() * test.b_mat;
 
             assert_eq!(a_mat_times_identity, identity_times_a_mat);
             assert_eq!(b_mat_times_identity, identity_times_b_mat);
@@ -1830,7 +1830,7 @@ mod mat4_tests {
     #[test]
     fn test_mat_times_mat_inverse_equals_identity() {
         for test in test_cases().iter() {
-            let identity = Mat4::identity();
+            let identity = Matrix4::identity();
             if test.a_mat.is_invertible() {
                 let a_mat_inverse = test.a_mat.inverse();
                 assert_eq!(a_mat_inverse * test.a_mat, identity);
@@ -1845,7 +1845,7 @@ mod mat4_tests {
     #[test]
     fn test_mat_inverse_times_mat_equals_identity() {
         for test in test_cases().iter() {
-            let identity = Mat4::identity();
+            let identity = Matrix4::identity();
             if test.a_mat.is_invertible() {
                 let a_mat_inverse = test.a_mat.inverse();
                 assert_eq!(test.a_mat * a_mat_inverse, identity);
@@ -1870,7 +1870,7 @@ mod mat4_tests {
 
     #[test]
     fn test_identity_transpose_equals_identity() {
-        let identity = Mat4::identity();
+        let identity = Matrix4::identity();
         let identity_tr = identity.transpose();
             
         assert_eq!(identity, identity_tr);
@@ -1879,7 +1879,7 @@ mod mat4_tests {
     #[test]
     fn test_identity_mat4_translates_vector_along_vector() {
         let v = super::vec3((2.0, 2.0, 2.0));
-        let trans_mat = Mat4::identity().translate(&v);
+        let trans_mat = Matrix4::identity().translate(&v);
         let zero_vec4 = super::vec4((0.0, 0.0, 0.0, 1.0));
         let zero_vec3 = super::vec3((0.0, 0.0, 0.0));
 

@@ -22,7 +22,7 @@ use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
-use math::{Mat4, Versor};
+use math::{Matrix4, Versor};
 use camera::Camera;
 
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
@@ -426,7 +426,7 @@ fn create_camera(context: &glh::GLContext) -> Camera {
     let up  = math::vec4((0.0, 1.0,  0.0, 0.0));
     let cam_pos = math::vec3((0.0, 0.0, 5.0));
     
-    let axis = Versor::from_axis_deg(0.0, 1.0, 0.0, 0.0);
+    let axis = Versor::from_axis_deg(0.0, math::vec3((1.0, 0.0, 0.0)));
 
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
@@ -662,7 +662,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, camera.up.v[0], camera.up.v[1], camera.up.v[2]);
+                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3((camera.up.v[0], camera.up.v[1], camera.up.v[2])));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -671,7 +671,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, camera.up.v[0], camera.up.v[1], camera.up.v[2]);
+                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3((camera.up.v[0], camera.up.v[1], camera.up.v[2])));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -680,7 +680,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2]);
+                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3((camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2])));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -689,7 +689,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2]);
+                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3((camera.rgt.v[0], camera.rgt.v[1], camera.rgt.v[2])));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -698,7 +698,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2]);
+                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3((camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2])));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -707,7 +707,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2]);
+                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3((camera.fwd.v[0], camera.fwd.v[1], camera.fwd.v[2])));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -724,7 +724,7 @@ fn main() {
             camera.cam_pos += math::vec3(camera.fwd) * -move_to.v[2];
             camera.cam_pos += math::vec3(camera.up)  *  move_to.v[1];
             camera.cam_pos += math::vec3(camera.rgt) *  move_to.v[0];
-            camera.trans_mat_inv = Mat4::identity().translate(&camera.cam_pos);
+            camera.trans_mat_inv = Matrix4::identity().translate(&camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse() * camera.trans_mat_inv.inverse();
             unsafe {
