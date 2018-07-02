@@ -35,7 +35,8 @@ const LEFT: &str = "assets/skybox-panel.png";
 const RIGHT: &str = "assets/skybox-panel.png";
 const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
-const FONT_SHEET: &str = "assets/font1684x1684.png";
+const TEXT_FONT_SHEET: &str = "assets/font1684x1684.png";
+const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
 const GROUND_PLANE_TEX: &str = "assets/tile-rock-planet256x256.png";
 
 const TEXT_COLOR: [f32; 3] = [194 as f32 / 255 as f32, 210 as f32 / 255 as f32, 234 as f32 / 255 as f32];
@@ -50,7 +51,7 @@ struct FontAtlas {
     columns: usize,
 }
 
-fn load_font_atlas() -> FontAtlas {
+fn load_game_text_font_atlas() -> FontAtlas {
     let coords = [
         (' ', (0, 0)),
         ('A', (1, 1)), ('B', (1, 2)), ('C', (1, 3)), ('D', (1, 4)), ('E', (1, 5)), ('F', (1, 6)),
@@ -107,6 +108,60 @@ fn load_font_atlas() -> FontAtlas {
     }
 }
 
+fn load_title_text_font_atlas() -> FontAtlas {
+    let coords = [
+        (' ', (0, 0)),
+        ('A', (1, 1)), ('B', (1, 2)), ('C', (1, 3)), ('D', (1, 4)), ('E', (1, 5)), ('F', (1, 6)),
+        ('G', (2, 1)), ('H', (2, 2)), ('I', (2, 3)), ('J', (2, 4)), ('K', (2, 5)), ('L', (2, 6)),
+        ('M', (3, 1)), ('N', (3, 2)), ('O', (3, 3)), ('P', (3, 4)), ('Q', (3, 5)), ('R', (3, 6)),
+        ('S', (4, 1)), ('T', (4, 2)), ('U', (4, 3)), ('V', (4, 4)), ('W', (4, 5)), ('X', (4, 6)),
+        ('Y', (5, 1)), ('Z', (5, 2)),
+        ('a', (1, 1)), ('b', (1, 2)), ('c', (1, 3)), ('d', (1, 4)), ('e', (1, 5)), ('f', (1, 6)),
+        ('g', (2, 1)), ('h', (2, 2)), ('i', (2, 3)), ('j', (2, 4)), ('k', (2, 5)), ('l', (2, 6)),
+        ('m', (3, 1)), ('n', (3, 2)), ('o', (3, 3)), ('p', (3, 4)), ('q', (3, 5)), ('r', (3, 6)),
+        ('s', (4, 1)), ('t', (4, 2)), ('u', (4, 3)), ('v', (4, 4)), ('w', (4, 5)), ('x', (4, 6)),
+        ('y', (5, 1)), ('z', (5, 2)), 
+    ].iter().cloned().collect();
+    let glyph_y_offsets = [
+        (' ', 0.0),
+        ('A', 0.0), ('B', 0.0), ('C', 0.0), ('D', 0.0), ('E', 0.0), ('F', 0.0),
+        ('G', 0.0), ('H', 0.0), ('I', 0.0), ('J', 0.0), ('K', 0.0), ('L', 0.0),
+        ('M', 0.0), ('N', 0.0), ('O', 0.0), ('P', 0.0), ('Q', 0.0), ('R', 0.0),
+        ('S', 0.0), ('T', 0.0), ('U', 0.0), ('V', 0.0), ('W', 0.0), ('X', 0.0),
+        ('Y', 0.0), ('Z', 0.0),
+        ('g', 0.0), ('h', 0.0), ('i', 0.0), ('j', 0.0), ('k', 0.0), ('l', 0.0),
+        ('a', 0.0), ('b', 0.0), ('c', 0.0), ('d', 0.0), ('e', 0.0), ('f', 0.0),
+        ('m', 0.0), ('n', 0.0), ('o', 0.0), ('p', 0.0), ('q', 0.0), ('r', 0.0),
+        ('s', 0.0), ('t', 0.0), ('u', 0.0), ('v', 0.0), ('w', 0.0), ('x', 0.0),
+        ('y', 0.0), ('z', 0.0),        
+    ].iter().cloned().collect();
+    let glyph_widths = [
+        (' ', 1.0),
+        ('A', 1.0), ('B', 1.0), ('C', 1.0), ('D', 1.0), ('E', 1.0), ('F', 1.0),
+        ('G', 1.0), ('H', 1.0), ('I', 1.0), ('J', 1.0), ('K', 1.0), ('L', 1.0),
+        ('M', 1.0), ('N', 1.0), ('O', 1.0), ('P', 1.0), ('Q', 1.0), ('R', 1.0),
+        ('S', 1.0), ('T', 1.0), ('U', 1.0), ('V', 1.0), ('W', 1.0), ('X', 1.0),
+        ('Y', 1.0), ('Z', 1.0),
+        ('g', 1.0), ('h', 1.0), ('i', 1.0), ('j', 1.0), ('k', 1.0), ('l', 1.0),
+        ('a', 1.0), ('b', 1.0), ('c', 1.0), ('d', 1.0), ('e', 1.0), ('f', 1.0),
+        ('m', 1.0), ('n', 1.0), ('o', 1.0), ('p', 1.0), ('q', 1.0), ('r', 1.0),
+        ('s', 1.0), ('t', 1.0), ('u', 1.0), ('v', 1.0), ('w', 1.0), ('x', 1.0),
+        ('y', 1.0), ('z', 1.0), 
+    ].iter().cloned().collect();
+    let bitmap = vec![];
+    let rows = 16;
+    let columns = 16;
+
+    FontAtlas {
+        glyph_y_offsets: glyph_y_offsets,
+        glyph_widths: glyph_widths,
+        coords: coords,
+        bitmap: bitmap,
+        rows: rows,
+        columns: columns,
+    }
+}
+
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     let title_screen_sp = glh::create_program_from_files(
         context, "shaders/title_screen.vert.glsl", "shaders/title_screen.frag.glsl"
@@ -122,7 +177,8 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
 }
 
 fn create_title_screen_geometry(
-    context: &glh::GLContext, font_atlas: &FontAtlas, text: &str) -> (GLuint, GLuint, GLuint, usize) {
+    context: &glh::GLContext, font_atlas: &FontAtlas, text: &str,
+    x_pos: f32, y_pos: f32, pixel_scale: f32) -> (GLuint, GLuint, GLuint, usize) {
     
     let mut string_vp_vbo = 0;
     unsafe {
@@ -134,9 +190,6 @@ fn create_title_screen_geometry(
         gl::GenBuffers(1, &mut string_vt_vbo);
     }
 
-    let x_pos: GLfloat = -0.75;
-    let y_pos: GLfloat = -0.4;
-    let pixel_scale: GLfloat = 42.0;
     let mut string_point_count = 0;
     text_to_vbo(
         &context, text, &font_atlas, 
@@ -514,7 +567,7 @@ fn main() {
         }
     };
 
-    let font_atlas = load_font_atlas();
+    let font_atlas = load_game_text_font_atlas();
 
     let (
         gp_sp,
@@ -538,12 +591,15 @@ fn main() {
         string_vp_vbo,
         string_vt_vbo,
         string_vao,
-        string_points) = create_title_screen_geometry(&context, &font_atlas, "Press ENTER to continue");
+        string_points
+    ) = create_title_screen_geometry(
+        &context, &font_atlas, "Press ENTER to continue", -0.75, -0.4, 42.0
+    );
 
     // Font sheet for the title screen text.
-    let mut title_screen_tex = 0;
-    load_texture(FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
-    assert!(title_screen_tex > 0);
+    let mut text_screen_tex = 0;
+    load_texture(TEXT_FONT_SHEET, &mut text_screen_tex, gl::CLAMP_TO_EDGE);
+    assert!(text_screen_tex > 0);
 
     let (
         cube_sp, 
@@ -615,7 +671,7 @@ fn main() {
             gl::Enable(gl::BLEND);
             gl::UseProgram(title_screen_sp);
             gl::ActiveTexture(gl::TEXTURE0);
-            gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
+            gl::BindTexture(gl::TEXTURE_2D, text_screen_tex);
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_color_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
