@@ -855,7 +855,7 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector3 {
 }
 
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone)]
 pub struct Vector4 {
     pub v: [f32; 4],
 }
@@ -873,6 +873,70 @@ impl Vector4 {
 #[inline]
 pub fn vec4<T: Into<Vector4>>(v: T) -> Vector4 {
     v.into()
+}
+
+impl AsRef<[f32; 4]> for Vector4 {
+    fn as_ref(&self) -> &[f32; 4] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsRef<(f32, f32, f32, f32)> for Vector4 {
+    fn as_ref(&self) -> &(f32, f32, f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<[f32; 4]> for Vector4 {
+    fn as_mut(&mut self) -> &mut [f32; 4] {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl AsMut<(f32, f32, f32, f32)> for Vector4 {
+    fn as_mut(&mut self) -> &mut (f32, f32, f32, f32) {
+        unsafe { mem::transmute(self) }
+    }
+}
+
+impl ops::Index<usize> for Vector4 {
+    type Output = f32;
+
+    #[inline]
+    fn index(&self, index: usize) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::Range<usize>> for Vector4 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::Range<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeTo<usize>> for Vector4 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeTo<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
+}
+
+impl ops::Index<ops::RangeFrom<usize>> for Vector4 {
+    type Output = [f32];
+
+    #[inline]
+    fn index(&self, index: ops::RangeFrom<usize>) -> &Self::Output {
+        let v: &[f32; 4] = self.as_ref();
+        &v[index]
+    }
 }
 
 impl From<(f32, f32, f32, f32)> for Vector4 {
@@ -907,6 +971,13 @@ impl<'a> From<(&'a Vector3, f32)> for Vector4 {
     #[inline]
     fn from((v, w): (&'a Vector3, f32)) -> Vector4 {
         Vector4::new(v.x, v.y, v.z, w)
+    }
+}
+
+impl fmt::Debug for Vector4 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        try!(write!(f, "Vector4 "));
+        <[f32; 4] as fmt::Debug>::fmt(self.as_ref(), f)
     }
 }
 
