@@ -29,16 +29,20 @@ const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
 const GL_LOG_FILE: &str = "gl.log";
+
+// Textures.
 const FRONT: &str = "assets/skybox-panel.png";
 const BACK: &str = "assets/skybox-panel.png";
 const LEFT: &str = "assets/skybox-panel.png";
 const RIGHT: &str = "assets/skybox-panel.png";
 const TOP: &str = "assets/skybox-panel.png";
 const BOTTOM: &str = "assets/skybox-panel.png";
+const GROUND_PLANE_TEX: &str = "assets/tile-rock-planet256x256.png";
 const TEXT_FONT_SHEET: &str = "assets/font1684x1684.png";
 const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
-const GROUND_PLANE_TEX: &str = "assets/tile-rock-planet256x256.png";
 
+// Text colors.
+const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [194 as f32 / 255 as f32, 210 as f32 / 255 as f32, 234 as f32 / 255 as f32];
 
 
@@ -51,7 +55,7 @@ struct FontAtlas {
     columns: usize,
 }
 
-fn load_game_text_font_atlas() -> FontAtlas {
+fn load_text_font_atlas() -> FontAtlas {
     let coords = [
         (' ', (0, 0)),
         ('A', (1, 1)), ('B', (1, 2)), ('C', (1, 3)), ('D', (1, 4)), ('E', (1, 5)), ('F', (1, 6)),
@@ -108,7 +112,7 @@ fn load_game_text_font_atlas() -> FontAtlas {
     }
 }
 
-fn load_title_text_font_atlas() -> FontAtlas {
+fn load_title_font_atlas() -> FontAtlas {
     let coords = [
         (' ', (0, 0)),
         ('A', (1, 1)), ('B', (1, 2)), ('C', (1, 3)), ('D', (1, 4)), ('E', (1, 5)), ('F', (1, 6)),
@@ -567,7 +571,8 @@ fn main() {
         }
     };
 
-    let font_atlas = load_game_text_font_atlas();
+    let text_font_atlas = load_text_font_atlas();
+    let title_font_atlas = load_title_font_atlas();
 
     let (
         gp_sp,
@@ -583,6 +588,7 @@ fn main() {
     load_texture(GROUND_PLANE_TEX, &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
+    /* --------------------------- TITLE SCREEN --------------------------- */
     let (
         title_screen_sp,
         title_screen_sp_color_loc) = create_title_screen_shaders(&context);
@@ -593,13 +599,28 @@ fn main() {
         string_vao,
         string_points
     ) = create_title_screen_geometry(
-        &context, &font_atlas, "Press ENTER to continue", -0.55, -0.4, 32.0
+        &context, &text_font_atlas, "Press ENTER to continue", -0.55, -0.4, 32.0
     );
 
     // Font sheet for the title screen text.
     let mut text_screen_tex = 0;
     load_texture(TEXT_FONT_SHEET, &mut text_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(text_screen_tex > 0);
+
+    let (
+        title_vp_vbo,
+        title_vt_vbo,
+        title_vao,
+        title_points
+    ) = create_title_screen_geometry(
+        &context, &title_font_atlas, "AAAAAAAAAAAAAAAAAAAa", -0.75, 0.4, 80.0
+    );
+
+    // Font sheet for the title text on the title screen.
+    let mut title_screen_tex = 0;
+    load_texture(TITLE_FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    assert!(title_screen_tex > 0);
+    /* ------------------------- END TITLE SCREEN ------------------------- */
 
     let (
         cube_sp, 
@@ -671,6 +692,12 @@ fn main() {
             gl::Enable(gl::BLEND);
             gl::UseProgram(title_screen_sp);
             gl::ActiveTexture(gl::TEXTURE0);
+            
+            gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
+            gl::BindVertexArray(title_vao);
+            gl::Uniform4f(title_screen_sp_color_loc, TITLE_COLOR[0], TITLE_COLOR[1], TITLE_COLOR[2], 1.0);
+            gl::DrawArrays(gl::TRIANGLES, 0, title_points as i32);
+
             gl::BindTexture(gl::TEXTURE_2D, text_screen_tex);
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_color_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
