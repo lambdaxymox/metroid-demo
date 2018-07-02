@@ -929,20 +929,20 @@ impl cmp::PartialEq for Vector4 {
 }
 
 ///
-/// The `Mat3` type represents 3x3 matrices in column-major order.
+/// The `Matrix3` type represents 3x3 matrices in column-major order.
 ///
 #[derive(Copy, Clone, Debug)]
-pub struct Mat3 {
+pub struct Matrix3 {
     m: [f32; 9],
 }
 
-impl Mat3 {
+impl Matrix3 {
     pub fn new(
         m11: f32, m12: f32, m13: f32, 
         m21: f32, m22: f32, m23: f32, 
-        m31: f32, m32: f32, m33: f32) -> Mat3 {
+        m31: f32, m32: f32, m33: f32) -> Matrix3 {
 
-        Mat3 {
+        Matrix3 {
             m: [
                 m11, m12, m13, // Column 1
                 m21, m22, m23, // Column 2
@@ -951,12 +951,12 @@ impl Mat3 {
         }
     }
 
-    pub fn zero() -> Mat3 {
-        Mat3::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    pub fn zero() -> Matrix3 {
+        Matrix3::new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     }
 
-    pub fn identity() -> Mat3 {
-        Mat3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
+    pub fn identity() -> Matrix3 {
+        Matrix3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     }
 
     pub fn as_ptr(&self) -> *const f32 {
@@ -968,7 +968,7 @@ impl Mat3 {
     }
 }
 
-impl fmt::Display for Mat3 {
+impl fmt::Display for Matrix3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, 
             "\n[{:.2}][{:.2}][{:.2}]\n[{:.2}][{:.2}][{:.2}]\n[{:.2}][{:.2}][{:.2}]", 
@@ -982,18 +982,18 @@ impl fmt::Display for Mat3 {
 #[inline]
 fn mat3(m11: f32, m12: f32, m13: f32, 
         m21: f32, m22: f32, m23: f32, 
-        m31: f32, m32: f32, m33: f32) -> Mat3 {
+        m31: f32, m32: f32, m33: f32) -> Matrix3 {
 
-    Mat3::new(m11, m12, m13, m21, m22, m23, m31, m32, m33)
+    Matrix3::new(m11, m12, m13, m21, m22, m23, m31, m32, m33)
 }
 
-impl convert::AsRef<[f32; 9]> for Mat3 {
+impl convert::AsRef<[f32; 9]> for Matrix3 {
     fn as_ref(&self) -> &[f32; 9] {
         &self.m
     }
 }
 
-impl convert::AsMut<[f32; 9]> for Mat3 {
+impl convert::AsMut<[f32; 9]> for Matrix3 {
     fn as_mut(&mut self) -> &mut [f32; 9] {
         &mut self.m
     }
