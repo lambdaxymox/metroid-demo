@@ -108,17 +108,17 @@ fn load_font_atlas() -> FontAtlas {
 }
 
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
-    let sp = glh::create_program_from_files(
+    let title_screen_sp = glh::create_program_from_files(
         context, "shaders/title_screen.vert.glsl", "shaders/title_screen.frag.glsl"
     );
-    assert!(sp > 0);
+    assert!(title_screen_sp > 0);
 
-    let sp_text_color_loc = unsafe { 
-        gl::GetUniformLocation(sp, "text_color".as_ptr() as *const i8)
+    let title_screen_sp_text_color_loc = unsafe { 
+        gl::GetUniformLocation(title_screen_sp, "text_color".as_ptr() as *const i8)
     };
-    assert!(sp_text_color_loc > -1);
+    assert!(title_screen_sp_text_color_loc > -1);
 
-    (sp, sp_text_color_loc)
+    (title_screen_sp, title_screen_sp_text_color_loc)
 }
 
 fn create_title_screen_geometry(
@@ -381,10 +381,14 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLi
     assert!(gp_sp > 0);
 
     // Get uniform locations of camera view and projection matrices.
-    let gp_view_mat_loc = unsafe { gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8) };
+    let gp_view_mat_loc = unsafe { 
+        gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8)
+    };
     assert!(gp_view_mat_loc > -1);
 
-    let gp_proj_mat_loc = unsafe { gl::GetUniformLocation(gp_sp, "proj".as_ptr() as *const i8) };
+    let gp_proj_mat_loc = unsafe { 
+        gl::GetUniformLocation(gp_sp, "proj".as_ptr() as *const i8)
+    };
     assert!(gp_proj_mat_loc > -1);
 
     (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
