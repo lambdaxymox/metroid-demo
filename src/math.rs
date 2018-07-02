@@ -387,23 +387,23 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector2 {
 /// Euclidean metric.
 ///
 #[derive(Copy, Clone, Debug, PartialEq)]
-pub struct Vec3 {
+pub struct Vector3 {
     pub v: [f32; 3],
 }
 
-impl Vec3 {
+impl Vector3 {
     ///
     /// Create a new vector.
     ///
-    pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
-        Vec3 { v: [x, y, z] }
+    pub fn new(x: f32, y: f32, z: f32) -> Vector3 {
+        Vector3 { v: [x, y, z] }
     }
 
     ///
     /// Generate a zero vector.
     ///
-    pub fn zero() -> Vec3 {
-        Vec3 { v: [0.0, 0.0, 0.0] }
+    pub fn zero() -> Vector3 {
+        Vector3 { v: [0.0, 0.0, 0.0] }
     }
     
     ///
@@ -423,19 +423,19 @@ impl Vec3 {
     ///
     /// Convert an arbitrary vector into a unit vector.
     ///
-    pub fn normalize(&self) -> Vec3 {
+    pub fn normalize(&self) -> Vector3 {
         let norm_v = self.norm();
         if norm_v == 0.0 {
-            return Vec3::zero();
+            return Vector3::zero();
         }
 
-        Vec3::new(self.v[0] / norm_v, self.v[1] / norm_v, self.v[2] / norm_v)
+        Vector3::new(self.v[0] / norm_v, self.v[1] / norm_v, self.v[2] / norm_v)
     }
 
     ///
     /// Compute the dot product of two vectors.
     ///
-    pub fn dot(&self, other: &Vec3) -> f32 {
+    pub fn dot(&self, other: &Vector3) -> f32 {
         self.v[0] * other.v[0] + self.v[1] * other.v[1] + self.v[2] * other.v[2]
     }
 
@@ -447,18 +447,18 @@ impl Vec3 {
     /// the surface element that the crossed vector is normal to. That is, 
     /// given vectors u and v, u x v == *(u /\ v), where *(.) denotes the hodge dual.
     ///
-    pub fn cross(&self, other: &Vec3) -> Vec3 {
+    pub fn cross(&self, other: &Vector3) -> Vector3 {
         let x = self.v[1] * other.v[2] - self.v[2] * other.v[1];
         let y = self.v[2] * other.v[0] - self.v[0] * other.v[2];
         let z = self.v[0] * other.v[1] - self.v[1] * other.v[0];
     
-        Vec3::new(x, y, z)
+        Vector3::new(x, y, z)
     }
 
     ///
     /// Compute the squared distance between two vectors.
     ///
-    pub fn get_squared_dist(&self, to: &Vec3) -> f32 {
+    pub fn get_squared_dist(&self, to: &Vector3) -> f32 {
         let x = (to.v[0] - self.v[0]) * (to.v[0] - self.v[0]);
         let y = (to.v[1] - self.v[1]) * (to.v[1] - self.v[1]);
         let z = (to.v[2] - self.v[2]) * (to.v[2] - self.v[2]);
@@ -472,56 +472,56 @@ impl Vec3 {
 /// a GLSL vec3 constructor.
 ///
 #[inline]
-pub fn vec3<T: Into<Vec3>>(v: T) -> Vec3 {
+pub fn vec3<T: Into<Vector3>>(v: T) -> Vector3 {
     v.into()
 }
 
-impl From<(f32, f32, f32)> for Vec3 {
+impl From<(f32, f32, f32)> for Vector3 {
     #[inline]
-    fn from((x, y, z): (f32, f32, f32)) -> Vec3 {
-        Vec3::new(x, y, z)
+    fn from((x, y, z): (f32, f32, f32)) -> Vector3 {
+        Vector3::new(x, y, z)
     }
 }
 
-impl From<(Vector2, f32)> for Vec3 {
+impl From<(Vector2, f32)> for Vector3 {
     #[inline]
-    fn from((v, z): (Vector2, f32)) -> Vec3 {
-        Vec3::new(v.x, v.y, z)
+    fn from((v, z): (Vector2, f32)) -> Vector3 {
+        Vector3::new(v.x, v.y, z)
     }
 }
 
-impl<'a> From<(&'a Vector2, f32)> for Vec3 {
+impl<'a> From<(&'a Vector2, f32)> for Vector3 {
     #[inline]
-    fn from((v, z): (&'a Vector2, f32)) -> Vec3 {
-        Vec3::new(v.x, v.y, z)
+    fn from((v, z): (&'a Vector2, f32)) -> Vector3 {
+        Vector3::new(v.x, v.y, z)
     }
 }
 
-impl<'a> From<Vec4> for Vec3 {
+impl<'a> From<Vec4> for Vector3 {
     #[inline]
-    fn from(v: Vec4) -> Vec3 {
-        Vec3::new(v.v[0], v.v[1], v.v[2])
+    fn from(v: Vec4) -> Vector3 {
+        Vector3::new(v.v[0], v.v[1], v.v[2])
     }
 }
 
-impl<'a> From<&'a Vec4> for Vec3 {
+impl<'a> From<&'a Vec4> for Vector3 {
     #[inline]
-    fn from(v: &'a Vec4) -> Vec3 {
-        Vec3::new(v.v[0], v.v[1], v.v[2])
+    fn from(v: &'a Vec4) -> Vector3 {
+        Vector3::new(v.v[0], v.v[1], v.v[2])
     }
 }
 
-impl fmt::Display for Vec3 {
+impl fmt::Display for Vector3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{:.2}, {:.2}, {:.2}]", self.v[0], self.v[1], self.v[2])
     }
 }
 
-impl<'a> ops::Add<Vec3> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Add<Vector3> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn add(self, other: Vec3) -> Self::Output {
-        Vec3 {
+    fn add(self, other: Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -531,11 +531,11 @@ impl<'a> ops::Add<Vec3> for &'a Vec3 {
     }
 }
 
-impl ops::Add<Vec3> for Vec3 {
-    type Output = Vec3;
+impl ops::Add<Vector3> for Vector3 {
+    type Output = Vector3;
 
-    fn add(self, other: Vec3) -> Self::Output {
-        Vec3 {
+    fn add(self, other: Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -545,11 +545,11 @@ impl ops::Add<Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::Add<&'a Vec3> for Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Add<&'a Vector3> for Vector3 {
+    type Output = Vector3;
 
-    fn add(self, other: &'a Vec3) -> Self::Output {
-        Vec3 {
+    fn add(self, other: &'a Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -559,11 +559,11 @@ impl<'a> ops::Add<&'a Vec3> for Vec3 {
     }
 }
 
-impl<'a, 'b> ops::Add<&'b Vec3> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a, 'b> ops::Add<&'b Vector3> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn add(self, other: &'b Vec3) -> Self::Output {
-        Vec3 {
+    fn add(self, other: &'b Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -573,11 +573,11 @@ impl<'a, 'b> ops::Add<&'b Vec3> for &'a Vec3 {
     }
 }
 
-impl ops::Add<f32> for Vec3 {
-    type Output = Vec3;
+impl ops::Add<f32> for Vector3 {
+    type Output = Vector3;
 
     fn add(self, other: f32) -> Self::Output {
-        Vec3 {
+        Vector3 {
             v: [
                 self.v[0] + other,
                 self.v[1] + other,
@@ -587,11 +587,11 @@ impl ops::Add<f32> for Vec3 {
     }
 }
 
-impl<'a> ops::Sub<Vec3> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Sub<Vector3> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn sub(self, other: Vec3) -> Self::Output {
-        Vec3 {
+    fn sub(self, other: Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -601,11 +601,11 @@ impl<'a> ops::Sub<Vec3> for &'a Vec3 {
     }
 }
 
-impl ops::Sub<Vec3> for Vec3 {
-    type Output = Vec3;
+impl ops::Sub<Vector3> for Vector3 {
+    type Output = Vector3;
 
-    fn sub(self, other: Vec3) -> Self::Output {
-        Vec3 {
+    fn sub(self, other: Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -615,11 +615,11 @@ impl ops::Sub<Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::Sub<&'a Vec3> for Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Sub<&'a Vector3> for Vector3 {
+    type Output = Vector3;
 
-    fn sub(self, other: &'a Vec3) -> Self::Output {
-        Vec3 {
+    fn sub(self, other: &'a Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -629,11 +629,11 @@ impl<'a> ops::Sub<&'a Vec3> for Vec3 {
     }
 }
 
-impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a, 'b> ops::Sub<&'b Vector3> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn sub(self, other: &'b Vec3) -> Self::Output {
-        Vec3 {
+    fn sub(self, other: &'b Vector3) -> Self::Output {
+        Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -643,11 +643,11 @@ impl<'a, 'b> ops::Sub<&'b Vec3> for &'a Vec3 {
     }
 }
 
-impl ops::Sub<f32> for Vec3 {
-    type Output = Vec3;
+impl ops::Sub<f32> for Vector3 {
+    type Output = Vector3;
 
     fn sub(self, other: f32) -> Self::Output {
-        Vec3 {
+        Vector3 {
             v: [
                 self.v[0] - other,
                 self.v[1] - other,
@@ -657,9 +657,9 @@ impl ops::Sub<f32> for Vec3 {
     }
 }
 
-impl ops::AddAssign<Vec3> for Vec3 {
-    fn add_assign(&mut self, other: Vec3) {
-        *self = Vec3 {
+impl ops::AddAssign<Vector3> for Vector3 {
+    fn add_assign(&mut self, other: Vector3) {
+        *self = Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -669,9 +669,9 @@ impl ops::AddAssign<Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::AddAssign<&'a Vec3> for Vec3 {
-    fn add_assign(&mut self, other: &'a Vec3) {
-        *self = Vec3 {
+impl<'a> ops::AddAssign<&'a Vector3> for Vector3 {
+    fn add_assign(&mut self, other: &'a Vector3) {
+        *self = Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -681,9 +681,9 @@ impl<'a> ops::AddAssign<&'a Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::AddAssign<Vec3> for &'a mut Vec3 {
-    fn add_assign(&mut self, other: Vec3) {
-        **self = Vec3 {
+impl<'a> ops::AddAssign<Vector3> for &'a mut Vector3 {
+    fn add_assign(&mut self, other: Vector3) {
+        **self = Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -693,9 +693,9 @@ impl<'a> ops::AddAssign<Vec3> for &'a mut Vec3 {
     }
 }
 
-impl<'a, 'b> ops::AddAssign<&'a Vec3> for &'b mut Vec3 {
-    fn add_assign(&mut self, other: &'a Vec3) {
-        **self = Vec3 {
+impl<'a, 'b> ops::AddAssign<&'a Vector3> for &'b mut Vector3 {
+    fn add_assign(&mut self, other: &'a Vector3) {
+        **self = Vector3 {
             v: [
                 self.v[0] + other.v[0],
                 self.v[1] + other.v[1],
@@ -705,9 +705,9 @@ impl<'a, 'b> ops::AddAssign<&'a Vec3> for &'b mut Vec3 {
     }
 }
 
-impl ops::AddAssign<f32> for Vec3 {
+impl ops::AddAssign<f32> for Vector3 {
     fn add_assign(&mut self, other: f32) {
-        *self = Vec3 {
+        *self = Vector3 {
             v: [
                 self.v[0] + other,
                 self.v[1] + other,
@@ -717,9 +717,9 @@ impl ops::AddAssign<f32> for Vec3 {
     }
 }
 
-impl ops::SubAssign<Vec3> for Vec3 {
-    fn sub_assign(&mut self, other: Vec3) {
-        *self = Vec3 {
+impl ops::SubAssign<Vector3> for Vector3 {
+    fn sub_assign(&mut self, other: Vector3) {
+        *self = Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -729,9 +729,9 @@ impl ops::SubAssign<Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::SubAssign<&'a Vec3> for Vec3 {
-    fn sub_assign(&mut self, other: &'a Vec3) {
-        *self = Vec3 {
+impl<'a> ops::SubAssign<&'a Vector3> for Vector3 {
+    fn sub_assign(&mut self, other: &'a Vector3) {
+        *self = Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -741,9 +741,9 @@ impl<'a> ops::SubAssign<&'a Vec3> for Vec3 {
     }
 }
 
-impl<'a> ops::SubAssign<Vec3> for &'a mut Vec3 {
-    fn sub_assign(&mut self, other: Vec3) {
-        **self = Vec3 {
+impl<'a> ops::SubAssign<Vector3> for &'a mut Vector3 {
+    fn sub_assign(&mut self, other: Vector3) {
+        **self = Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -753,9 +753,9 @@ impl<'a> ops::SubAssign<Vec3> for &'a mut Vec3 {
     }
 }
 
-impl<'a, 'b> ops::SubAssign<&'a Vec3> for &'b mut Vec3 {
-    fn sub_assign(&mut self, other: &'a Vec3) {
-        **self = Vec3 {
+impl<'a, 'b> ops::SubAssign<&'a Vector3> for &'b mut Vector3 {
+    fn sub_assign(&mut self, other: &'a Vector3) {
+        **self = Vector3 {
             v: [
                 self.v[0] - other.v[0],
                 self.v[1] - other.v[1],
@@ -765,9 +765,9 @@ impl<'a, 'b> ops::SubAssign<&'a Vec3> for &'b mut Vec3 {
     }
 }
 
-impl ops::SubAssign<f32> for Vec3 {
+impl ops::SubAssign<f32> for Vector3 {
     fn sub_assign(&mut self, other: f32) {
-        *self = Vec3 {
+        *self = Vector3 {
             v: [
                 self.v[0] - other,
                 self.v[1] - other,
@@ -777,11 +777,11 @@ impl ops::SubAssign<f32> for Vec3 {
     }
 }
 
-impl ops::Mul<f32> for Vec3 {
-    type Output = Vec3;
+impl ops::Mul<f32> for Vector3 {
+    type Output = Vector3;
 
-    fn mul(self, other: f32) -> Vec3 {
-        Vec3 {
+    fn mul(self, other: f32) -> Vector3 {
+        Vector3 {
             v: [
                 self.v[0] * other,
                 self.v[1] * other,
@@ -791,11 +791,11 @@ impl ops::Mul<f32> for Vec3 {
     }
 }
 
-impl<'a> ops::Mul<f32> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Mul<f32> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn mul(self, other: f32) -> Vec3 {
-        Vec3 {
+    fn mul(self, other: f32) -> Vector3 {
+        Vector3 {
             v: [
                 self.v[0] * other,
                 self.v[1] * other,
@@ -805,11 +805,11 @@ impl<'a> ops::Mul<f32> for &'a Vec3 {
     }
 }
 
-impl ops::Div<f32> for Vec3 {
-    type Output = Vec3;
+impl ops::Div<f32> for Vector3 {
+    type Output = Vector3;
 
-    fn div(self, other: f32) -> Vec3 {
-        Vec3 {
+    fn div(self, other: f32) -> Vector3 {
+        Vector3 {
             v: [
                 self.v[0] / other,
                 self.v[1] / other,
@@ -819,11 +819,11 @@ impl ops::Div<f32> for Vec3 {
     }
 }
 
-impl<'a> ops::Div<f32> for &'a Vec3 {
-    type Output = Vec3;
+impl<'a> ops::Div<f32> for &'a Vector3 {
+    type Output = Vector3;
 
-    fn div(self, other: f32) -> Vec3 {
-        Vec3 {
+    fn div(self, other: f32) -> Vector3 {
+        Vector3 {
             v: [
                 self.v[0] / other,
                 self.v[1] / other,
@@ -833,9 +833,9 @@ impl<'a> ops::Div<f32> for &'a Vec3 {
     }
 }
 
-impl ops::DivAssign<f32> for Vec3 {
+impl ops::DivAssign<f32> for Vector3 {
     fn div_assign(&mut self, other: f32) {
-        *self = Vec3 {
+        *self = Vector3 {
             v: [
                 self.v[0] / other,
                 self.v[1] / other,
@@ -845,9 +845,9 @@ impl ops::DivAssign<f32> for Vec3 {
     }
 }
 
-impl<'a> ops::DivAssign<f32> for &'a mut Vec3 {
+impl<'a> ops::DivAssign<f32> for &'a mut Vector3 {
     fn div_assign(&mut self, other: f32) {
-        **self = Vec3 {
+        **self = Vector3 {
             v: [
                 self.v[0] / other,
                 self.v[1] / other,
@@ -899,16 +899,16 @@ impl<'a> From<(&'a Vector2, f32, f32)> for Vec4 {
     }
 }
 
-impl From<(Vec3, f32)> for Vec4 {
+impl From<(Vector3, f32)> for Vec4 {
     #[inline]
-    fn from((v, w): (Vec3, f32)) -> Vec4 {
+    fn from((v, w): (Vector3, f32)) -> Vec4 {
         Vec4::new(v.v[0], v.v[1], v.v[2], w)
     }
 }
 
-impl<'a> From<(&'a Vec3, f32)> for Vec4 {
+impl<'a> From<(&'a Vector3, f32)> for Vec4 {
     #[inline]
-    fn from((v, w): (&'a Vec3, f32)) -> Vec4 {
+    fn from((v, w): (&'a Vector3, f32)) -> Vec4 {
         Vec4::new(v.v[0], v.v[1], v.v[2], w)
     }
 }
@@ -1051,7 +1051,7 @@ impl Mat4 {
         )
     }
 
-    pub fn translate(&self, v: &Vec3) -> Mat4 {
+    pub fn translate(&self, v: &Vector3) -> Mat4 {
         let mut m_t = Mat4::identity();
         m_t.m[12] = v.v[0];
         m_t.m[13] = v.v[1];
@@ -1100,7 +1100,7 @@ impl Mat4 {
     }
 
     // scale a matrix by [x, y, z]
-    pub fn scale(&self, v: &Vec3) -> Mat4 {
+    pub fn scale(&self, v: &Vector3) -> Mat4 {
         let mut m_s = Mat4::identity();
         m_s.m[0]  = v.v[0];
         m_s.m[5]  = v.v[1];
@@ -1604,12 +1604,12 @@ mod vec2_tests {
 
 mod vec3_tests {
     use std::slice::Iter;
-    use super::Vec3;
+    use super::Vector3;
 
     struct TestCase {
         c: f32,
-        x: Vec3,
-        y: Vec3,
+        x: Vector3,
+        y: Vector3,
     }
 
     struct Test {
@@ -1702,7 +1702,7 @@ mod vec3_tests {
 
 mod mat4_tests {
     use std::slice::Iter;
-    use super::{Vec3, Mat4};
+    use super::{Vector3, Mat4};
 
     struct TestCase {
         c: f32,

@@ -1,4 +1,4 @@
-use math::{Vec3, Vec4, Mat4, Versor};
+use math::{Vector3, Vec4, Mat4, Versor};
 
 
 pub struct Camera {
@@ -10,7 +10,7 @@ pub struct Camera {
 
     pub cam_speed: f32,
     pub cam_yaw_speed: f32,
-    pub cam_pos: Vec3,
+    pub cam_pos: Vector3,
     pub fwd: Vec4,
     pub rgt: Vec4,
     pub up: Vec4,
@@ -24,7 +24,7 @@ pub struct Camera {
 impl Camera {
     pub fn new(
         near: f32, far: f32, fov: f32, aspect: f32, 
-        cam_speed: f32, cam_yaw_speed: f32, cam_pos: Vec3,
+        cam_speed: f32, cam_yaw_speed: f32, cam_pos: Vector3,
         fwd: Vec4, rgt: Vec4, up: Vec4, axis: Versor) -> Camera {
 
         let proj_mat = Mat4::perspective(fov, aspect, near, far);

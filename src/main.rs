@@ -22,7 +22,7 @@ use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
-use math::{Vec3, Mat4, Versor};
+use math::{Mat4, Versor};
 use camera::Camera;
 
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
