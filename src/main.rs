@@ -618,42 +618,42 @@ fn main() {
         let mut cam_roll = 0.0;
         match context.window.get_key(Key::A) {
             Action::Press | Action::Repeat => {
-                move_to.v[0] -= camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.x -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::D) {
             Action::Press | Action::Repeat => {
-                move_to.v[0] += camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.x += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::Q) {
             Action::Press | Action::Repeat => {
-                move_to.v[1] += camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.y += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::E) {
             Action::Press | Action::Repeat => {
-                move_to.v[1] -= camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.y -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::W) {
             Action::Press | Action::Repeat => {
-                move_to.v[2] -= camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.z -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
         match context.window.get_key(Key::S) {
             Action::Press | Action::Repeat => {
-                move_to.v[2] += camera.cam_speed * (elapsed_seconds as GLfloat);
+                move_to.z += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
@@ -721,9 +721,9 @@ fn main() {
             camera.rgt = camera.rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
             camera.up  = camera.rot_mat_inv * math::vec4((0.0, 1.0,  0.0, 0.0));
 
-            camera.cam_pos += math::vec3(camera.fwd) * -move_to.v[2];
-            camera.cam_pos += math::vec3(camera.up)  *  move_to.v[1];
-            camera.cam_pos += math::vec3(camera.rgt) *  move_to.v[0];
+            camera.cam_pos += math::vec3(camera.fwd) * -move_to.z;
+            camera.cam_pos += math::vec3(camera.up)  *  move_to.y;
+            camera.cam_pos += math::vec3(camera.rgt) *  move_to.x;
             camera.trans_mat_inv = Matrix4::identity().translate(&camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse() * camera.trans_mat_inv.inverse();

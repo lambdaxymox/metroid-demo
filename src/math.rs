@@ -388,7 +388,9 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector2 {
 ///
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Vector3 {
-    pub v: [f32; 3],
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl Vector3 {
@@ -396,28 +398,28 @@ impl Vector3 {
     /// Create a new vector.
     ///
     pub fn new(x: f32, y: f32, z: f32) -> Vector3 {
-        Vector3 { v: [x, y, z] }
+        Vector3 { x: x, y: y, z: z }
     }
 
     ///
     /// Generate a zero vector.
     ///
     pub fn zero() -> Vector3 {
-        Vector3 { v: [0.0, 0.0, 0.0] }
+        Vector3 { x: 0.0, y: 0.0, z: 0.0 }
     }
     
     ///
     /// Compute the norm (length) of a vector.
     ///
     pub fn norm(&self) -> f32 {
-        f32::sqrt(self.v[0] * self.v[0] + self.v[1] * self.v[1] + self.v[2] * self.v[2])
+        f32::sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
     }
 
     ///
     /// Compute the squared norm (length) of a vector.
     ///
     pub fn norm2(&self) -> f32 {
-        self.v[0] * self.v[0] + self.v[1] * self.v[1] + self.v[2] * self.v[2]
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     ///
@@ -429,14 +431,14 @@ impl Vector3 {
             return Vector3::zero();
         }
 
-        Vector3::new(self.v[0] / norm_v, self.v[1] / norm_v, self.v[2] / norm_v)
+        Vector3::new(self.x / norm_v, self.y / norm_v, self.z / norm_v)
     }
 
     ///
     /// Compute the dot product of two vectors.
     ///
     pub fn dot(&self, other: &Vector3) -> f32 {
-        self.v[0] * other.v[0] + self.v[1] * other.v[1] + self.v[2] * other.v[2]
+        self.x * other.x + self.y * other.y + self.z * other.z
     }
 
     ///
@@ -448,9 +450,9 @@ impl Vector3 {
     /// given vectors u and v, u x v == *(u /\ v), where *(.) denotes the hodge dual.
     ///
     pub fn cross(&self, other: &Vector3) -> Vector3 {
-        let x = self.v[1] * other.v[2] - self.v[2] * other.v[1];
-        let y = self.v[2] * other.v[0] - self.v[0] * other.v[2];
-        let z = self.v[0] * other.v[1] - self.v[1] * other.v[0];
+        let x = self.y * other.z - self.z * other.y;
+        let y = self.z * other.x - self.x * other.z;
+        let z = self.x * other.y - self.y * other.x;
     
         Vector3::new(x, y, z)
     }
@@ -459,9 +461,9 @@ impl Vector3 {
     /// Compute the squared distance between two vectors.
     ///
     pub fn get_squared_dist(&self, to: &Vector3) -> f32 {
-        let x = (to.v[0] - self.v[0]) * (to.v[0] - self.v[0]);
-        let y = (to.v[1] - self.v[1]) * (to.v[1] - self.v[1]);
-        let z = (to.v[2] - self.v[2]) * (to.v[2] - self.v[2]);
+        let x = (to.x - self.x) * (to.x - self.x);
+        let y = (to.y - self.y) * (to.y - self.y);
+        let z = (to.z - self.z) * (to.z - self.z);
     
         x + y + z
     }
@@ -513,7 +515,7 @@ impl<'a> From<&'a Vector4> for Vector3 {
 
 impl fmt::Display for Vector3 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[{:.2}, {:.2}, {:.2}]", self.v[0], self.v[1], self.v[2])
+        write!(f, "[{:.2}, {:.2}, {:.2}]", self.x, self.y, self.z)
     }
 }
 
@@ -522,11 +524,9 @@ impl<'a> ops::Add<Vector3> for &'a Vector3 {
 
     fn add(self, other: Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
@@ -536,11 +536,9 @@ impl ops::Add<Vector3> for Vector3 {
 
     fn add(self, other: Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
@@ -550,11 +548,9 @@ impl<'a> ops::Add<&'a Vector3> for Vector3 {
 
     fn add(self, other: &'a Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],               
-            ]
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,               
         }
     }
 }
@@ -564,11 +560,9 @@ impl<'a, 'b> ops::Add<&'b Vector3> for &'a Vector3 {
 
     fn add(self, other: &'b Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
         }
     }
 }
@@ -578,11 +572,9 @@ impl ops::Add<f32> for Vector3 {
 
     fn add(self, other: f32) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] + other,
-                self.v[1] + other,
-                self.v[2] + other,
-            ]
+            x: self.x + other,
+            y: self.y + other,
+            z: self.z + other,
         }
     }
 }
@@ -592,11 +584,9 @@ impl<'a> ops::Sub<Vector3> for &'a Vector3 {
 
     fn sub(self, other: Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
         }
     }
 }
@@ -606,11 +596,9 @@ impl ops::Sub<Vector3> for Vector3 {
 
     fn sub(self, other: Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
         }
     }
 }
@@ -620,11 +608,9 @@ impl<'a> ops::Sub<&'a Vector3> for Vector3 {
 
     fn sub(self, other: &'a Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],               
-            ]
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,               
         }
     }
 }
@@ -634,11 +620,9 @@ impl<'a, 'b> ops::Sub<&'b Vector3> for &'a Vector3 {
 
     fn sub(self, other: &'b Vector3) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
         }
     }
 }
@@ -648,132 +632,90 @@ impl ops::Sub<f32> for Vector3 {
 
     fn sub(self, other: f32) -> Self::Output {
         Vector3 {
-            v: [
-                self.v[0] - other,
-                self.v[1] - other,
-                self.v[2] - other,
-            ]
+            x: self.x - other,
+            y: self.y - other,
+            z: self.z - other,
         }
     }
 }
 
 impl ops::AddAssign<Vector3> for Vector3 {
     fn add_assign(&mut self, other: Vector3) {
-        *self = Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
-        }
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
 impl<'a> ops::AddAssign<&'a Vector3> for Vector3 {
     fn add_assign(&mut self, other: &'a Vector3) {
-        *self = Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
-        }
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
 impl<'a> ops::AddAssign<Vector3> for &'a mut Vector3 {
     fn add_assign(&mut self, other: Vector3) {
-        **self = Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
-        }
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
 impl<'a, 'b> ops::AddAssign<&'a Vector3> for &'b mut Vector3 {
     fn add_assign(&mut self, other: &'a Vector3) {
-        **self = Vector3 {
-            v: [
-                self.v[0] + other.v[0],
-                self.v[1] + other.v[1],
-                self.v[2] + other.v[2],
-            ]
-        }
+        self.x += other.x;
+        self.y += other.y;
+        self.z += other.z;
     }
 }
 
 impl ops::AddAssign<f32> for Vector3 {
     fn add_assign(&mut self, other: f32) {
-        *self = Vector3 {
-            v: [
-                self.v[0] + other,
-                self.v[1] + other,
-                self.v[2] + other,
-            ]
-        }
+        self.x += other;
+        self.y += other;
+        self.z += other;
     }
 }
 
 impl ops::SubAssign<Vector3> for Vector3 {
     fn sub_assign(&mut self, other: Vector3) {
-        *self = Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
-        }
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 }
 
 impl<'a> ops::SubAssign<&'a Vector3> for Vector3 {
     fn sub_assign(&mut self, other: &'a Vector3) {
-        *self = Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
-        }
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 }
 
 impl<'a> ops::SubAssign<Vector3> for &'a mut Vector3 {
     fn sub_assign(&mut self, other: Vector3) {
-        **self = Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
-        }
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 }
 
 impl<'a, 'b> ops::SubAssign<&'a Vector3> for &'b mut Vector3 {
     fn sub_assign(&mut self, other: &'a Vector3) {
-        **self = Vector3 {
-            v: [
-                self.v[0] - other.v[0],
-                self.v[1] - other.v[1],
-                self.v[2] - other.v[2],
-            ]
-        }
+        self.x -= other.x;
+        self.y -= other.y;
+        self.z -= other.z;
     }
 }
 
 impl ops::SubAssign<f32> for Vector3 {
     fn sub_assign(&mut self, other: f32) {
-        *self = Vector3 {
-            v: [
-                self.v[0] - other,
-                self.v[1] - other,
-                self.v[2] - other,
-            ]
-        }
+        self.x -= other;
+        self.y -= other;
+        self.z -= other;
     }
 }
 
@@ -782,11 +724,9 @@ impl ops::Mul<f32> for Vector3 {
 
     fn mul(self, other: f32) -> Vector3 {
         Vector3 {
-            v: [
-                self.v[0] * other,
-                self.v[1] * other,
-                self.v[2] * other,
-            ]
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
         }
     }
 }
@@ -796,11 +736,9 @@ impl<'a> ops::Mul<f32> for &'a Vector3 {
 
     fn mul(self, other: f32) -> Vector3 {
         Vector3 {
-            v: [
-                self.v[0] * other,
-                self.v[1] * other,
-                self.v[2] * other,
-            ]
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
         }
     }
 }
@@ -810,11 +748,9 @@ impl ops::Div<f32> for Vector3 {
 
     fn div(self, other: f32) -> Vector3 {
         Vector3 {
-            v: [
-                self.v[0] / other,
-                self.v[1] / other,
-                self.v[2] / other,
-            ]
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
         }
     }
 }
@@ -824,36 +760,26 @@ impl<'a> ops::Div<f32> for &'a Vector3 {
 
     fn div(self, other: f32) -> Vector3 {
         Vector3 {
-            v: [
-                self.v[0] / other,
-                self.v[1] / other,
-                self.v[2] / other,
-            ]
+            x: self.x / other,
+            y: self.y / other,
+            z: self.z / other,
         }
     }
 }
 
 impl ops::DivAssign<f32> for Vector3 {
     fn div_assign(&mut self, other: f32) {
-        *self = Vector3 {
-            v: [
-                self.v[0] / other,
-                self.v[1] / other,
-                self.v[2] / other,
-            ]
-        }
+        self.x /= other;
+        self.y /= other;
+        self.z /= other;
     }
 }
 
 impl<'a> ops::DivAssign<f32> for &'a mut Vector3 {
     fn div_assign(&mut self, other: f32) {
-        **self = Vector3 {
-            v: [
-                self.v[0] / other,
-                self.v[1] / other,
-                self.v[2] / other,
-            ]
-        }
+        self.x /= other;
+        self.y /= other;
+        self.z /= other;
     }
 }
 
@@ -902,14 +828,14 @@ impl<'a> From<(&'a Vector2, f32, f32)> for Vector4 {
 impl From<(Vector3, f32)> for Vector4 {
     #[inline]
     fn from((v, w): (Vector3, f32)) -> Vector4 {
-        Vector4::new(v.v[0], v.v[1], v.v[2], w)
+        Vector4::new(v.x, v.y, v.z, w)
     }
 }
 
 impl<'a> From<(&'a Vector3, f32)> for Vector4 {
     #[inline]
     fn from((v, w): (&'a Vector3, f32)) -> Vector4 {
-        Vector4::new(v.v[0], v.v[1], v.v[2], w)
+        Vector4::new(v.x, v.y, v.z, w)
     }
 }
 
@@ -1053,9 +979,9 @@ impl Matrix4 {
 
     pub fn translate(&self, v: &Vector3) -> Matrix4 {
         let mut m_t = Matrix4::identity();
-        m_t.m[12] = v.v[0];
-        m_t.m[13] = v.v[1];
-        m_t.m[14] = v.v[2];
+        m_t.m[12] = v.x;
+        m_t.m[13] = v.y;
+        m_t.m[14] = v.z;
 
         m_t * self
     }
@@ -1102,9 +1028,9 @@ impl Matrix4 {
     // scale a matrix by [x, y, z]
     pub fn scale(&self, v: &Vector3) -> Matrix4 {
         let mut m_s = Matrix4::identity();
-        m_s.m[0]  = v.v[0];
-        m_s.m[5]  = v.v[1];
-        m_s.m[10] = v.v[2];
+        m_s.m[0]  = v.x;
+        m_s.m[5]  = v.y;
+        m_s.m[10] = v.z;
     
         m_s * self
     }
@@ -1417,9 +1343,9 @@ impl Versor {
         Versor {
             q: [
                 f32::cos(0.5 * radians),
-                f32::sin(0.5 * radians) * axis.v[0],
-                f32::sin(0.5 * radians) * axis.v[1],
-                f32::sin(0.5 * radians) * axis.v[2],
+                f32::sin(0.5 * radians) * axis.x,
+                f32::sin(0.5 * radians) * axis.y,
+                f32::sin(0.5 * radians) * axis.z,
             ]
         }
     }
@@ -1666,7 +1592,7 @@ mod vec3_tests {
     #[test]
     fn test_addition() {
         for test in test_cases().iter() {
-            let expected = super::vec3((test.x.v[0] + test.y.v[0], test.x.v[1] + test.y.v[1], test.x.v[2] + test.y.v[2]));
+            let expected = super::vec3((test.x.x + test.y.x, test.x.y + test.y.y, test.x.z + test.y.z));
             let result = test.x + test.y;
             assert_eq!(result, expected);
         }
@@ -1675,7 +1601,7 @@ mod vec3_tests {
     #[test]
     fn test_subtraction() {
         for test in test_cases().iter() {
-            let expected = super::vec3((test.x.v[0] - test.y.v[0], test.x.v[1] - test.y.v[1], test.x.v[2] - test.y.v[2]));
+            let expected = super::vec3((test.x.x - test.y.x, test.x.y - test.y.y, test.x.z - test.y.z));
             let result = test.x - test.y;
             assert_eq!(result, expected);
         }
@@ -1684,7 +1610,7 @@ mod vec3_tests {
     #[test]
     fn test_scalar_multiplication() {
         for test in test_cases().iter() {
-            let expected = super::vec3((test.c * test.x.v[0], test.c * test.x.v[1], test.c * test.x.v[2]));
+            let expected = super::vec3((test.c * test.x.x, test.c * test.x.y, test.c * test.x.z));
             let result = test.x * test.c;
             assert_eq!(result, expected);
         }
@@ -1693,7 +1619,7 @@ mod vec3_tests {
     #[test]
     fn test_scalar_division() {
         for test in test_cases().iter() {
-            let expected = super::vec3((test.x.v[0] / test.c, test.x.v[1] / test.c, test.x.v[2] / test.c));
+            let expected = super::vec3((test.x.x / test.c, test.x.y / test.c, test.x.z / test.c));
             let result = test.x / test.c;
             assert_eq!(result, expected);
         }
