@@ -1513,14 +1513,10 @@ impl Matrix4 {
         self.determinant() != 0.0
     }
 
-    /* returns a 16-element array that is the inverse of a 16-element array (4x4
-    matrix). see
-    http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-    */
     pub fn inverse(&self) -> Matrix4 {
         let det = self.determinant();
-        /* there is no inverse if determinant is zero (not likely unless scale is
-        broken) */
+        
+        // A matrix with zero determinant has no inverse.
         if det == 0.0 {
             eprintln!("WARNING. Matrix has zero determinant. It cannot be inverted.");
             
@@ -1591,7 +1587,8 @@ impl Matrix4 {
         let sy = near / range;
         let sz = -(far + near) / (far - near);
         let pz = -(2.0 * far * near) / (far - near);
-        let mut m = Matrix4::zero(); // make sure bottom-right corner is zero
+        // Make sure the bottom right corner is zero.
+        let mut m = Matrix4::zero();
         m.m[0] = sx;
         m.m[5] = sy;
         m.m[10] = sz;
@@ -1768,11 +1765,8 @@ pub struct Quaternion {
 
 impl Quaternion {
     pub fn normalize(&self) -> Quaternion {
-        // normalize(q) = q / magnitude (q)
-        // magnitude (q) = sqrt (w*w + x*x...)
-        // only compute sqrt if interior sum != 1.0
         let sum = self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z;
-        // NB: Floats have min 6 digits of precision.
+        // NOTE: f32s have min 6 digits of precision.
         let threshold = 0.0001;
         if f32::abs(1.0 - sum) < threshold {
             return *self;

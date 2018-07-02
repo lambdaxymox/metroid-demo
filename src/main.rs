@@ -345,11 +345,15 @@ fn create_cube_map(
     }
 }
 
+///
+/// Create the cube map shaders.
+///
 fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     let cube_sp = glh::create_program_from_files(
         &context, "shaders/cube.vert.glsl", "shaders/cube.frag.glsl"
     );
     assert!(cube_sp > 0);
+
     // NOTE: This view matrix should *NOT* contain camera translation.
     let cube_view_mat_location = unsafe {
         gl::GetUniformLocation(cube_sp, "view".as_ptr() as *const i8)
@@ -364,6 +368,9 @@ fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     (cube_sp, cube_view_mat_location, cube_proj_mat_location)
 }
 
+///
+/// Create the ground plane shaders.
+///
 fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint,  GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. also note how I
