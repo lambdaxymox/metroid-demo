@@ -22,7 +22,7 @@ use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
-use math::{Matrix4, Versor};
+use math::{Matrix4, Quaternion};
 use camera::Camera;
 
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
@@ -426,7 +426,7 @@ fn create_camera(context: &glh::GLContext) -> Camera {
     let up  = math::vec4((0.0, 1.0,  0.0, 0.0));
     let cam_pos = math::vec3((0.0, 0.0, 5.0));
     
-    let axis = Versor::from_axis_deg(0.0, math::vec3((1.0, 0.0, 0.0)));
+    let axis = Quaternion::from_axis_deg(0.0, math::vec3((1.0, 0.0, 0.0)));
 
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
@@ -662,7 +662,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3(camera.up));
+                let q_yaw = Quaternion::from_axis_deg(cam_yaw, math::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -671,7 +671,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Versor::from_axis_deg(cam_yaw, math::vec3(camera.up));
+                let q_yaw = Quaternion::from_axis_deg(cam_yaw, math::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -680,7 +680,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
+                let q_pitch = Quaternion::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -689,7 +689,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Versor::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
+                let q_pitch = Quaternion::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -698,7 +698,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3(camera.fwd));
+                let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -707,7 +707,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Versor::from_axis_deg(cam_roll, math::vec3(camera.fwd));
+                let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}

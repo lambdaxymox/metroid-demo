@@ -1321,6 +1321,14 @@ impl Matrix3 {
         Matrix3::new(1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0)
     }
 
+    pub fn transpose(&self) -> Matrix3 {
+        Matrix3::new(
+            self.m[0], self.m[3], self.m[7],  
+            self.m[1], self.m[4], self.m[8],  
+            self.m[2], self.m[6], self.m[9]
+        )
+    }
+
     pub fn as_ptr(&self) -> *const f32 {
         self.m.as_ptr()
     }
@@ -1663,22 +1671,22 @@ impl<'a> ops::Mul<&'a Matrix4> for Matrix4 {
     fn mul(self, other: &'a Matrix4) -> Matrix4 {
         let mut mm = Matrix4::zero();
 
-        mm.m[0]  = self.m[0]*other.m[0]  + self.m[4]*other.m[1]  + self.m[8]*other.m[2]   + self.m[12]*other.m[3];
-        mm.m[1]  = self.m[1]*other.m[0]  + self.m[5]*other.m[1]  + self.m[9]*other.m[2]   + self.m[13]*other.m[3];
-        mm.m[2]  = self.m[2]*other.m[0]  + self.m[6]*other.m[1]  + self.m[10]*other.m[2]  + self.m[14]*other.m[3];
-        mm.m[3]  = self.m[3]*other.m[0]  + self.m[7]*other.m[1]  + self.m[11]*other.m[2]  + self.m[15]*other.m[3];
-        mm.m[4]  = self.m[0]*other.m[4]  + self.m[4]*other.m[5]  + self.m[8]*other.m[6]   + self.m[12]*other.m[7];
-        mm.m[5]  = self.m[1]*other.m[4]  + self.m[5]*other.m[5]  + self.m[9]*other.m[6]   + self.m[13]*other.m[7];
-        mm.m[6]  = self.m[2]*other.m[4]  + self.m[6]*other.m[5]  + self.m[10]*other.m[6]  + self.m[14]*other.m[7];
-        mm.m[7]  = self.m[3]*other.m[4]  + self.m[7]*other.m[5]  + self.m[11]*other.m[6]  + self.m[15]*other.m[7];
-        mm.m[8]  = self.m[0]*other.m[8]  + self.m[4]*other.m[9]  + self.m[8]*other.m[10]  + self.m[12]*other.m[11];
-        mm.m[9]  = self.m[1]*other.m[8]  + self.m[5]*other.m[9]  + self.m[9]*other.m[10]  + self.m[13]*other.m[11];
-        mm.m[10] = self.m[2]*other.m[8]  + self.m[6]*other.m[9]  + self.m[10]*other.m[10] + self.m[14]*other.m[11];
-        mm.m[11] = self.m[3]*other.m[8]  + self.m[7]*other.m[9]  + self.m[11]*other.m[10] + self.m[15]*other.m[11];
-        mm.m[12] = self.m[0]*other.m[12] + self.m[4]*other.m[13] + self.m[8]*other.m[14]  + self.m[12]*other.m[15];
-        mm.m[13] = self.m[1]*other.m[12] + self.m[5]*other.m[13] + self.m[9]*other.m[14]  + self.m[13]*other.m[15];
-        mm.m[14] = self.m[2]*other.m[12] + self.m[6]*other.m[13] + self.m[10]*other.m[14] + self.m[14]*other.m[15];
-        mm.m[15] = self.m[3]*other.m[12] + self.m[7]*other.m[13] + self.m[11]*other.m[14] + self.m[15]*other.m[15];
+        mm.m[0]  = self.m[0] * other.m[0]  + self.m[4] * other.m[1]  + self.m[8]  * other.m[2]  + self.m[12] * other.m[3];
+        mm.m[1]  = self.m[1] * other.m[0]  + self.m[5] * other.m[1]  + self.m[9]  * other.m[2]  + self.m[13] * other.m[3];
+        mm.m[2]  = self.m[2] * other.m[0]  + self.m[6] * other.m[1]  + self.m[10] * other.m[2]  + self.m[14] * other.m[3];
+        mm.m[3]  = self.m[3] * other.m[0]  + self.m[7] * other.m[1]  + self.m[11] * other.m[2]  + self.m[15] * other.m[3];
+        mm.m[4]  = self.m[0] * other.m[4]  + self.m[4] * other.m[5]  + self.m[8]  * other.m[6]  + self.m[12] * other.m[7];
+        mm.m[5]  = self.m[1] * other.m[4]  + self.m[5] * other.m[5]  + self.m[9]  * other.m[6]  + self.m[13] * other.m[7];
+        mm.m[6]  = self.m[2] * other.m[4]  + self.m[6] * other.m[5]  + self.m[10] * other.m[6]  + self.m[14] * other.m[7];
+        mm.m[7]  = self.m[3] * other.m[4]  + self.m[7] * other.m[5]  + self.m[11] * other.m[6]  + self.m[15] * other.m[7];
+        mm.m[8]  = self.m[0] * other.m[8]  + self.m[4] * other.m[9]  + self.m[8]  * other.m[10] + self.m[12] * other.m[11];
+        mm.m[9]  = self.m[1] * other.m[8]  + self.m[5] * other.m[9]  + self.m[9]  * other.m[10] + self.m[13] * other.m[11];
+        mm.m[10] = self.m[2] * other.m[8]  + self.m[6] * other.m[9]  + self.m[10] * other.m[10] + self.m[14] * other.m[11];
+        mm.m[11] = self.m[3] * other.m[8]  + self.m[7] * other.m[9]  + self.m[11] * other.m[10] + self.m[15] * other.m[11];
+        mm.m[12] = self.m[0] * other.m[12] + self.m[4] * other.m[13] + self.m[8]  * other.m[14] + self.m[12] * other.m[15];
+        mm.m[13] = self.m[1] * other.m[12] + self.m[5] * other.m[13] + self.m[9]  * other.m[14] + self.m[13] * other.m[15];
+        mm.m[14] = self.m[2] * other.m[12] + self.m[6] * other.m[13] + self.m[10] * other.m[14] + self.m[14] * other.m[15];
+        mm.m[15] = self.m[3] * other.m[12] + self.m[7] * other.m[13] + self.m[11] * other.m[14] + self.m[15] * other.m[15];
 
         mm
     }
@@ -1751,12 +1759,12 @@ impl cmp::PartialEq for Matrix4 {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct Versor {
+pub struct Quaternion {
     q: [f32; 4],
 }
 
-impl Versor {
-    pub fn normalize(&self) -> Versor {
+impl Quaternion {
+    pub fn normalize(&self) -> Quaternion {
         // normalize(q) = q / magnitude (q)
         // magnitude (q) = sqrt (w*w + x*x...)
         // only compute sqrt if interior sum != 1.0
@@ -1771,12 +1779,12 @@ impl Versor {
         self / norm
     }
 
-    pub fn dot(&self, r: &Versor) -> f32 {
+    pub fn dot(&self, r: &Quaternion) -> f32 {
         self.q[0] * r.q[0] + self.q[1] * r.q[1] + self.q[2] * r.q[2] + self.q[3] * r.q[3]
     }
 
-    pub fn from_axis_rad(radians: f32, axis: Vector3) -> Versor {
-        Versor {
+    pub fn from_axis_rad(radians: f32, axis: Vector3) -> Quaternion {
+        Quaternion {
             q: [
                 f32::cos(0.5 * radians),
                 f32::sin(0.5 * radians) * axis.x,
@@ -1786,7 +1794,7 @@ impl Versor {
         }
     }
 
-    pub fn from_axis_deg(degrees: f32, axis: Vector3) -> Versor {
+    pub fn from_axis_deg(degrees: f32, axis: Vector3) -> Quaternion {
         Self::from_axis_rad(ONE_DEG_IN_RAD * degrees, axis)
     }
 
@@ -1827,7 +1835,7 @@ impl Versor {
         m.m[15] = 1.0;
     }
 
-    pub fn slerp(q: &mut Versor, r: &Versor, t: f32) -> Versor {
+    pub fn slerp(q: &mut Quaternion, r: &Quaternion, t: f32) -> Quaternion {
         // angle between q0-q1
         let mut cos_half_theta = q.dot(r);
         // as found here
@@ -1852,7 +1860,7 @@ impl Versor {
         let sin_half_theta = f32::sqrt(1.0 - cos_half_theta * cos_half_theta);
         // if theta = 180 degrees then result is not fully defined
         // we could rotate around any axis normal to qa or qb
-        let mut result = Versor { q: [1.0, 0.0, 0.0, 0.0] };
+        let mut result = Quaternion { q: [1.0, 0.0, 0.0, 0.0] };
         if f32::abs(sin_half_theta) < 0.001 {
             result.q[0] = (1.0 - t) * q.q[0] + t * r.q[0];
             result.q[1] = (1.0 - t) * q.q[1] + t * r.q[1];
@@ -1874,17 +1882,17 @@ impl Versor {
     }
 }
 
-impl fmt::Display for Versor {
+impl fmt::Display for Quaternion {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "[{:.2}, {:.2}, {:.2}, {:.2}]", self.q[0], self.q[1], self.q[2], self.q[3])
     }
 }
 
-impl ops::Div<f32> for Versor {
-    type Output = Versor;
+impl ops::Div<f32> for Quaternion {
+    type Output = Quaternion;
 
-    fn div(self, other: f32) -> Versor {
-        Versor {
+    fn div(self, other: f32) -> Quaternion {
+        Quaternion {
             q: [
                 self.q[0] / other, 
                 self.q[1] / other, 
@@ -1895,11 +1903,11 @@ impl ops::Div<f32> for Versor {
     }
 }
 
-impl<'a> ops::Div<f32> for &'a Versor {
-    type Output = Versor;
+impl<'a> ops::Div<f32> for &'a Quaternion {
+    type Output = Quaternion;
 
-    fn div(self, other: f32) -> Versor {
-        Versor {
+    fn div(self, other: f32) -> Quaternion {
+        Quaternion {
             q: [
                 self.q[0] / other, 
                 self.q[1] / other, 
@@ -1910,11 +1918,11 @@ impl<'a> ops::Div<f32> for &'a Versor {
     }
 }
 
-impl ops::Mul<f32> for Versor {
-    type Output = Versor;
+impl ops::Mul<f32> for Quaternion {
+    type Output = Quaternion;
 
-    fn mul(self, other: f32) -> Versor {
-        Versor {
+    fn mul(self, other: f32) -> Quaternion {
+        Quaternion {
             q: [
                 self.q[0] * other,
                 self.q[1] * other,
@@ -1925,11 +1933,11 @@ impl ops::Mul<f32> for Versor {
     }
 }
 
-impl<'a> ops::Mul<&'a Versor> for Versor {
-    type Output = Versor;
+impl<'a> ops::Mul<&'a Quaternion> for Quaternion {
+    type Output = Quaternion;
 
-    fn mul(self, other: &'a Versor) -> Self::Output {
-        let result = Versor {
+    fn mul(self, other: &'a Quaternion) -> Self::Output {
+        let result = Quaternion {
             q: [
                 other.q[0] * self.q[0] - other.q[1] * self.q[1] - other.q[2] * self.q[2] - other.q[3] * self.q[3],
                 other.q[0] * self.q[1] + other.q[1] * self.q[0] - other.q[2] * self.q[3] + other.q[3] * self.q[2],
@@ -1942,11 +1950,11 @@ impl<'a> ops::Mul<&'a Versor> for Versor {
     }
 }
 
-impl<'a> ops::Add<&'a Versor> for Versor {
-    type Output = Versor;
+impl<'a> ops::Add<&'a Quaternion> for Quaternion {
+    type Output = Quaternion;
 
-    fn add(self, other: &'a Versor) -> Self::Output {
-        let result = Versor {
+    fn add(self, other: &'a Quaternion) -> Self::Output {
+        let result = Quaternion {
             q: [
                 other.q[0] + self.q[0],
                 other.q[1] + self.q[1],

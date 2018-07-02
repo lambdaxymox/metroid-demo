@@ -1,4 +1,4 @@
-use math::{Vector3, Vector4, Matrix4, Versor};
+use math::{Vector3, Vector4, Matrix4, Quaternion};
 
 
 pub struct Camera {
@@ -16,7 +16,7 @@ pub struct Camera {
     pub up: Vector4,
 
     pub trans_mat_inv: Matrix4,
-    pub axis: Versor,
+    pub axis: Quaternion,
     pub rot_mat_inv: Matrix4,
     pub view_mat: Matrix4,
 }
@@ -25,7 +25,7 @@ impl Camera {
     pub fn new(
         near: f32, far: f32, fov: f32, aspect: f32, 
         cam_speed: f32, cam_yaw_speed: f32, cam_pos: Vector3,
-        fwd: Vector4, rgt: Vector4, up: Vector4, axis: Versor) -> Camera {
+        fwd: Vector4, rgt: Vector4, up: Vector4, axis: Quaternion) -> Camera {
 
         let proj_mat = Matrix4::perspective(fov, aspect, near, far);
         let trans_mat_inv = Matrix4::identity().translate(&cam_pos);
