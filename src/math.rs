@@ -497,16 +497,16 @@ impl<'a> From<(&'a Vector2, f32)> for Vector3 {
     }
 }
 
-impl<'a> From<Vec4> for Vector3 {
+impl<'a> From<Vector4> for Vector3 {
     #[inline]
-    fn from(v: Vec4) -> Vector3 {
+    fn from(v: Vector4) -> Vector3 {
         Vector3::new(v.v[0], v.v[1], v.v[2])
     }
 }
 
-impl<'a> From<&'a Vec4> for Vector3 {
+impl<'a> From<&'a Vector4> for Vector3 {
     #[inline]
-    fn from(v: &'a Vec4) -> Vector3 {
+    fn from(v: &'a Vector4) -> Vector3 {
         Vector3::new(v.v[0], v.v[1], v.v[2])
     }
 }
@@ -859,68 +859,68 @@ impl<'a> ops::DivAssign<f32> for &'a mut Vector3 {
 
 
 #[derive(Copy, Clone, Debug)]
-pub struct Vec4 {
+pub struct Vector4 {
     pub v: [f32; 4],
 }
 
-impl Vec4 {
-    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Vec4 {
-        Vec4 { v: [x, y, z, w] }
+impl Vector4 {
+    pub fn new(x: f32, y: f32, z: f32, w: f32) -> Vector4 {
+        Vector4 { v: [x, y, z, w] }
     }
 
-    pub fn zero() -> Vec4 {
-        Vec4 { v: [0.0, 0.0, 0.0, 0.0] }
+    pub fn zero() -> Vector4 {
+        Vector4 { v: [0.0, 0.0, 0.0, 0.0] }
     }
 }
 
 #[inline]
-pub fn vec4<T: Into<Vec4>>(v: T) -> Vec4 {
+pub fn vec4<T: Into<Vector4>>(v: T) -> Vector4 {
     v.into()
 }
 
-impl From<(f32, f32, f32, f32)> for Vec4 {
+impl From<(f32, f32, f32, f32)> for Vector4 {
     #[inline]
-    fn from((x, y, z, w): (f32, f32, f32, f32)) -> Vec4 {
-        Vec4::new(x, y, z, w)
+    fn from((x, y, z, w): (f32, f32, f32, f32)) -> Vector4 {
+        Vector4::new(x, y, z, w)
     }
 }
 
-impl From<(Vector2, f32, f32)> for Vec4 {
+impl From<(Vector2, f32, f32)> for Vector4 {
     #[inline]
-    fn from((v, z, w): (Vector2, f32, f32)) -> Vec4 {
-        Vec4::new(v.x, v.y, z, w)
+    fn from((v, z, w): (Vector2, f32, f32)) -> Vector4 {
+        Vector4::new(v.x, v.y, z, w)
     }
 }
 
-impl<'a> From<(&'a Vector2, f32, f32)> for Vec4 {
+impl<'a> From<(&'a Vector2, f32, f32)> for Vector4 {
     #[inline]
-    fn from((v, z, w): (&'a Vector2, f32, f32)) -> Vec4 {
-        Vec4::new(v.x, v.y, z, w)
+    fn from((v, z, w): (&'a Vector2, f32, f32)) -> Vector4 {
+        Vector4::new(v.x, v.y, z, w)
     }
 }
 
-impl From<(Vector3, f32)> for Vec4 {
+impl From<(Vector3, f32)> for Vector4 {
     #[inline]
-    fn from((v, w): (Vector3, f32)) -> Vec4 {
-        Vec4::new(v.v[0], v.v[1], v.v[2], w)
+    fn from((v, w): (Vector3, f32)) -> Vector4 {
+        Vector4::new(v.v[0], v.v[1], v.v[2], w)
     }
 }
 
-impl<'a> From<(&'a Vector3, f32)> for Vec4 {
+impl<'a> From<(&'a Vector3, f32)> for Vector4 {
     #[inline]
-    fn from((v, w): (&'a Vector3, f32)) -> Vec4 {
-        Vec4::new(v.v[0], v.v[1], v.v[2], w)
+    fn from((v, w): (&'a Vector3, f32)) -> Vector4 {
+        Vector4::new(v.v[0], v.v[1], v.v[2], w)
     }
 }
 
-impl fmt::Display for Vec4 {
+impl fmt::Display for Vector4 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "[{:.2}, {:.2}, {:.2}, {:.2}]", self.v[0], self.v[1], self.v[2], self.v[3])
     }
 }
 
-impl cmp::PartialEq for Vec4 {
-    fn eq(&self, other: &Vec4) -> bool {
+impl cmp::PartialEq for Vector4 {
+    fn eq(&self, other: &Vector4) -> bool {
         (f32::abs(self.v[0] - other.v[0]) < EPSILON) &&
         (f32::abs(self.v[1] - other.v[1]) < EPSILON) &&
         (f32::abs(self.v[2] - other.v[2]) < EPSILON) &&
@@ -1282,16 +1282,16 @@ impl convert::AsMut<[f32; 16]> for Mat4 {
     }
 }
 
-impl ops::Mul<Vec4> for Mat4 {
-    type Output = Vec4;
+impl ops::Mul<Vector4> for Mat4 {
+    type Output = Vector4;
 
-    fn mul(self, other: Vec4) -> Self::Output {
+    fn mul(self, other: Vector4) -> Self::Output {
         let x = self.m[0] * other.v[0] + self.m[4] * other.v[1] + self.m[8]  * other.v[2] + self.m[12] * other.v[3];
         let y = self.m[1] * other.v[0] + self.m[5] * other.v[1] + self.m[9]  * other.v[2] + self.m[13] * other.v[3];
         let z = self.m[2] * other.v[0] + self.m[6] * other.v[1] + self.m[10] * other.v[2] + self.m[14] * other.v[3];
         let w = self.m[3] * other.v[0] + self.m[7] * other.v[1] + self.m[11] * other.v[2] + self.m[15] * other.v[3];
         
-        Vec4::new(x, y, z, w)
+        Vector4::new(x, y, z, w)
     }
 }
 
