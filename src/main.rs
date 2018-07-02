@@ -689,21 +689,22 @@ fn main() {
             // Draw the title screen. Disable depth testing and enable 
             // alpha blending to do so.
             gl::Disable(gl::DEPTH_TEST);
-            gl::Enable(gl::BLEND);
             gl::UseProgram(title_screen_sp);
             gl::ActiveTexture(gl::TEXTURE0);
             
+            gl::Enable(gl::BLEND);
+            gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
             gl::BindTexture(gl::TEXTURE_2D, title_screen_tex);
             gl::BindVertexArray(title_vao);
             gl::Uniform4f(title_screen_sp_color_loc, TITLE_COLOR[0], TITLE_COLOR[1], TITLE_COLOR[2], 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, title_points as i32);
+            gl::Disable(gl::BLEND);
 
             gl::BindTexture(gl::TEXTURE_2D, text_screen_tex);
             gl::BindVertexArray(string_vao);
             gl::Uniform4f(title_screen_sp_color_loc, TEXT_COLOR[0], TEXT_COLOR[2], TEXT_COLOR[2], 1.0);
             gl::DrawArrays(gl::TRIANGLES, 0, string_points as i32);
             gl::Enable(gl::DEPTH_TEST);
-            gl::Disable(gl::BLEND);
         }
 
         context.glfw.poll_events();
