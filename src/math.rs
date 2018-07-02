@@ -1760,7 +1760,10 @@ impl cmp::PartialEq for Matrix4 {
 
 #[derive(Copy, Clone, Debug)]
 pub struct Quaternion {
-    q: [f32; 4],
+    w: f32,
+    x: f32,
+    y: f32,
+    z: f32,
 }
 
 impl Quaternion {
@@ -1768,7 +1771,7 @@ impl Quaternion {
         // normalize(q) = q / magnitude (q)
         // magnitude (q) = sqrt (w*w + x*x...)
         // only compute sqrt if interior sum != 1.0
-        let sum = self.q[0] * self.q[0] + self.q[1] * self.q[1] + self.q[2] * self.q[2] + self.q[3] * self.q[3];
+        let sum = self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z;
         // NB: Floats have min 6 digits of precision.
         let threshold = 0.0001;
         if f32::abs(1.0 - sum) < threshold {
@@ -1780,17 +1783,15 @@ impl Quaternion {
     }
 
     pub fn dot(&self, r: &Quaternion) -> f32 {
-        self.q[0] * r.q[0] + self.q[1] * r.q[1] + self.q[2] * r.q[2] + self.q[3] * r.q[3]
+        self.w * r.w + self.x * r.x + self.y * r.y + self.z * r.z
     }
 
     pub fn from_axis_rad(radians: f32, axis: Vector3) -> Quaternion {
         Quaternion {
-            q: [
-                f32::cos(0.5 * radians),
-                f32::sin(0.5 * radians) * axis.x,
-                f32::sin(0.5 * radians) * axis.y,
-                f32::sin(0.5 * radians) * axis.z,
-            ]
+            w: f32::cos(0.5 * radians),
+            x: f32::sin(0.5 * radians) * axis.x,
+            y: f32::sin(0.5 * radians) * axis.y,
+            z: f32::sin(0.5 * radians) * axis.z,
         }
     }
 
@@ -1799,10 +1800,10 @@ impl Quaternion {
     }
 
     pub fn to_mat4(&self) -> Matrix4 {
-        let w = self.q[0];
-        let x = self.q[1];
-        let y = self.q[2];
-        let z = self.q[3];
+        let w = self.w;
+        let x = self.x;
+        let y = self.y;
+        let z = self.z;
     
         Matrix4::new(
             1.0 - 2.0 * y * y - 2.0 * z * z, 2.0 * x * y + 2.0 * w * z,       2.0 * x * z - 2.0 * w * y,       0.0, 
@@ -1813,10 +1814,10 @@ impl Quaternion {
     }
 
     pub fn to_mut_mat4(&self, m: &mut Matrix4) {
-        let w = self.q[0];
-        let x = self.q[1];
-        let y = self.q[2];
-        let z = self.q[3];
+        let w = self.w;
+        let x = self.x;
+        let y = self.y;
+        let z = self.z;
         m.m[0] = 1.0 - 2.0 * y * y - 2.0 * z * z;
         m.m[1] = 2.0 * x * y + 2.0 * w * z;
         m.m[2] = 2.0 * x * z - 2.0 * w * y;
@@ -1844,10 +1845,10 @@ impl Quaternion {
         // it take the short way around, rather than the long way
         // yeah! and furthermore Susan, I had to recalculate the d.p. after this
         if cos_half_theta < 0.0 {
-            q.q[0] *= -1.0;
-            q.q[1] *= -1.0;
-            q.q[2] *= -1.0;
-            q.q[3] *= -1.0;
+            q.w *= -1.0;
+            q.x *= -1.0;
+            q.y *= -1.0;
+            q.z *= -1.0;
 
             cos_half_theta = q.dot(r);
         }
@@ -1860,12 +1861,12 @@ impl Quaternion {
         let sin_half_theta = f32::sqrt(1.0 - cos_half_theta * cos_half_theta);
         // if theta = 180 degrees then result is not fully defined
         // we could rotate around any axis normal to qa or qb
-        let mut result = Quaternion { q: [1.0, 0.0, 0.0, 0.0] };
+        let mut result = Quaternion { w: 1.0, x: 0.0, y: 0.0, z: 0.0 };
         if f32::abs(sin_half_theta) < 0.001 {
-            result.q[0] = (1.0 - t) * q.q[0] + t * r.q[0];
-            result.q[1] = (1.0 - t) * q.q[1] + t * r.q[1];
-            result.q[2] = (1.0 - t) * q.q[2] + t * r.q[2];
-            result.q[3] = (1.0 - t) * q.q[3] + t * r.q[3];
+            result.w = (1.0 - t) * q.w + t * r.w;
+            result.x = (1.0 - t) * q.x + t * r.x;
+            result.y = (1.0 - t) * q.y + t * r.y;
+            result.z = (1.0 - t) * q.z + t * r.z;
 
             return result;
         }
@@ -1873,18 +1874,18 @@ impl Quaternion {
         let a = f32::sin((1.0 - t) * half_theta) / sin_half_theta;
         let b = f32::sin(t * half_theta) / sin_half_theta;
         
-        result.q[0] = q.q[0] * a + r.q[0] * b;
-        result.q[1] = q.q[1] * a + r.q[1] * b;
-        result.q[2] = q.q[2] * a + r.q[2] * b;
-        result.q[3] = q.q[3] * a + r.q[3] * b;
+        result.w = q.w * a + r.w * b;
+        result.x = q.x * a + r.x * b;
+        result.y = q.y * a + r.y * b;
+        result.z = q.z * a + r.z * b;
 
-        return result;
+        result
     }
 }
 
 impl fmt::Display for Quaternion {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "[{:.2}, {:.2}, {:.2}, {:.2}]", self.q[0], self.q[1], self.q[2], self.q[3])
+        writeln!(f, "[{:.2}, [{:.2}, {:.2}, {:.2}]]", self.w, self.x, self.y, self.z)
     }
 }
 
@@ -1893,12 +1894,10 @@ impl ops::Div<f32> for Quaternion {
 
     fn div(self, other: f32) -> Quaternion {
         Quaternion {
-            q: [
-                self.q[0] / other, 
-                self.q[1] / other, 
-                self.q[2] / other, 
-                self.q[3] / other,
-            ]
+            w: self.w / other, 
+            x: self.x / other, 
+            y: self.y / other, 
+            z: self.z / other,
         }
     }
 }
@@ -1908,12 +1907,10 @@ impl<'a> ops::Div<f32> for &'a Quaternion {
 
     fn div(self, other: f32) -> Quaternion {
         Quaternion {
-            q: [
-                self.q[0] / other, 
-                self.q[1] / other, 
-                self.q[2] / other, 
-                self.q[3] / other,
-            ]
+            w: self.w / other, 
+            x: self.x / other, 
+            y: self.y / other, 
+            z: self.z / other,
         }
     }
 }
@@ -1923,12 +1920,10 @@ impl ops::Mul<f32> for Quaternion {
 
     fn mul(self, other: f32) -> Quaternion {
         Quaternion {
-            q: [
-                self.q[0] * other,
-                self.q[1] * other,
-                self.q[2] * other,
-                self.q[3] * other,
-            ]
+            w: self.w * other,
+            x: self.x * other,
+            y: self.y * other,
+            z: self.z * other,
         }
     }
 }
@@ -1938,13 +1933,12 @@ impl<'a> ops::Mul<&'a Quaternion> for Quaternion {
 
     fn mul(self, other: &'a Quaternion) -> Self::Output {
         let result = Quaternion {
-            q: [
-                other.q[0] * self.q[0] - other.q[1] * self.q[1] - other.q[2] * self.q[2] - other.q[3] * self.q[3],
-                other.q[0] * self.q[1] + other.q[1] * self.q[0] - other.q[2] * self.q[3] + other.q[3] * self.q[2],
-                other.q[0] * self.q[2] + other.q[1] * self.q[3] + other.q[2] * self.q[0] - other.q[3] * self.q[1],
-                other.q[0] * self.q[3] - other.q[1] * self.q[2] + other.q[2] * self.q[1] + other.q[3] * self.q[0],
-            ]
+            w: other.w * self.w - other.x * self.x - other.y * self.y - other.z * self.z,
+            x: other.w * self.x + other.x * self.w - other.y * self.z + other.z * self.y,
+            y: other.w * self.y + other.x * self.z + other.y * self.w - other.z * self.x,
+            z: other.w * self.z - other.x * self.y + other.y * self.x + other.z * self.w,
         };
+
         // Renormalize in case of mangling.
         result.normalize()
     }
@@ -1955,12 +1949,10 @@ impl<'a> ops::Add<&'a Quaternion> for Quaternion {
 
     fn add(self, other: &'a Quaternion) -> Self::Output {
         let result = Quaternion {
-            q: [
-                other.q[0] + self.q[0],
-                other.q[1] + self.q[1],
-                other.q[2] + self.q[2],
-                other.q[3] + self.q[3],
-            ]
+            w: other.w + self.w,
+            x: other.x + self.x,
+            y: other.y + self.y,
+            z: other.z + self.z,
         };
         // Renormalize in case of mangling.
         result.normalize()
@@ -1969,7 +1961,7 @@ impl<'a> ops::Add<&'a Quaternion> for Quaternion {
 
 
 mod vec2_tests {
-    
+
 }
 
 mod vec3_tests {
