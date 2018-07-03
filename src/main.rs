@@ -25,9 +25,11 @@ use gl_helpers as glh;
 use math::{Matrix4, Quaternion};
 use camera::Camera;
 
+// OpenGL extension constants.
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
+// Log file.
 const GL_LOG_FILE: &str = "gl.log";
 
 // Textures.
@@ -167,6 +169,9 @@ fn load_title_font_atlas() -> FontAtlas {
     }
 }
 
+///
+/// Create the shaders for rendering text.
+///
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     let title_screen_sp = glh::create_program_from_files(
         context, "shaders/title_screen.vert.glsl", "shaders/title_screen.frag.glsl"
@@ -181,6 +186,9 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     (title_screen_sp, title_screen_sp_text_color_loc)
 }
 
+///
+/// Set up the geometry for rendering title screen text.
+///
 fn create_title_screen_geometry(
     context: &glh::GLContext, 
     font_atlas: &FontAtlas, text: &str,
@@ -219,6 +227,9 @@ fn create_title_screen_geometry(
     (string_vp_vbo, string_vt_vbo, string_vao, string_point_count)
 }
 
+///
+/// Print a string to the GLFW screen with the given font.
+///
 fn text_to_vbo(
     context: &glh::GLContext, st: &str, atlas: &FontAtlas,
     start_x: f32, start_y: f32, scale_px: f32,
@@ -452,6 +463,9 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
     (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
 }
 
+///
+/// Create the ground plane geometry.
+///
 #[allow(unused_variables)]
 fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     let ground_plane_points: [GLfloat; 18] = [
@@ -503,6 +517,9 @@ fn create_camera(context: &glh::GLContext) -> Camera {
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
 
+///
+/// Load textures.
+///
 fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
     let force_channels = 4;
     let mut image_data = match image::load_with_depth(file_name, force_channels, false) {
@@ -563,7 +580,10 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
 }
 
 ///
-/// Run this function whenever the frame buffer is resized.
+/// The GLFW frame buffer size callback function. This is normally set using 
+/// the GLFW `glfwSetFramebufferSizeCallback` function, but instead we explicitly
+/// handle window resizing in our state updates on the application side. Run this function 
+/// whenever the frame buffer is resized.
 /// 
 fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Camera, width: u32, height: u32) {
     context.width = width;
@@ -611,6 +631,7 @@ fn main() {
         title_screen_sp,
         title_screen_sp_color_loc) = create_title_screen_shaders(&context);
 
+    // Screen text.
     let (
         string_vp_vbo,
         string_vt_vbo,
@@ -625,6 +646,7 @@ fn main() {
     load_texture(TEXT_FONT_SHEET, &mut text_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(text_screen_tex > 0);
 
+    // Title text.
     let (
         title_vp_vbo,
         title_vt_vbo,
@@ -678,7 +700,7 @@ fn main() {
         gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
 
-    /* ********************** RENDERING LOOP ****************************** */
+    /* -------------------------- RENDERING LOOP --------------------------- */
     while !context.window.should_close() {
         let elapsed_seconds = glh::update_timers(&mut context);
         glh::update_fps_counter(&mut context);
@@ -732,7 +754,7 @@ fn main() {
 
         context.glfw.poll_events();
 
-        /* ********************** UPDATE GAME STATE ************************* */
+        /* ------------------------- UPDATE GAME STATE ------------------------ */
         // Camera control keys.
         let mut cam_moved = false;
         let mut move_to = math::vec3((0.0, 0.0, 0.0));
@@ -836,9 +858,9 @@ fn main() {
             _ => {}
         }
 
-        // update view matrix
+        // Update view matrix.
         if cam_moved {
-            // re-calculate local axes so can move fwd in dir cam is pointing
+            // Recalculate local axes so we can move fwd in the direction the camera is pointing.
             camera.rot_mat_inv = camera.axis.to_mat4();
             camera.fwd = camera.rot_mat_inv * math::vec4((0.0, 0.0, -1.0, 0.0));
             camera.rgt = camera.rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
@@ -867,9 +889,9 @@ fn main() {
             }
             _ => {}
         }
-        /* ********************* END UPDATE GAME STATE ************************* */
+        /* ----------------------- END UPDATE GAME STATE ----------------------- */
 
         context.window.swap_buffers();
     }
-    /* ******************* END RENDERING LOOP ****************************** */
+    /* ---------------------- END RENDERING LOOP ----------------------------- */
 }
