@@ -22,10 +22,10 @@ The demo has the following control scheme.
 * E -- Move camera down
 * W -- Move camera forward
 * S -- Move camera backwards
-* Left Arrow -- Rotate camera left
-* Right Arrow -- Rotate camera right
-* Up Key -- Rotate camera up
-* Down Key -- Rotate camera down
+* Left Arrow -- Yaw camera left
+* Right Arrow -- Yaw camera right
+* Up Key -- Pitch camera up
+* Down Key -- Pitch camera down
 * Z -- Roll camera left
 * C -- Roll camera right
 * Escape -- Close window and shut down program
