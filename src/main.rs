@@ -493,12 +493,12 @@ fn create_camera(context: &glh::GLContext) -> Camera {
     let cam_speed: GLfloat = 3.0;
     let cam_yaw_speed: GLfloat = 50.0;
 
-    let fwd = math::vec4((0.0, 0.0, -1.0, 0.0));
+    let fwd = math::vec4((0.0, 0.98, -0.19, 0.0));
     let rgt = math::vec4((1.0, 0.0,  0.0, 0.0));
-    let up  = math::vec4((0.0, 1.0,  0.0, 0.0));
-    let cam_pos = math::vec3((0.0, 0.0, 5.0));
+    let up  = math::vec4((0.0, 0.22,  0.98, 0.0));
+    let cam_pos = math::vec3((0.0, -6.81, 3.96));
     
-    let axis = Quaternion::from_axis_deg(0.0, math::vec3((1.0, 0.0, 0.0)));
+    let axis = Quaternion::new(0.77, 0.64, 0.0, 0.0);
 
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
@@ -832,6 +832,18 @@ fn main() {
                 cam_moved = true;
                 let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
+            }
+            _ => {}
+        }
+        match context.window.get_key(Key::Space) {
+            Action::Press | Action::Repeat => {
+                println!("near: {}", camera.near);
+                println!("far: {}", camera.far);
+                println!("cam_pos: {}", camera.cam_pos);
+                println!("fwd: {}", camera.fwd);
+                println!("rgt: {}", camera.rgt);
+                println!("up: {}", camera.up);
+                println!("axis: {}", camera.axis);
             }
             _ => {}
         }

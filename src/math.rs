@@ -1764,6 +1764,12 @@ pub struct Quaternion {
 }
 
 impl Quaternion {
+    pub fn new(w: f32, x: f32, y: f32, z: f32) -> Quaternion {
+        let q = Quaternion { w: w, x: x, y: y, z: z };
+
+        q.normalize()
+    }
+
     pub fn normalize(&self) -> Quaternion {
         let sum = self.w * self.w + self.x * self.x + self.y * self.y + self.z * self.z;
         // NOTE: f32s have min 6 digits of precision.
