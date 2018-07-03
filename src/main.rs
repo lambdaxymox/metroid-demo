@@ -182,7 +182,8 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
 }
 
 fn create_title_screen_geometry(
-    context: &glh::GLContext, font_atlas: &FontAtlas, text: &str,
+    context: &glh::GLContext, 
+    font_atlas: &FontAtlas, text: &str,
     x_pos: f32, y_pos: f32, pixel_scale: f32) -> (GLuint, GLuint, GLuint, usize) {
     
     let mut string_vp_vbo = 0;
@@ -561,6 +562,22 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
     true
 }
 
+///
+/// Run this function whenever the frame buffer is resized.
+/// 
+fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Camera, width: u32, height: u32) {
+    context.width = width;
+    context.height = height;
+
+    let aspect = context.width as f32 / context.height as f32;
+    camera.aspect = aspect;
+    camera.proj_mat = Matrix4::perspective(camera.fov, aspect, camera.near, camera.far);
+    unsafe {
+        gl::Viewport(0, 0, context.width as i32, context.height as i32);
+    }
+}
+
+
 #[allow(unused_variables)]
 fn main() {
     let mut context = match glh::start_gl(GL_LOG_FILE) {
@@ -665,6 +682,11 @@ fn main() {
     while !context.window.should_close() {
         let elapsed_seconds = glh::update_timers(&mut context);
         glh::update_fps_counter(&mut context);
+
+        let (width, height) = context.window.get_framebuffer_size();
+        if (width != context.width as i32) && (height != context.height as i32) {
+            glfw_framebuffer_size_callback(&mut context, &mut camera, width as u32, height as u32);
+        }
 
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
