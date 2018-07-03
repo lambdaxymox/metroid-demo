@@ -2,8 +2,6 @@ use std::cmp;
 use std::fmt;
 use std::mem;
 use std::ops;
-use std::convert::From;
-use std::convert;
 
 
 // Constants used to convert degrees into radians.
@@ -1357,13 +1355,13 @@ fn mat3(m11: f32, m12: f32, m13: f32,
     Matrix3::new(m11, m12, m13, m21, m22, m23, m31, m32, m33)
 }
 
-impl convert::AsRef<[f32; 9]> for Matrix3 {
+impl AsRef<[f32; 9]> for Matrix3 {
     fn as_ref(&self) -> &[f32; 9] {
         &self.m
     }
 }
 
-impl convert::AsMut<[f32; 9]> for Matrix3 {
+impl AsMut<[f32; 9]> for Matrix3 {
     fn as_mut(&mut self) -> &mut [f32; 9] {
         &mut self.m
     }
@@ -1637,13 +1635,13 @@ pub fn mat4(
     )
 }
 
-impl convert::AsRef<[f32; 16]> for Matrix4 {
+impl AsRef<[f32; 16]> for Matrix4 {
     fn as_ref(&self) -> &[f32; 16] {
         &self.m
     }
 }
 
-impl convert::AsMut<[f32; 16]> for Matrix4 {
+impl AsMut<[f32; 16]> for Matrix4 {
     fn as_mut(&mut self) -> &mut [f32; 16] {
         &mut self.m
     }
