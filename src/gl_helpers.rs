@@ -122,7 +122,7 @@ pub struct GLContext {
 ///
 /// Initialize a new OpenGL context and start a new GLFW window. 
 ///
-pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
+pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, String> {
     // Initiate a logger.
     let logger = Logger::from(log_file);
     logger.restart();
@@ -147,7 +147,7 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
 
     log!(logger, "Started GLFW successfully");
     let maybe_glfw_window = glfw.create_window(
-        640, 480, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
+        width, height, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
     );
     let (mut window, events) = match maybe_glfw_window {
         Some(tuple) => tuple,
@@ -181,8 +181,8 @@ pub fn start_gl(log_file: &str) -> Result<GLContext, String> {
         window: window, 
         events: events,
         logger: logger,
-        width: 640,
-        height: 480,
+        width: width,
+        height: height,
         channel_depth: 3,
         running_time_seconds: 0.0,
         framerate_time_seconds: 0.0,

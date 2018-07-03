@@ -580,7 +580,7 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 
 #[allow(unused_variables)]
 fn main() {
-    let mut context = match glh::start_gl(GL_LOG_FILE) {
+    let mut context = match glh::start_gl(1280, 768, GL_LOG_FILE) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
