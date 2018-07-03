@@ -44,7 +44,7 @@ const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
-const TEXT_COLOR: [f32; 3] = [194 as f32 / 255 as f32, 210 as f32 / 255 as f32, 234 as f32 / 255 as f32];
+const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
 
 
 struct FontAtlas {
