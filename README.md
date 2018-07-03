@@ -1,3 +1,4 @@
+![Title Screen](readme.png)
 # Metroid(-like) OpenGL Demo
 An OpenGL tech demo with a skybox, some geometry, bitmapped font rendering, and a moveable camera.
 
