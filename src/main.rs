@@ -617,7 +617,7 @@ fn main() {
         string_vao,
         string_points
     ) = create_title_screen_geometry(
-        &context, &text_font_atlas, "Press ENTER to continue", -0.55, -0.4, 32.0
+        &context, &text_font_atlas, "Press ENTER to continue", -0.5, -0.4, 48.0
     );
 
     // Font sheet for the title screen text.
@@ -631,7 +631,7 @@ fn main() {
         title_vao,
         title_points
     ) = create_title_screen_geometry(
-        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 200.0
+        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 400.0
     );
 
     // Font sheet for the title text on the title screen.
