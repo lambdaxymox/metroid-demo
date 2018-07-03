@@ -835,18 +835,6 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Space) {
-            Action::Press | Action::Repeat => {
-                println!("near: {}", camera.near);
-                println!("far: {}", camera.far);
-                println!("cam_pos: {}", camera.cam_pos);
-                println!("fwd: {}", camera.fwd);
-                println!("rgt: {}", camera.rgt);
-                println!("up: {}", camera.up);
-                println!("axis: {}", camera.axis);
-            }
-            _ => {}
-        }
 
         // update view matrix
         if cam_moved {
