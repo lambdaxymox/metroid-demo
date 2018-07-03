@@ -31,12 +31,13 @@ const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 const GL_LOG_FILE: &str = "gl.log";
 
 // Textures.
-const FRONT: &str = "assets/skybox-panel.png";
-const BACK: &str = "assets/skybox-panel.png";
-const LEFT: &str = "assets/skybox-panel.png";
-const RIGHT: &str = "assets/skybox-panel.png";
-const TOP: &str = "assets/skybox-panel.png";
-const BOTTOM: &str = "assets/skybox-panel.png";
+const CUBE_MAP: &str = "assets/box.png";
+const FRONT: &str = CUBE_MAP;
+const BACK: &str = CUBE_MAP;
+const LEFT: &str = CUBE_MAP;
+const RIGHT: &str = CUBE_MAP;
+const TOP: &str = CUBE_MAP;
+const BOTTOM: &str = CUBE_MAP;
 const GROUND_PLANE_TEX: &str = "assets/tile-rock-planet256x256.png";
 const TEXT_FONT_SHEET: &str = "assets/font1684x1684.png";
 const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
