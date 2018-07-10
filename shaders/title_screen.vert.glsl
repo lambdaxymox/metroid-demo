@@ -1,4 +1,4 @@
-#version 410
+#version 420
 
 in layout (location = 0) vec2 vp;
 in layout (location = 1) vec2 vt;
