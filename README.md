@@ -30,3 +30,4 @@ The demo has the following control scheme.
 * Z -- Roll camera left
 * C -- Roll camera right
 * Escape -- Close window and shut down program
+* Backspace -- Reset the camera position and orientation to default.
