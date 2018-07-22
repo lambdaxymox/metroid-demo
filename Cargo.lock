@@ -123,6 +123,7 @@ dependencies = [
  "chrono 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "gl 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "glfw 0.23.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "simple_cgmath 0.2.0 (git+https://github.com/stallmanifold/simple-cgmath)",
  "stb_image 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -234,6 +235,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "simple_cgmath"
+version = "0.2.0"
+source = "git+https://github.com/stallmanifold/simple-cgmath#90e180c8fa937ebc44b365741c4dca7c6781e45f"
+
+[[package]]
 name = "stb_image"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -309,6 +315,7 @@ dependencies = [
 "checksum redox_syscall 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)" = "c214e91d3ecf43e9a4e41e578973adeb14b474f2bee858742d127af75a0112b1"
 "checksum rustc-serialize 0.3.24 (registry+https://github.com/rust-lang/crates.io-index)" = "dcf128d1287d2ea9d80910b5f1120d0b8eede3fbf1abe91c40d39ea7d51e6fda"
 "checksum semver 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2d5b7638a1f03815d94e88cb3b3c08e87f0db4d683ef499d1836aaf70a45623f"
+"checksum simple_cgmath 0.2.0 (git+https://github.com/stallmanifold/simple-cgmath)" = "<none>"
 "checksum stb_image 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "fda28e54a600dfee451fbab5eddef5e987e50f7ace7ceced3087dfb043ee7692"
 "checksum time 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)" = "d825be0eb33fda1a7e68012d51e9c7f451dc1a69391e7fdc197060bb8c56667b"
 "checksum winapi 0.3.5 (registry+https://github.com/rust-lang/crates.io-index)" = "773ef9dcc5f24b7d850d0ff101e542ff24c3b090a9768e03ff889fdef41f00fd"

@@ -2,12 +2,12 @@ extern crate gl;
 extern crate glfw;
 extern crate chrono;
 extern crate stb_image;
+extern crate simple_cgmath;
 
 #[macro_use]
 mod logger;
 
 mod gl_helpers;
-mod math;
 mod camera;
 
 use glfw::{Action, Context, Key};
@@ -22,7 +22,8 @@ use std::ptr;
 use std::process;
 
 use gl_helpers as glh;
-use math::{Matrix4, Quaternion};
+use simple_cgmath as math;
+use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
 
 // OpenGL extension constants.
@@ -591,7 +592,7 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 
     let aspect = context.width as f32 / context.height as f32;
     camera.aspect = aspect;
-    camera.proj_mat = Matrix4::perspective(camera.fov, aspect, camera.near, camera.far);
+    camera.proj_mat = math::perspective((camera.fov, aspect, camera.near, camera.far));
     unsafe {
         gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
