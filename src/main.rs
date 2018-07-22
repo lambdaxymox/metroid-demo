@@ -862,7 +862,7 @@ fn main() {
         // Update view matrix.
         if cam_moved {
             // Recalculate local axes so we can move fwd in the direction the camera is pointing.
-            camera.rot_mat_inv = camera.axis.to_mat4();
+            camera.rot_mat_inv = Matrix4::from(camera.axis);
             camera.fwd = camera.rot_mat_inv * math::vec4((0.0, 0.0, -1.0, 0.0));
             camera.rgt = camera.rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
             camera.up  = camera.rot_mat_inv * math::vec4((0.0, 1.0,  0.0, 0.0));
@@ -870,7 +870,7 @@ fn main() {
             camera.cam_pos += math::vec3(camera.fwd) * -move_to.z;
             camera.cam_pos += math::vec3(camera.up)  *  move_to.y;
             camera.cam_pos += math::vec3(camera.rgt) *  move_to.x;
-            camera.trans_mat_inv = Matrix4::identity().translate(&camera.cam_pos);
+            camera.trans_mat_inv = Matrix4::from_translation(camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse() * camera.trans_mat_inv.inverse();
             unsafe {
