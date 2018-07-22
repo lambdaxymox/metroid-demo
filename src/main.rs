@@ -499,11 +499,11 @@ fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     (points_vbo, points_vao)
 }
 
-fn create_camera(context: &glh::GLContext) -> Camera {
+fn create_camera(width: u32, height: u32) -> Camera {
     let near = 0.1;
     let far = 100.0;
     let fov = 67.0;
-    let aspect = context.width as f32 / context.height as f32;
+    let aspect = width as f32 / height as f32;
 
     let cam_speed: GLfloat = 3.0;
     let cam_yaw_speed: GLfloat = 50.0;
@@ -519,9 +519,9 @@ fn create_camera(context: &glh::GLContext) -> Camera {
 }
 
 fn reset_camera_to_default(context: &glh::GLContext, camera: &mut Camera) {
-    let width = context.width as f32;
-    let height = context.height as f32;
-    *camera = create_camera(context);
+    let width = context.width;
+    let height = context.height;
+    *camera = create_camera(width, height);
 }
 
 ///
@@ -682,7 +682,7 @@ fn main() {
     create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
     assert!(cube_map_texture > 0);
 
-    let mut camera = create_camera(&context);
+    let mut camera = create_camera(context.width, context.height);
 
     unsafe {
         gl::UseProgram(gp_sp);
