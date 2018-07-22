@@ -518,6 +518,12 @@ fn create_camera(context: &glh::GLContext) -> Camera {
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
 
+fn reset_camera_to_default(context: &glh::GLContext, camera: &mut Camera) {
+    let width = context.width as f32;
+    let height = context.height as f32;
+    *camera = create_camera(context);
+}
+
 ///
 /// Load textures.
 ///
@@ -855,6 +861,13 @@ fn main() {
                 cam_moved = true;
                 let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
+            }
+            _ => {}
+        }
+        match context.window.get_key(Key::Backspace) {
+            Action::Press | Action::Repeat => {
+                reset_camera_to_default(&context, &mut camera);
+                cam_moved = true;
             }
             _ => {}
         }
