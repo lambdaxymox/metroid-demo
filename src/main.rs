@@ -183,7 +183,7 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     assert!(title_screen_sp > 0);
 
     let title_screen_sp_text_color_loc = unsafe { 
-        gl::GetUniformLocation(title_screen_sp, "text_color".as_ptr() as *const i8)
+        gl::GetUniformLocation(title_screen_sp, glh::gl_str("text_color").as_ptr())
     };
     assert!(title_screen_sp_text_color_loc > -1);
 
@@ -430,12 +430,12 @@ fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
 
     // NOTE: This view matrix should *NOT* contain camera translation.
     let cube_view_mat_location = unsafe {
-        gl::GetUniformLocation(cube_sp, "view".as_ptr() as *const i8)
+        gl::GetUniformLocation(cube_sp, glh::gl_str("view").as_ptr())
     };
     assert!(cube_view_mat_location > -1);
 
     let cube_proj_mat_location = unsafe {
-        gl::GetUniformLocation(cube_sp, "proj".as_ptr() as *const i8)
+        gl::GetUniformLocation(cube_sp, glh::gl_str("proj").as_ptr())
     };
     assert!(cube_proj_mat_location > -1);
 
@@ -455,12 +455,12 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
     assert!(gp_sp > 0);
 
     let gp_view_mat_loc = unsafe { 
-        gl::GetUniformLocation(gp_sp, "view".as_ptr() as *const i8)
+        gl::GetUniformLocation(gp_sp, glh::gl_str("view").as_ptr())
     };
     assert!(gp_view_mat_loc > -1);
 
-    let gp_proj_mat_loc = unsafe { 
-        gl::GetUniformLocation(gp_sp, "proj".as_ptr() as *const i8)
+    let gp_proj_mat_loc = unsafe {
+        gl::GetUniformLocation(gp_sp, glh::gl_str("proj").as_ptr())
     };
     assert!(gp_proj_mat_loc > -1);
 
