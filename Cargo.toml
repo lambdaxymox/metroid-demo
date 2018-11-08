@@ -2,10 +2,13 @@
 name = "metroid-demo"
 version = "0.1.0"
 authors = ["Stallmanifold <stallmanifold@gmail.com>"]
+build = "build.rs"
 
 [dependencies]
 glfw = "0.25.0"
-gl = "0.11.0"
 stb_image = "0.2.2"
 chrono = "0.4.4"
 simple_cgmath = { git = "https://github.com/stallmanifold/simple-cgmath" }
+
+[build-dependencies]
+gl_generator = "0.10.0"

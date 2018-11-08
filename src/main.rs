@@ -1,4 +1,3 @@
-extern crate gl;
 extern crate glfw;
 extern crate chrono;
 extern crate stb_image;
@@ -6,6 +5,10 @@ extern crate simple_cgmath;
 
 #[macro_use]
 mod logger;
+
+mod gl {
+    include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
+}
 
 mod gl_helpers;
 mod camera;
