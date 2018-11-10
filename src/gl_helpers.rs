@@ -180,8 +180,7 @@ pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, St
     let mut glfw = __init_glfw();
 
     log!(logger, "Started GLFW successfully");
-    let maybe_glfw_window = glfw.create_window(///
-                                               #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let maybe_glfw_window = glfw.create_window(
         width, height, &format!("Metroid DEMO @ {:.2} FPS", 0.0), glfw::WindowMode::Windowed
     );
     let (mut window, events) = match maybe_glfw_window {
