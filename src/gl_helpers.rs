@@ -213,8 +213,8 @@ pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, St
     glfw.window_hint(glfw::WindowHint::Samples(Some(4)));
 
     // * ------------------------------ WINDOWS --------------------------- */
-    glfw.window_hint(glfw::WindowHint::ContextVersionMajor(3));
-    glfw.window_hint(glfw::WindowHint::ContextVersionMinor(3));
+    glfw.window_hint(glfw::WindowHint::ContextVersionMajor(4));
+    glfw.window_hint(glfw::WindowHint::ContextVersionMinor(6));
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
     glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
     /* ----------------------------------------- ---------------------------*/
