@@ -177,7 +177,7 @@ pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, St
     log!(logger, "Starting GLFW");
     log!(logger, "Using GLFW version {}", glfw::get_version_string());
 
-    let mut glfw = __init_glfw();
+    let glfw = __init_glfw();
 
     log!(logger, "Started GLFW successfully");
     let maybe_glfw_window = glfw.create_window(
