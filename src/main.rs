@@ -72,6 +72,7 @@ struct FontAtlas {
     columns: usize,
 }
 
+
 fn load_text_font_atlas() -> FontAtlas {
     let coords = [
         (' ', (0, 0)),
@@ -188,7 +189,7 @@ fn load_title_font_atlas() -> FontAtlas {
 ///
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     let title_screen_sp = glh::create_program_from_files(
-        context, "shaders/420/title_screen.vert.glsl", "shaders/420/title_screen.frag.glsl"
+        context, &format!("{}title_screen.vert.glsl", SHADERS), &format!("{}title_screen.frag.glsl", SHADERS)
     );
     assert!(title_screen_sp > 0);
 
@@ -434,7 +435,7 @@ fn create_cube_map(
 ///
 fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     let cube_sp = glh::create_program_from_files(
-        &context, "shaders/420/cube.vert.glsl", "shaders/420/cube.frag.glsl"
+        &context, &format!("{}cube.vert.glsl", SHADERS), &format!("{}cube.frag.glsl", SHADERS)
     );
     assert!(cube_sp > 0);
 
@@ -460,7 +461,7 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let gp_sp = glh::create_program_from_files(
-        context, "shaders/420/ground_plane.vert.glsl", "shaders/420/ground_plane.frag.glsl"
+        context, &format!("{}ground_plane.vert.glsl", SHADERS), &format!("{}ground_plane.frag.glsl", SHADERS)
     );
     assert!(gp_sp > 0);
 
