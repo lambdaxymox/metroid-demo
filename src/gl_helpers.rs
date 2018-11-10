@@ -267,7 +267,7 @@ pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, St
 ///
 /// Initialize a new OpenGL context and start a new GLFW window. 
 ///
-#[cfg(not(target_os = "macos"))]
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
 pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, String> {
     // Initiate a logger.
     let logger = Logger::from(log_file);
