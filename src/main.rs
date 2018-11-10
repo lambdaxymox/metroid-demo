@@ -52,6 +52,16 @@ const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
 
+// Shader paths.
+#[cfg(target_os = "macos")]
+const SHADERS: &str = "shaders/330/";
+
+#[cfg(target_os = "windows")]
+const SHADERS: &str = "shaders/330/";
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+const SHADERS: &str = "shaders/420/";
+
 
 struct FontAtlas {
     glyph_y_offsets: HashMap<char, f32>,
