@@ -1,7 +1,7 @@
 #version 330
 
-in layout (location = 0) vec2 vp;
-in layout (location = 1) vec2 vt;
+in vec2 vp;
+in vec2 vt;
 out vec2 st;
 
 
