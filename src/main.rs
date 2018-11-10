@@ -54,13 +54,13 @@ const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 
 
 // Shader paths.
 #[cfg(target_os = "macos")]
-const SHADERS: &str = "shaders/330/";
+const SHADER_PATH: &str = "shaders/330";
 
 #[cfg(target_os = "windows")]
-const SHADERS: &str = "shaders/330/";
+const SHADER_PATH: &str = "shaders/330";
 
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
-const SHADERS: &str = "shaders/420/";
+const SHADER_PATH: &str = "shaders/420";
 
 
 struct FontAtlas {
@@ -72,6 +72,9 @@ struct FontAtlas {
     columns: usize,
 }
 
+fn shader_file(file: &str) -> String {
+    format!("{}/{}", SHADER_PATH, file)
+}
 
 fn load_text_font_atlas() -> FontAtlas {
     let coords = [
@@ -189,7 +192,7 @@ fn load_title_font_atlas() -> FontAtlas {
 ///
 fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
     let title_screen_sp = glh::create_program_from_files(
-        context, &format!("{}title_screen.vert.glsl", SHADERS), &format!("{}title_screen.frag.glsl", SHADERS)
+        context, &shader_file("title_screen.vert.glsl"), &shader_file("title_screen.frag.glsl")
     );
     assert!(title_screen_sp > 0);
 
@@ -435,7 +438,7 @@ fn create_cube_map(
 ///
 fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     let cube_sp = glh::create_program_from_files(
-        &context, &format!("{}cube.vert.glsl", SHADERS), &format!("{}cube.frag.glsl", SHADERS)
+        &context, &shader_file("cube.vert.glsl"), &shader_file("cube.frag.glsl")
     );
     assert!(cube_sp > 0);
 
@@ -461,7 +464,7 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
     // the floor but also that the 'front' was on the top side. also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let gp_sp = glh::create_program_from_files(
-        context, &format!("{}ground_plane.vert.glsl", SHADERS), &format!("{}ground_plane.frag.glsl", SHADERS)
+        context, &shader_file("ground_plane.vert.glsl"), &shader_file("ground_plane.frag.glsl")
     );
     assert!(gp_sp > 0);
 
