@@ -37,7 +37,7 @@ const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 const GL_LOG_FILE: &str = "gl.log";
 
 // Textures.
-const CUBE_MAP: &str = "assets/skybox_panel.png";
+const CUBE_MAP: &str = "skybox_panel.png";
 const FRONT: &str = CUBE_MAP;
 const BACK: &str = CUBE_MAP;
 const LEFT: &str = CUBE_MAP;
@@ -702,7 +702,11 @@ fn main() {
 
     // Texture for the cube map.
     let mut cube_map_texture = 0;
-    create_cube_map(FRONT, BACK, TOP, BOTTOM, LEFT, RIGHT, &mut cube_map_texture);
+    create_cube_map(
+        &asset_file(FRONT), &asset_file(BACK), &asset_file(TOP),
+        &asset_file(BOTTOM), &asset_file(LEFT), &asset_file(RIGHT),
+        &mut cube_map_texture
+    );
     assert!(cube_map_texture > 0);
 
     let mut camera = create_camera(context.width, context.height);
