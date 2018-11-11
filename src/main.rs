@@ -62,6 +62,16 @@ const SHADER_PATH: &str = "shaders/330";
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 const SHADER_PATH: &str = "shaders/420";
 
+const ASSET_PATH: &str = "assets";
+
+
+fn shader_file(file: &str) -> String {
+    format!("{}/{}", SHADER_PATH, file)
+}
+
+fn asset_file(file: &str) -> String {
+    format!("{}/{}", ASSET_PATH, file)
+}
 
 struct FontAtlas {
     glyph_y_offsets: HashMap<char, f32>,
@@ -70,10 +80,6 @@ struct FontAtlas {
     bitmap: Vec<u8>,
     rows: usize,
     columns: usize,
-}
-
-fn shader_file(file: &str) -> String {
-    format!("{}/{}", SHADER_PATH, file)
 }
 
 fn load_text_font_atlas() -> FontAtlas {
