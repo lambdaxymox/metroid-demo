@@ -44,9 +44,9 @@ const LEFT: &str = CUBE_MAP;
 const RIGHT: &str = CUBE_MAP;
 const TOP: &str = CUBE_MAP;
 const BOTTOM: &str = CUBE_MAP;
-const GROUND_PLANE_TEX: &str = "assets/tile_rock_planet256x256.png";
-const TEXT_FONT_SHEET: &str = "assets/font1684x1684.png";
-const TITLE_FONT_SHEET: &str = "assets/title_font3200x3200.png";
+const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
+const TEXT_FONT_SHEET: &str = "font1684x1684.png";
+const TITLE_FONT_SHEET: &str = "title_font3200x3200.png";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
@@ -653,7 +653,7 @@ fn main() {
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture(GROUND_PLANE_TEX, &mut gp_tex, gl::REPEAT);
+    load_texture(&asset_file(GROUND_PLANE_TEX), &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
     /* --------------------------- TITLE SCREEN --------------------------- */
@@ -673,7 +673,7 @@ fn main() {
 
     // Font sheet for the title screen text.
     let mut text_screen_tex = 0;
-    load_texture(TEXT_FONT_SHEET, &mut text_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&asset_file(TEXT_FONT_SHEET), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(text_screen_tex > 0);
 
     // Title text.
@@ -688,7 +688,7 @@ fn main() {
 
     // Font sheet for the title text on the title screen.
     let mut title_screen_tex = 0;
-    load_texture(TITLE_FONT_SHEET, &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&asset_file(TITLE_FONT_SHEET), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
     /* ------------------------- END TITLE SCREEN ------------------------- */
 
