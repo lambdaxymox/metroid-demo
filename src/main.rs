@@ -630,7 +630,7 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 
 #[allow(unused_variables)]
 fn main() {
-    let mut context = match glh::start_gl(1280, 768, GL_LOG_FILE) {
+    let mut context = match glh::start_gl(720, 480, GL_LOG_FILE) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
@@ -668,7 +668,7 @@ fn main() {
         string_vao,
         string_points
     ) = create_title_screen_geometry(
-        &context, &text_font_atlas, "Press ENTER to continue", -0.5, -0.4, 48.0
+        &context, &text_font_atlas, "Press ENTER to continue", -0.80, -0.40, 48.0
     );
 
     // Font sheet for the title screen text.
@@ -683,7 +683,7 @@ fn main() {
         title_vao,
         title_points
     ) = create_title_screen_geometry(
-        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 400.0
+        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 224.0
     );
 
     // Font sheet for the title text on the title screen.
