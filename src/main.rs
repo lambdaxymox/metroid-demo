@@ -45,8 +45,8 @@ const RIGHT: &str = CUBE_MAP;
 const TOP: &str = CUBE_MAP;
 const BOTTOM: &str = CUBE_MAP;
 const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
-const TEXT_FONT_SHEET: &str = "font1684x1684.png";
-const TITLE_FONT_SHEET: &str = "title_font3200x3200.png";
+const TEXT_FONT_SHEET: &str = "font1024x1024.png";
+const TITLE_FONT_SHEET: &str = "title_font2048x2048.png";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
