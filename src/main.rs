@@ -691,7 +691,7 @@ fn main() {
         title_vao,
         title_points
     ) = create_title_screen_geometry(
-        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 224.0
+        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 256.0
     );
 
     // Font sheet for the title text on the title screen.
