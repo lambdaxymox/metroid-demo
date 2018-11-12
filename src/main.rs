@@ -126,8 +126,8 @@ fn load_text_font_atlas() -> FontAtlas {
         ('y', 1.0), ('z', 1.0), 
     ].iter().cloned().collect();
     let bitmap = vec![];
-    let rows = 7;
-    let columns = 7;
+    let rows = 8;
+    let columns = 8;
 
     FontAtlas {
         glyph_y_offsets: glyph_y_offsets,
