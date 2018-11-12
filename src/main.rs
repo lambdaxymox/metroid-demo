@@ -608,7 +608,6 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
     }
 
     let mut max_aniso = 0.0;
-    // TODO: Check this against my OpenGL extension dependencies.
     unsafe {
         gl::GetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mut max_aniso);
         // Set the maximum!
