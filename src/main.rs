@@ -676,7 +676,7 @@ fn main() {
         string_vao,
         string_points
     ) = create_title_screen_geometry(
-        &context, &text_font_atlas, "Press ENTER to continue", -0.80, -0.40, 48.0
+        &context, &text_font_atlas, "Press ENTER to continue", -0.65, -0.40, 40.0
     );
 
     // Font sheet for the title screen text.
