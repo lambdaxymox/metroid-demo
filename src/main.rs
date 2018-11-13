@@ -84,11 +84,11 @@ fn asset_file(file: &str) -> String {
 
 
 fn load_text_font_atlas() -> FontAtlas {
-    font_atlas::load(&asset_file("font2048x2048.json"))
+    font_atlas::load(&asset_file("font2048x2048.json")).unwrap()
 }
 
 fn load_title_font_atlas() -> FontAtlas {
-    font_atlas::load(&asset_file("title_font2048x2048.json"))
+    font_atlas::load(&asset_file("title_font2048x2048.json")).unwrap()
 }
 
 ///

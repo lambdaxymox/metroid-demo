@@ -25,9 +25,21 @@ pub struct FontAtlas {
     pub columns: usize,
 }
 
-pub fn load(file: &str) -> FontAtlas {
-    let data = File::open(file).expect("File not found.");
-    let font_atlas = serde_json::from_reader(data).unwrap();
+#[derive(Debug, Clone)]
+pub enum Error {
+    FileNotFound(String),
+    CouldNotParseFontFile(String),
+}
 
-    font_atlas
+pub fn load(file: &str) -> Result<FontAtlas, Error> {
+    let data = match File::open(file) {
+        Ok(file) => file,
+        Err(_) => return Err(Error::FileNotFound(file.to_owned())),
+    };
+    let font_atlas = match serde_json::from_reader(data) {
+        Ok(val) => val,
+        Err(_) => return Err(Error::CouldNotParseFontFile(file.to_owned())),
+    };
+
+    Ok(font_atlas)
 }
