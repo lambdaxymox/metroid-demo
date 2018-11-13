@@ -4,7 +4,11 @@ An OpenGL tech demo with a skybox, some geometry, bitmapped font rendering, and 
 
 ## Installation
 Fork the demo and enter
+```bash
+cargo build
 ```
+to build it, and then
+```bash
 cargo run
 ```
 to run it.
