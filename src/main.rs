@@ -2,6 +2,11 @@ extern crate glfw;
 extern crate chrono;
 extern crate stb_image;
 extern crate simple_cgmath;
+extern crate serde;
+extern crate serde_json;
+
+#[macro_use]
+extern crate serde_derive;
 
 #[macro_use]
 mod logger;
@@ -23,6 +28,7 @@ use std::collections::HashMap;
 use std::mem;
 use std::ptr;
 use std::process;
+use std::fs::File;
 
 use gl_helpers as glh;
 use simple_cgmath as math;
@@ -73,6 +79,30 @@ fn asset_file(file: &str) -> String {
     format!("{}/{}", ASSET_PATH, file)
 }
 
+
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
+struct Address {
+    row: usize,
+    column: usize,
+}
+
+impl Address {
+    fn new(row: usize, column: usize) -> Self {
+        Self {
+            row: row, column: column
+        }
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct FontAtlas {
+    glyph_y_offsets: HashMap<char, f32>,
+    glyph_widths: HashMap<char, f32>,
+    glyph_coords: HashMap<char, Address>,
+    rows: usize,
+    columns: usize,
+}
+/*
 struct FontAtlas {
     glyph_y_offsets: HashMap<char, f32>,
     glyph_widths: HashMap<char, f32>,
@@ -81,21 +111,30 @@ struct FontAtlas {
     rows: usize,
     columns: usize,
 }
+*/
+/*
+fn load_text_font_atlas() -> FontAtlas {
+    let data = File::open(&asset_file("font2048x2048.json")).expect("File not found.");
+    let font_atlas = serde_json::from_reader(data).unwrap();
+
+    font_atlas
+}
+*/
 
 fn load_text_font_atlas() -> FontAtlas {
     let coords = [
-        (' ', (0, 0)),
-        ('A', (1, 1)), ('B', (1, 2)), ('C', (1, 3)), ('D', (1, 4)), ('E', (1, 5)), ('F', (1, 6)),
-        ('G', (2, 1)), ('H', (2, 2)), ('I', (2, 3)), ('J', (2, 4)), ('K', (2, 5)), ('L', (2, 6)),
-        ('M', (3, 1)), ('N', (3, 2)), ('O', (3, 3)), ('P', (3, 4)), ('Q', (3, 5)), ('R', (3, 6)),
-        ('S', (4, 1)), ('T', (4, 2)), ('U', (4, 3)), ('V', (4, 4)), ('W', (4, 5)), ('X', (4, 6)),
-        ('Y', (5, 1)), ('Z', (5, 2)), ('0', (5, 3)), ('1', (5, 4)), ('2', (5, 5)), ('3', (5, 6)),
-        ('4', (6, 1)), ('5', (6, 2)), ('6', (6, 3)), ('7', (6, 4)), ('8', (6, 5)), ('9', (6, 6)),
-        ('a', (1, 1)), ('b', (1, 2)), ('c', (1, 3)), ('d', (1, 4)), ('e', (1, 5)), ('f', (1, 6)),
-        ('g', (2, 1)), ('h', (2, 2)), ('i', (2, 3)), ('j', (2, 4)), ('k', (2, 5)), ('l', (2, 6)),
-        ('m', (3, 1)), ('n', (3, 2)), ('o', (3, 3)), ('p', (3, 4)), ('q', (3, 5)), ('r', (3, 6)),
-        ('s', (4, 1)), ('t', (4, 2)), ('u', (4, 3)), ('v', (4, 4)), ('w', (4, 5)), ('x', (4, 6)),
-        ('y', (5, 1)), ('z', (5, 2)), 
+        (' ', Address::new(0, 0)),
+        ('A', Address::new(1, 1)), ('B', Address::new(1, 2)), ('C', Address::new(1, 3)), ('D', Address::new(1, 4)), ('E', Address::new(1, 5)), ('F', Address::new(1, 6)),
+        ('G', Address::new(2, 1)), ('H', Address::new(2, 2)), ('I', Address::new(2, 3)), ('J', Address::new(2, 4)), ('K', Address::new(2, 5)), ('L', Address::new(2, 6)),
+        ('M', Address::new(3, 1)), ('N', Address::new(3, 2)), ('O', Address::new(3, 3)), ('P', Address::new(3, 4)), ('Q', Address::new(3, 5)), ('R', Address::new(3, 6)),
+        ('S', Address::new(4, 1)), ('T', Address::new(4, 2)), ('U', Address::new(4, 3)), ('V', Address::new(4, 4)), ('W', Address::new(4, 5)), ('X', Address::new(4, 6)),
+        ('Y', Address::new(5, 1)), ('Z', Address::new(5, 2)), ('0', Address::new(5, 3)), ('1', Address::new(5, 4)), ('2', Address::new(5, 5)), ('3', Address::new(5, 6)),
+        ('4', Address::new(6, 1)), ('5', Address::new(6, 2)), ('6', Address::new(6, 3)), ('7', Address::new(6, 4)), ('8', Address::new(6, 5)), ('9', Address::new(6, 6)),
+        ('a', Address::new(1, 1)), ('b', Address::new(1, 2)), ('c', Address::new(1, 3)), ('d', Address::new(1, 4)), ('e', Address::new(1, 5)), ('f', Address::new(1, 6)),
+        ('g', Address::new(2, 1)), ('h', Address::new(2, 2)), ('i', Address::new(2, 3)), ('j', Address::new(2, 4)), ('k', Address::new(2, 5)), ('l', Address::new(2, 6)),
+        ('m', Address::new(3, 1)), ('n', Address::new(3, 2)), ('o', Address::new(3, 3)), ('p', Address::new(3, 4)), ('q', Address::new(3, 5)), ('r', Address::new(3, 6)),
+        ('s', Address::new(4, 1)), ('t', Address::new(4, 2)), ('u', Address::new(4, 3)), ('v', Address::new(4, 4)), ('w', Address::new(4, 5)), ('x', Address::new(4, 6)),
+        ('y', Address::new(5, 1)), ('z', Address::new(5, 2)),
     ].iter().cloned().collect();
     let glyph_y_offsets = [
         (' ', 0.0),
@@ -125,15 +164,15 @@ fn load_text_font_atlas() -> FontAtlas {
         ('s', 1.0), ('t', 1.0), ('u', 1.0), ('v', 1.0), ('w', 1.0), ('x', 1.0),
         ('y', 1.0), ('z', 1.0), 
     ].iter().cloned().collect();
-    let bitmap = vec![];
+    //let bitmap = vec![];
     let rows = 8;
     let columns = 8;
 
     FontAtlas {
         glyph_y_offsets: glyph_y_offsets,
         glyph_widths: glyph_widths,
-        coords: coords,
-        bitmap: bitmap,
+        glyph_coords: coords,
+        //bitmap: bitmap,
         rows: rows,
         columns: columns,
     }
@@ -141,20 +180,20 @@ fn load_text_font_atlas() -> FontAtlas {
 
 fn load_title_font_atlas() -> FontAtlas {
     let coords = [
-        (' ', (0,  0)), ('A', (0,  1)), ('B', (0,  2)), ('C', (0,  3)),
-        ('D', (0,  4)), ('E', (0,  5)), ('F', (0,  6)), ('G', (0,  7)),
-        ('H', (1,  0)), ('I', (1,  1)), ('J', (1,  2)), ('K', (1,  3)),
-        ('L', (1,  4)), ('M', (1,  5)), ('N', (1,  6)), ('O', (1,  7)),
-        ('P', (2,  0)), ('Q', (2,  1)), ('R', (2,  2)), ('S', (2,  3)),
-        ('T', (2,  4)), ('U', (2,  5)), ('V', (2,  6)), ('W', (2,  7)),
-        ('X', (3,  0)), ('Y', (3,  1)), ('Z', (3,  2)),
-                        ('a', (0,  1)), ('b', (0,  2)), ('c', (0,  3)),
-        ('d', (0,  4)), ('e', (0,  5)), ('f', (0,  6)), ('g', (0,  7)),
-        ('h', (1,  0)), ('i', (1,  1)), ('j', (1,  2)), ('k', (1,  3)),
-        ('l', (1,  4)), ('m', (1,  5)), ('n', (1,  6)), ('o', (1,  7)),
-        ('p', (2,  0)), ('q', (2,  1)), ('r', (2,  2)), ('s', (2,  3)),
-        ('t', (2,  4)), ('u', (2,  5)), ('v', (2,  6)), ('w', (2,  7)),
-        ('x', (3,  0)), ('y', (3,  1)), ('z', (3,  2)),
+        (' ', Address::new(0,  0)), ('A', Address::new(0,  1)), ('B', Address::new(0,  2)), ('C', Address::new(0,  3)),
+        ('D', Address::new(0,  4)), ('E', Address::new(0,  5)), ('F', Address::new(0,  6)), ('G', Address::new(0,  7)),
+        ('H', Address::new(1,  0)), ('I', Address::new(1,  1)), ('J', Address::new(1,  2)), ('K', Address::new(1,  3)),
+        ('L', Address::new(1,  4)), ('M', Address::new(1,  5)), ('N', Address::new(1,  6)), ('O', Address::new(1,  7)),
+        ('P', Address::new(2,  0)), ('Q', Address::new(2,  1)), ('R', Address::new(2,  2)), ('S', Address::new(2,  3)),
+        ('T', Address::new(2,  4)), ('U', Address::new(2,  5)), ('V', Address::new(2,  6)), ('W', Address::new(2,  7)),
+        ('X', Address::new(3,  0)), ('Y', Address::new(3,  1)), ('Z', Address::new(3,  2)),
+                                    ('a', Address::new(0,  1)), ('b', Address::new(0,  2)), ('c', Address::new(0,  3)),
+        ('d', Address::new(0,  4)), ('e', Address::new(0,  5)), ('f', Address::new(0,  6)), ('g', Address::new(0,  7)),
+        ('h', Address::new(1,  0)), ('i', Address::new(1,  1)), ('j', Address::new(1,  2)), ('k', Address::new(1,  3)),
+        ('l', Address::new(1,  4)), ('m', Address::new(1,  5)), ('n', Address::new(1,  6)), ('o', Address::new(1,  7)),
+        ('p', Address::new(2,  0)), ('q', Address::new(2,  1)), ('r', Address::new(2,  2)), ('s', Address::new(2,  3)),
+        ('t', Address::new(2,  4)), ('u', Address::new(2,  5)), ('v', Address::new(2,  6)), ('w', Address::new(2,  7)),
+        ('x', Address::new(3,  0)), ('y', Address::new(3,  1)), ('z', Address::new(3,  2)),
     ].iter().cloned().collect();
     let glyph_y_offsets = [
         (' ', 0.0), ('A', 0.0), ('B', 0.0), ('C', 0.0),
@@ -188,15 +227,15 @@ fn load_title_font_atlas() -> FontAtlas {
         ('t', 0.40), ('u', 0.40), ('v', 0.40), ('w', 0.50),
         ('x', 0.40), ('y', 0.40), ('z', 0.40),
     ].iter().cloned().collect();
-    let bitmap = vec![];
+    //let bitmap = vec![];
     let rows = 8;
     let columns = 8;
 
     FontAtlas {
         glyph_y_offsets: glyph_y_offsets,
         glyph_widths: glyph_widths,
-        coords: coords,
-        bitmap: bitmap,
+        glyph_coords: coords,
+        //bitmap: bitmap,
         rows: rows,
         columns: columns,
     }
@@ -274,10 +313,10 @@ fn text_to_vbo(
     let at_y = start_y;
 
     for (i, ch_i) in st.chars().enumerate() {
-        let (atlas_row, atlas_col) = atlas.coords[&ch_i];
+        let address = atlas.glyph_coords[&ch_i];
         
-        let s = (atlas_col as f32) * (1.0 / (atlas.columns as f32));
-        let t = ((atlas_row + 1) as f32) * (1.0 / (atlas.rows as f32));
+        let s = (address.column as f32) * (1.0 / (atlas.columns as f32));
+        let t = ((address.row + 1) as f32) * (1.0 / (atlas.rows as f32));
 
         let x_pos = at_x;
         let y_pos = at_y - (scale_px / (context.height as f32)) * atlas.glyph_y_offsets[&ch_i];
