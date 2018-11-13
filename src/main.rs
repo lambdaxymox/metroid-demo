@@ -102,16 +102,7 @@ struct FontAtlas {
     rows: usize,
     columns: usize,
 }
-/*
-struct FontAtlas {
-    glyph_y_offsets: HashMap<char, f32>,
-    glyph_widths: HashMap<char, f32>,
-    coords: HashMap<char, (usize, usize)>,
-    bitmap: Vec<u8>,
-    rows: usize,
-    columns: usize,
-}
-*/
+
 /*
 fn load_text_font_atlas() -> FontAtlas {
     let data = File::open(&asset_file("font2048x2048.json")).expect("File not found.");
