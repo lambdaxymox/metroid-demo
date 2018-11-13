@@ -24,16 +24,17 @@ use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 use stb_image::image;
 use stb_image::image::LoadResult;
 
-use std::collections::HashMap;
 use std::mem;
 use std::ptr;
 use std::process;
-use std::fs::File;
+
 
 use gl_helpers as glh;
 use simple_cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
+use font_atlas as font_atlas;
+use font_atlas::FontAtlas;
 
 // OpenGL extension constants.
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
@@ -80,43 +81,12 @@ fn asset_file(file: &str) -> String {
 }
 
 
-#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
-struct Address {
-    row: usize,
-    column: usize,
-}
-
-impl Address {
-    fn new(row: usize, column: usize) -> Self {
-        Self {
-            row: row, column: column
-        }
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct FontAtlas {
-    glyph_y_offsets: HashMap<char, f32>,
-    glyph_widths: HashMap<char, f32>,
-    glyph_coords: HashMap<char, Address>,
-    rows: usize,
-    columns: usize,
-}
-
-fn load_font_atlas(file: &str) -> FontAtlas {
-    let data = File::open(file).expect("File not found.");
-    let font_atlas = serde_json::from_reader(data).unwrap();
-
-    font_atlas
-}
-
-
 fn load_text_font_atlas() -> FontAtlas {
-    load_font_atlas(&asset_file("font2048x2048.json"))
+    font_atlas::load(&asset_file("font2048x2048.json"))
 }
 
 fn load_title_font_atlas() -> FontAtlas {
-    load_font_atlas(&asset_file("title_font2048x2048.json"))
+    font_atlas::load(&asset_file("title_font2048x2048.json"))
 }
 
 ///
