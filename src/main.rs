@@ -15,6 +15,7 @@ mod gl {
     include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
 }
 
+mod font_atlas;
 mod gl_helpers;
 mod camera;
 
@@ -28,13 +29,12 @@ use std::mem;
 use std::ptr;
 use std::process;
 
+use font_atlas::FontAtlas;
 
 use gl_helpers as glh;
 use simple_cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
-use font_atlas as font_atlas;
-use font_atlas::FontAtlas;
 
 // OpenGL extension constants.
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
