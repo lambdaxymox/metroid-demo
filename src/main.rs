@@ -2,6 +2,7 @@ extern crate glfw;
 extern crate chrono;
 extern crate stb_image;
 extern crate simple_cgmath;
+extern crate wavefront;
 extern crate serde;
 extern crate serde_json;
 
@@ -18,6 +19,7 @@ mod gl {
 mod font_atlas;
 mod gl_helpers;
 mod camera;
+mod obj;
 
 use glfw::{Action, Context, Key};
 use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
@@ -388,18 +390,21 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
 ///
 #[allow(unused_variables)]
 fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
+    /*
     let ground_plane_points: [GLfloat; 18] = [
          20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
         -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
     ];
+    */
+    let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
 
     let mut points_vbo = 0;
     unsafe {
         gl::GenBuffers(1, &mut points_vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
         gl::BufferData( 
-            gl::ARRAY_BUFFER, (mem::size_of::<GLfloat>() * ground_plane_points.len()) as GLsizeiptr,
-            ground_plane_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
+            gl::ARRAY_BUFFER, (3 * mem::size_of::<GLfloat>() * mesh.len()) as GLsizeiptr,
+            mesh.points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
         );
     }
     assert!(points_vbo > 0);
