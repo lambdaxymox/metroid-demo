@@ -390,12 +390,6 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
 ///
 #[allow(unused_variables)]
 fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
-    /*
-    let ground_plane_points: [GLfloat; 18] = [
-         20.0,  10.0, 0.0, -20.0,  10.0, 0.0, -20.0, -10.0, 0.0, 
-        -20.0, -10.0, 0.0,  20.0, -10.0, 0.0,  20.0,  10.0, 0.0
-    ];
-    */
     let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
 
     let mut points_vbo = 0;
