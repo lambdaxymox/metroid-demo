@@ -111,64 +111,6 @@ fn load_text_font_atlas() -> FontAtlas {
     font_atlas
 }
 
-/*
-fn load_text_font_atlas() -> FontAtlas {
-    let coords = [
-        (' ', Address::new(0, 0)),
-        ('A', Address::new(1, 1)), ('B', Address::new(1, 2)), ('C', Address::new(1, 3)), ('D', Address::new(1, 4)), ('E', Address::new(1, 5)), ('F', Address::new(1, 6)),
-        ('G', Address::new(2, 1)), ('H', Address::new(2, 2)), ('I', Address::new(2, 3)), ('J', Address::new(2, 4)), ('K', Address::new(2, 5)), ('L', Address::new(2, 6)),
-        ('M', Address::new(3, 1)), ('N', Address::new(3, 2)), ('O', Address::new(3, 3)), ('P', Address::new(3, 4)), ('Q', Address::new(3, 5)), ('R', Address::new(3, 6)),
-        ('S', Address::new(4, 1)), ('T', Address::new(4, 2)), ('U', Address::new(4, 3)), ('V', Address::new(4, 4)), ('W', Address::new(4, 5)), ('X', Address::new(4, 6)),
-        ('Y', Address::new(5, 1)), ('Z', Address::new(5, 2)), ('0', Address::new(5, 3)), ('1', Address::new(5, 4)), ('2', Address::new(5, 5)), ('3', Address::new(5, 6)),
-        ('4', Address::new(6, 1)), ('5', Address::new(6, 2)), ('6', Address::new(6, 3)), ('7', Address::new(6, 4)), ('8', Address::new(6, 5)), ('9', Address::new(6, 6)),
-        ('a', Address::new(1, 1)), ('b', Address::new(1, 2)), ('c', Address::new(1, 3)), ('d', Address::new(1, 4)), ('e', Address::new(1, 5)), ('f', Address::new(1, 6)),
-        ('g', Address::new(2, 1)), ('h', Address::new(2, 2)), ('i', Address::new(2, 3)), ('j', Address::new(2, 4)), ('k', Address::new(2, 5)), ('l', Address::new(2, 6)),
-        ('m', Address::new(3, 1)), ('n', Address::new(3, 2)), ('o', Address::new(3, 3)), ('p', Address::new(3, 4)), ('q', Address::new(3, 5)), ('r', Address::new(3, 6)),
-        ('s', Address::new(4, 1)), ('t', Address::new(4, 2)), ('u', Address::new(4, 3)), ('v', Address::new(4, 4)), ('w', Address::new(4, 5)), ('x', Address::new(4, 6)),
-        ('y', Address::new(5, 1)), ('z', Address::new(5, 2)),
-    ].iter().cloned().collect();
-    let glyph_y_offsets = [
-        (' ', 0.0),
-        ('A', 0.0), ('B', 0.0), ('C', 0.0), ('D', 0.0), ('E', 0.0), ('F', 0.0),
-        ('G', 0.0), ('H', 0.0), ('I', 0.0), ('J', 0.0), ('K', 0.0), ('L', 0.0),
-        ('M', 0.0), ('N', 0.0), ('O', 0.0), ('P', 0.0), ('Q', 0.0), ('R', 0.0),
-        ('S', 0.0), ('T', 0.0), ('U', 0.0), ('V', 0.0), ('W', 0.0), ('X', 0.0),
-        ('Y', 0.0), ('Z', 0.0), ('0', 0.0), ('1', 0.0), ('2', 0.0), ('3', 0.0),
-        ('4', 0.0), ('5', 0.0), ('6', 0.0), ('7', 0.0), ('8', 0.0), ('9', 0.0),
-        ('g', 0.0), ('h', 0.0), ('i', 0.0), ('j', 0.0), ('k', 0.0), ('l', 0.0),
-        ('a', 0.0), ('b', 0.0), ('c', 0.0), ('d', 0.0), ('e', 0.0), ('f', 0.0),
-        ('m', 0.0), ('n', 0.0), ('o', 0.0), ('p', 0.0), ('q', 0.0), ('r', 0.0),
-        ('s', 0.0), ('t', 0.0), ('u', 0.0), ('v', 0.0), ('w', 0.0), ('x', 0.0),
-        ('y', 0.0), ('z', 0.0),        
-    ].iter().cloned().collect();
-    let glyph_widths = [
-        (' ', 1.0),
-        ('A', 1.0), ('B', 1.0), ('C', 1.0), ('D', 1.0), ('E', 1.0), ('F', 1.0),
-        ('G', 1.0), ('H', 1.0), ('I', 1.0), ('J', 1.0), ('K', 1.0), ('L', 1.0),
-        ('M', 1.0), ('N', 1.0), ('O', 1.0), ('P', 1.0), ('Q', 1.0), ('R', 1.0),
-        ('S', 1.0), ('T', 1.0), ('U', 1.0), ('V', 1.0), ('W', 1.0), ('X', 1.0),
-        ('Y', 1.0), ('Z', 1.0), ('0', 1.0), ('1', 1.0), ('2', 1.0), ('3', 1.0),
-        ('4', 1.0), ('5', 1.0), ('6', 1.0), ('7', 1.0), ('8', 1.0), ('9', 1.0),
-        ('g', 1.0), ('h', 1.0), ('i', 1.0), ('j', 1.0), ('k', 1.0), ('l', 1.0),
-        ('a', 1.0), ('b', 1.0), ('c', 1.0), ('d', 1.0), ('e', 1.0), ('f', 1.0),
-        ('m', 1.0), ('n', 1.0), ('o', 1.0), ('p', 1.0), ('q', 1.0), ('r', 1.0),
-        ('s', 1.0), ('t', 1.0), ('u', 1.0), ('v', 1.0), ('w', 1.0), ('x', 1.0),
-        ('y', 1.0), ('z', 1.0), 
-    ].iter().cloned().collect();
-    //let bitmap = vec![];
-    let rows = 8;
-    let columns = 8;
-
-    FontAtlas {
-        glyph_y_offsets: glyph_y_offsets,
-        glyph_widths: glyph_widths,
-        glyph_coords: coords,
-        //bitmap: bitmap,
-        rows: rows,
-        columns: columns,
-    }
-}
-*/
 fn load_title_font_atlas() -> FontAtlas {
     let coords = [
         (' ', Address::new(0,  0)), ('A', Address::new(0,  1)), ('B', Address::new(0,  2)), ('C', Address::new(0,  3)),
