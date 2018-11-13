@@ -1,0 +1,16 @@
+{
+    "MoveCameraLeft": "KeyA",
+    "MoveCameraRight": "KeyD",
+    "MoveCameraUp": "KeyD",
+    "MoveCameraDown": "KeyE",
+    "MoveCameraForward": "KeyW",
+    "MoveCameraBackwards": "KeyS",
+    "YawCameraLeft": "KeyLeftArrow",
+    "YawCameraRight": "KeyRightArrow",
+    "PitchCameraUp": "KeyUpArrow",
+    "PitchCameraDown": "KeyDownArrow",
+    "RollCameraLeft": "KeyZ",
+    "RollCameraRight": "KeyC",
+    "ExitProgram": "KeyEscape",
+    "ResetCameraPosition": "KeyBackspace"
+}
