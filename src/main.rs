@@ -222,6 +222,7 @@ fn text_to_vbo(
 /// Load the vertex buffer object for the skybox.
 ///
 fn create_cube_map_geometry() -> GLuint {
+    /*
     let cube_map_points: [GLfloat; 108] = [
         -10.0,  10.0, -10.0, -10.0, -10.0, -10.0,  10.0, -10.0, -10.0,
          10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,  10.0, -10.0,
@@ -241,14 +242,16 @@ fn create_cube_map_geometry() -> GLuint {
         -10.0, -10.0, -10.0, -10.0, -10.0,  10.0,  10.0, -10.0, -10.0,
          10.0, -10.0, -10.0, -10.0, -10.0,  10.0,  10.0, -10.0,  10.0
     ];
+    */
+    let cube_map = obj::load_file(&asset_file("cube_map.obj")).unwrap();
 
     let mut cube_map_vbo = 0;
     unsafe {
         gl::GenBuffers(1, &mut cube_map_vbo);
         gl::BindBuffer(gl::ARRAY_BUFFER, cube_map_vbo);
         gl::BufferData(
-            gl::ARRAY_BUFFER, (3 * 36 * mem::size_of::<GLfloat>()) as GLsizeiptr,
-            cube_map_points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
+            gl::ARRAY_BUFFER, (3 * mem::size_of::<GLfloat>() * cube_map.len()) as GLsizeiptr,
+            cube_map.points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
         );
     }
 
