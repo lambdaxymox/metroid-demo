@@ -103,7 +103,6 @@ struct FontAtlas {
     columns: usize,
 }
 
-
 fn load_text_font_atlas() -> FontAtlas {
     let data = File::open(&asset_file("font2048x2048.json")).expect("File not found.");
     let font_atlas = serde_json::from_reader(data).unwrap();
@@ -111,6 +110,14 @@ fn load_text_font_atlas() -> FontAtlas {
     font_atlas
 }
 
+fn load_title_font_atlas() -> FontAtlas {
+    let data = File::open(&asset_file("title_font2048x2048.json")).expect("File not found.");
+    let font_atlas = serde_json::from_reader(data).unwrap();
+
+    font_atlas
+}
+
+/*
 fn load_title_font_atlas() -> FontAtlas {
     let coords = [
         (' ', Address::new(0,  0)), ('A', Address::new(0,  1)), ('B', Address::new(0,  2)), ('C', Address::new(0,  3)),
@@ -173,6 +180,7 @@ fn load_title_font_atlas() -> FontAtlas {
         columns: columns,
     }
 }
+*/
 
 ///
 /// Create the shaders for rendering text.
