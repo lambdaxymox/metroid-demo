@@ -153,7 +153,7 @@ enum Error {
 }
 
 fn load_json(file: &str) -> Result<HashMap<String, String>, serde_json::Error> {
-    let data = File::open("src/controls.json").expect("File not found.");
+    let data = File::open(file).expect("File not found.");
     let key_map = serde_json::from_reader(data)?;
 
     Ok(key_map)
