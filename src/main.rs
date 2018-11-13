@@ -1,7 +1,7 @@
 extern crate glfw;
 extern crate chrono;
 extern crate stb_image;
-extern crate simple_cgmath;
+extern crate cgmath;
 extern crate wavefront;
 extern crate serde;
 extern crate serde_json;
@@ -34,7 +34,7 @@ use std::process;
 use font_atlas::FontAtlas;
 
 use gl_helpers as glh;
-use simple_cgmath as math;
+use cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
 
