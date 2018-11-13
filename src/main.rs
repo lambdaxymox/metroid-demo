@@ -103,18 +103,20 @@ struct FontAtlas {
     columns: usize,
 }
 
-fn load_text_font_atlas() -> FontAtlas {
-    let data = File::open(&asset_file("font2048x2048.json")).expect("File not found.");
+fn load_font_atlas(file: &str) -> FontAtlas {
+    let data = File::open(file).expect("File not found.");
     let font_atlas = serde_json::from_reader(data).unwrap();
 
     font_atlas
 }
 
-fn load_title_font_atlas() -> FontAtlas {
-    let data = File::open(&asset_file("title_font2048x2048.json")).expect("File not found.");
-    let font_atlas = serde_json::from_reader(data).unwrap();
 
-    font_atlas
+fn load_text_font_atlas() -> FontAtlas {
+    load_font_atlas(&asset_file("font2048x2048.json"))
+}
+
+fn load_title_font_atlas() -> FontAtlas {
+    load_font_atlas(&asset_file("title_font2048x2048.json"))
 }
 
 ///
