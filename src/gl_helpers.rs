@@ -33,7 +33,7 @@ pub fn gl_str(st: &str) -> CString {
 /// A record containing a description of the GL capabilities on a local machine.
 /// The contents of this record can be used for debugging OpenGL problems on
 /// different machines.
-/// 
+///
 struct GLParameters {
     params: Vec<(String, String)>
 }
@@ -85,14 +85,14 @@ fn gl_params() -> GLParameters {
     // Integers: this only works if the order is 0-10 integer return types.
     for i in 0..10 {
         let mut v = 0;
-        unsafe { 
+        unsafe {
             gl::GetIntegerv(params[i], &mut v);
         }
         vec.push((format!("{}", names[i]), format!("{}", v)));
     }
     // others
     let mut v: [GLint; 2] = [0; 2];
-    unsafe {    
+    unsafe {
         gl::GetIntegerv(params[10], &mut v[0]);
     }
     vec.push((format!("{}", names[10]), format!("{} {}", v[0], v[1])));
@@ -167,7 +167,7 @@ fn __init_glfw() -> Glfw {
 }
 
 ///
-/// Initialize a new OpenGL context and start a new GLFW window. 
+/// Initialize a new OpenGL context and start a new GLFW window.
 ///
 pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, String> {
     // Initiate a logger.
@@ -212,8 +212,8 @@ pub fn start_gl(width: u32, height: u32, log_file: &str) -> Result<GLContext, St
     log!(logger, "{}", gl_params());
 
     Ok(GLContext {
-        glfw: glfw, 
-        window: window, 
+        glfw: glfw,
+        window: window,
         events: events,
         logger: logger,
         width: width,
@@ -242,7 +242,7 @@ pub fn update_timers(context: &mut GLContext) -> f64 {
 /// Update the framerate and display in the window titlebar.
 ///
 #[inline]
-pub fn update_fps_counter(context: &mut GLContext) {     
+pub fn update_fps_counter(context: &mut GLContext) {
     let current_time_seconds = context.glfw.get_time();
     let elapsed_seconds = current_time_seconds - context.framerate_time_seconds;
     if elapsed_seconds > 0.5 {
@@ -298,14 +298,14 @@ impl fmt::Display for ShaderLog {
 ///
 /// Query the shader information log generated during shader compilation from
 /// OpenGL.
-/// 
+///
 pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
     let mut actual_length = 0;
     let mut raw_log: [i8; 2048] = [0; 2048];
     unsafe {
         gl::GetShaderInfoLog(shader_index, raw_log.len() as i32, &mut actual_length, &mut raw_log[0]);
     }
-    
+
     let mut log = String::new();
     for i in 0..actual_length as usize {
         log.push(raw_log[i] as u8 as char);
@@ -328,7 +328,7 @@ pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, 
 
     if bytes_read >= (MAX_SHADER_LENGTH - 1) {
         log!(context.logger,
-            "WARNING: The shader was truncated because the shader code 
+            "WARNING: The shader was truncated because the shader code
             was longer than MAX_SHADER_LENGTH {} bytes.", MAX_SHADER_LENGTH
         );
     }
@@ -349,11 +349,11 @@ pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, 
     if params != gl::TRUE as i32 {
         log_err!(context.logger, "ERROR: GL shader index {} did not compile\n", *shader);
         log_err!(context.logger, "{}", shader_info_log(*shader));
-        
+
         return false;
     }
     log!(context.logger, "Shader compiled with index {}\n", *shader);
-    
+
     true
 }
 
@@ -375,16 +375,16 @@ impl fmt::Display for ProgramLog {
 }
 
 ///
-/// Query the shader program information log generated during shader compilation 
+/// Query the shader program information log generated during shader compilation
 /// from OpenGL.
-/// 
+///
 pub fn program_info_log(index: GLuint) -> ProgramLog {
     let mut actual_length = 0;
     let mut raw_log = [0 as i8; 2048];
     unsafe {
         gl::GetProgramInfoLog(index, raw_log.len() as i32, &mut actual_length, &mut raw_log[0]);
     }
-    
+
     let mut log = String::new();
     for i in 0..actual_length as usize {
         log.push(raw_log[i] as u8 as char);
@@ -406,12 +406,12 @@ pub fn validate_program(logger: &Logger, sp: GLuint) -> bool {
     if params != gl::TRUE as i32 {
         log_err!(logger, "Program {} GL_VALIDATE_STATUS = GL_FALSE\n", sp);
         log_err!(logger, "{}", program_info_log(sp));
-        
+
         return false;
     }
 
     log!(logger, "Program {} GL_VALIDATE_STATUS = {}\n", sp, params);
-    
+
     true
 }
 
@@ -421,7 +421,7 @@ pub fn validate_program(logger: &Logger, sp: GLuint) -> bool {
 pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shader: GLuint, program: &mut GLuint) -> bool {
     unsafe {
         *program = gl::CreateProgram();
-        log!(context.logger, "Created programme {}. attaching shaders {} and {}...\n", 
+        log!(context.logger, "Created programme {}. attaching shaders {} and {}...\n",
             program, vertex_shader, fragment_shader
         );
         gl::AttachShader(*program, vertex_shader);
@@ -429,22 +429,25 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
 
         // Link the shader programme. If binding input attributes do that before linking.
         gl::LinkProgram(*program);
-        
+
         let mut params = -1;
         gl::GetProgramiv(*program, gl::LINK_STATUS, &mut params);
         if params != gl::TRUE as i32 {
             log_err!(context.logger, "ERROR: could not link shader programme GL index {}\n", *program);
             log_err!(context.logger, "{}", program_info_log(*program));
-        
+
             return false;
         }
 
-        validate_program(&context.logger, *program);
+        // TODO: Remove this line. This line should only be called after the vertex buffers
+        // and attribute pointers have been loaded and before rendering during application
+        // development.
+        //validate_program(&context.logger, *program);
 
         // Delete shaders here to free memory.
         gl::DeleteShader(vertex_shader);
         gl::DeleteShader(fragment_shader);
-        
+
         true
     }
 }
@@ -456,7 +459,7 @@ pub fn create_program_from_files(context: &GLContext, vert_file_name: &str, frag
     let mut vertex_shader = 0;
     let mut fragment_shader = 0;
     let mut program = 0;
-    
+
     create_shader(context, vert_file_name, &mut vertex_shader, gl::VERTEX_SHADER);
     create_shader(context, frag_file_name, &mut fragment_shader, gl::FRAGMENT_SHADER);
     create_program(context, vertex_shader, fragment_shader, &mut program);
