@@ -396,7 +396,7 @@ pub fn program_info_log(index: GLuint) -> ProgramLog {
 ///
 /// Validate a shader program.
 ///
-pub fn is_program_valid(logger: &Logger, sp: GLuint) -> bool {
+pub fn validate_program(logger: &Logger, sp: GLuint) -> bool {
     let mut params = -1;
     unsafe {
         gl::ValidateProgram(sp);
@@ -438,8 +438,10 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
         
             return false;
         }
-        is_program_valid(&context.logger, *program);
-        // Delete shaders here to free memory
+
+        validate_program(&context.logger, *program);
+
+        // Delete shaders here to free memory.
         gl::DeleteShader(vertex_shader);
         gl::DeleteShader(fragment_shader);
         
