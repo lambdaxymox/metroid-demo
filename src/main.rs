@@ -382,8 +382,7 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
 ///
 /// Create the ground plane geometry.
 ///
-#[allow(unused_variables)]
-fn create_ground_plane_geometry(context: &glh::GLContext, shader: GLuint) -> (GLuint, GLuint) {
+fn create_ground_plane_geometry(shader: GLuint) -> (GLuint, GLuint) {
     let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
 
     let mut points_vbo = 0;
@@ -544,7 +543,7 @@ fn main() {
     
     let (
         ground_plane_points_vbo,
-        ground_plane_points_vao) = create_ground_plane_geometry(&context, gp_sp);
+        ground_plane_points_vao) = create_ground_plane_geometry(gp_sp);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
