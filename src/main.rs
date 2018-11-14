@@ -383,7 +383,7 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
 /// Create the ground plane geometry.
 ///
 #[allow(unused_variables)]
-fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
+fn create_ground_plane_geometry(context: &glh::GLContext, shader: GLuint) -> (GLuint, GLuint) {
     let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
 
     let mut points_vbo = 0;
@@ -397,14 +397,18 @@ fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     }
     assert!(points_vbo > 0);
 
+    let gp_vp_loc = unsafe { gl::GetAttribLocation(shader, glh::gl_str("vp").as_ptr()) };
+    assert!(gp_vp_loc > -1);
+    let gp_vp_loc = gp_vp_loc as u32;
+
     let mut points_vao = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut points_vao);
         gl::BindVertexArray(points_vao);
 
         gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(gp_vp_loc, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(gp_vp_loc);
     }
     assert!(points_vao > 0);
 
@@ -540,7 +544,7 @@ fn main() {
     
     let (
         ground_plane_points_vbo,
-        ground_plane_points_vao) = create_ground_plane_geometry(&context);
+        ground_plane_points_vao) = create_ground_plane_geometry(&context, gp_sp);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
