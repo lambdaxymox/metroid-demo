@@ -1,8 +1,8 @@
 ![Title Screen](readme.png)
 # Metroid(-like) OpenGL Demo
-An OpenGL tech demo with a skybox, some geometry, bitmapped font rendering, and a moveable camera.
+An OpenGL tech demo with a sky box, some geometry, bitmapped font rendering, and a movable camera.
 
-## Installation
+## Compilation And Operation
 Fork the demo and enter
 ```bash
 cargo build
@@ -15,11 +15,11 @@ to run it.
 
 ## Dependencies
 ### Linux
-This program requires a recent version of Rust (>= 1.30.0) and OpenGL 4.60 to run.
+This program requires a recent version of `Rust (>= 1.30.0)` and `OpenGL 4.60` to run.
 ### Microsoft Windows
-This program requires a recent version of Rust (>= 1.30.0) and OpenGL 3.30 to run.
+This program requires a recent version of `Rust (>= 1.30.0)` and `OpenGL 3.30` to run.
 ### Apple MacOS
-Coming soon.
+This program requires a recent version of `Rust (>= 1.30.0)` and `OpenGL 3.30` to run.
 
 ## Controls
 The demo has the following control scheme.
