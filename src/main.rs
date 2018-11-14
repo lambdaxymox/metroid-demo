@@ -112,7 +112,7 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
 /// Set up the geometry for rendering title screen text.
 ///
 fn create_title_screen_geometry(
-    context: &glh::GLContext, 
+    context: &glh::GLContext, shader: GLuint,
     font_atlas: &FontAtlas, text: &str,
     x_pos: f32, y_pos: f32, pixel_scale: f32) -> (GLuint, GLuint, GLuint, usize) {
     
@@ -133,16 +133,24 @@ fn create_title_screen_geometry(
         &mut string_vp_vbo, &mut string_vt_vbo, &mut string_point_count
     );
 
+    let string_vp_loc = unsafe { gl::GetAttribLocation(shader, glh::gl_str("vp").as_ptr()) };
+    assert!(string_vp_loc > -1);
+    let string_vp_loc = string_vp_loc as u32;
+
+    let string_vt_loc = unsafe { gl::GetAttribLocation(shader, glh::gl_str("vt").as_ptr()) };
+    assert!(string_vt_loc > -1);
+    let string_vt_loc = string_vt_loc as u32;
+
     let mut string_vao = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut string_vao);
         gl::BindVertexArray(string_vao);
         gl::BindBuffer(gl::ARRAY_BUFFER, string_vp_vbo);
-        gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(0);
+        gl::VertexAttribPointer(string_vp_loc, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(string_vp_loc);
         gl::BindBuffer(gl::ARRAY_BUFFER, string_vt_vbo);
-        gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
-        gl::EnableVertexAttribArray(1);
+        gl::VertexAttribPointer(string_vt_loc, 2, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::EnableVertexAttribArray(string_vt_loc);
     }
     assert!(string_vao > 0);
 
@@ -547,7 +555,7 @@ fn main() {
         string_vao,
         string_points
     ) = create_title_screen_geometry(
-        &context, &text_font_atlas, "Press ENTER to continue", -0.65, -0.40, 40.0
+        &context, title_screen_sp, &text_font_atlas, "Press ENTER to continue", -0.65, -0.40, 40.0
     );
 
     // Font sheet for the title screen text.
@@ -562,7 +570,7 @@ fn main() {
         title_vao,
         title_points
     ) = create_title_screen_geometry(
-        &context, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 256.0
+        &context, title_screen_sp, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 256.0
     );
 
     // Font sheet for the title text on the title screen.
