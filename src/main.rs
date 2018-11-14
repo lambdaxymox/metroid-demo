@@ -359,7 +359,7 @@ fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
 ///
 fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
-    // the floor but also that the 'front' was on the top side. also note how I
+    // the floor but also that the 'front' was on the top side. Also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let gp_sp = glh::create_program_from_files(
         context, &shader_file("ground_plane.vert.glsl"), &shader_file("ground_plane.frag.glsl")
