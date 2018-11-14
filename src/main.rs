@@ -385,33 +385,33 @@ fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLin
 fn create_ground_plane_geometry(shader: GLuint) -> (GLuint, GLuint) {
     let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
 
-    let mut points_vbo = 0;
+    let mut gp_vp_vbo = 0;
     unsafe {
-        gl::GenBuffers(1, &mut points_vbo);
-        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
+        gl::GenBuffers(1, &mut gp_vp_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, gp_vp_vbo);
         gl::BufferData( 
             gl::ARRAY_BUFFER, (3 * mem::size_of::<GLfloat>() * mesh.len()) as GLsizeiptr,
             mesh.points.as_ptr() as *const GLvoid, gl::STATIC_DRAW
         );
     }
-    assert!(points_vbo > 0);
+    assert!(gp_vp_vbo > 0);
 
     let gp_vp_loc = unsafe { gl::GetAttribLocation(shader, glh::gl_str("vp").as_ptr()) };
     assert!(gp_vp_loc > -1);
     let gp_vp_loc = gp_vp_loc as u32;
 
-    let mut points_vao = 0;
+    let mut gp_vp_vao = 0;
     unsafe {
-        gl::GenVertexArrays(1, &mut points_vao);
-        gl::BindVertexArray(points_vao);
+        gl::GenVertexArrays(1, &mut gp_vp_vao);
+        gl::BindVertexArray(gp_vp_vao);
 
-        gl::BindBuffer(gl::ARRAY_BUFFER, points_vbo);
+        gl::BindBuffer(gl::ARRAY_BUFFER, gp_vp_vbo);
         gl::VertexAttribPointer(gp_vp_loc, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
         gl::EnableVertexAttribArray(gp_vp_loc);
     }
-    assert!(points_vao > 0);
+    assert!(gp_vp_vao > 0);
 
-    (points_vbo, points_vao)
+    (gp_vp_vbo, gp_vp_vao)
 }
 
 ///
