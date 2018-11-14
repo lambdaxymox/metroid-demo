@@ -399,6 +399,9 @@ fn create_ground_plane_geometry(context: &glh::GLContext) -> (GLuint, GLuint) {
     (points_vbo, points_vao)
 }
 
+///
+/// Initialize the camera to default position and orientation.
+///
 fn create_camera(width: u32, height: u32) -> Camera {
     let near = 0.1;
     let far = 100.0;
