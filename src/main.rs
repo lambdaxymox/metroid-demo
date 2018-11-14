@@ -229,7 +229,7 @@ fn text_to_vbo(
 ///
 /// Load the vertex buffer object for the skybox.
 ///
-fn create_cube_map_geometry() -> GLuint {
+fn create_cube_map_geometry(shader: GLuint) -> GLuint {
     let cube_map = obj::load_file(&asset_file("cube_map.obj")).unwrap();
 
     let mut cube_map_vbo = 0;
@@ -242,13 +242,17 @@ fn create_cube_map_geometry() -> GLuint {
         );
     }
 
+    let cube_map_vp_loc = unsafe { gl::GetAttribLocation(shader, glh::gl_str("vp").as_ptr()) };
+    assert!(cube_map_vp_loc > -1);
+    let cube_map_vp_loc = cube_map_vp_loc as u32;
+
     let mut cube_map_vao = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut cube_map_vao);
         gl::BindVertexArray(cube_map_vao);
-        gl::EnableVertexAttribArray(0);
+        gl::EnableVertexAttribArray(cube_map_vp_loc);
         gl::BindBuffer(gl::ARRAY_BUFFER, cube_map_vbo);
-        gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
+        gl::VertexAttribPointer(cube_map_vp_loc, 3, gl::FLOAT, gl::FALSE, 0, ptr::null());
     }
 
     cube_map_vao
@@ -584,7 +588,7 @@ fn main() {
         cube_view_mat_location,
         cube_proj_mat_location) = create_cube_map_shaders(&context);
 
-    let cube_vao = create_cube_map_geometry();
+    let cube_vao = create_cube_map_geometry(cube_sp);
     assert!(cube_vao > 0);
 
     // Texture for the cube map.
