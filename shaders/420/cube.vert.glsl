@@ -1,4 +1,4 @@
-#version 420
+#version 420 core
 
 in vec3 vp;
 uniform mat4 view, proj;

@@ -1,4 +1,4 @@
-#version 420
+#version 420 core
 
 in vec3 texcoords;
 uniform samplerCube cube_texture;
