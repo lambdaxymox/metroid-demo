@@ -79,10 +79,9 @@ fn shader_file<P: AsRef<Path>>(path: P) -> String {
     String::from(Path::new(SHADER_PATH).join(path).to_str().unwrap())
 }
 
-fn asset_file(file: &str) -> String {
+fn asset_file<P: AsRef<Path>>(path: P) -> String {
     String::from(Path::new(ASSET_PATH).join(path).to_str().unwrap())
 }
-
 
 fn load_text_font_atlas() -> FontAtlas {
     font_atlas::load(&asset_file("font2048x2048.json")).unwrap()
