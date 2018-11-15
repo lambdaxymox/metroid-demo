@@ -76,7 +76,7 @@ const ASSET_PATH: &str = "assets";
 
 
 fn shader_file<P: AsRef<Path>>(path: P) -> String {
-    String::from(Path::new(SHADER_PATH).join(path).to_str().unwrap())
+    format!("{}", Path::new(SHADER_PATH).join(path).display())
 }
 
 fn asset_file<P: AsRef<Path>>(path: P) -> String {
