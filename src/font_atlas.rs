@@ -1,4 +1,5 @@
 use std::fs::File;
+use std::path::Path;
 use std::collections::HashMap;
 
 
@@ -31,14 +32,22 @@ pub enum Error {
     CouldNotParseFontFile(String),
 }
 
-pub fn load(file: &str) -> Result<FontAtlas, Error> {
-    let data = match File::open(file) {
-        Ok(file) => file,
-        Err(_) => return Err(Error::FileNotFound(file.to_owned())),
+pub fn load<P: AsRef<Path>>(file: P) -> Result<FontAtlas, Error> {
+    let data = match File::open(file.as_ref()) {
+        Ok(handle) => handle,
+        Err(_) => {
+            return Err(
+                Error::FileNotFound(format!("{}", file.as_ref().display()))
+            );
+        }
     };
     let font_atlas = match serde_json::from_reader(data) {
         Ok(val) => val,
-        Err(_) => return Err(Error::CouldNotParseFontFile(file.to_owned())),
+        Err(_) => {
+            return Err(
+                Error::CouldNotParseFontFile(format!("{}", file.as_ref().display()))
+            );
+        }
     };
 
     Ok(font_atlas)
