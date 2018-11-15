@@ -9,14 +9,6 @@ pub struct Address {
     pub column: usize,
 }
 
-impl Address {
-    fn new(row: usize, column: usize) -> Self {
-        Self {
-            row: row, column: column
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FontAtlas {
     pub glyph_y_offsets: HashMap<char, f32>,

@@ -186,7 +186,7 @@ dependencies = [
  "serde_json 1.0.33 (registry+https://github.com/rust-lang/crates.io-index)",
  "simple_cgmath 0.3.0 (git+https://github.com/stallmanifold/simple-cgmath)",
  "stb_image 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "wavefront_obj 0.3.0 (git+https://github.com/stallmanifold/wavefront-obj)",
+ "wavefront_obj 0.3.1 (git+https://github.com/stallmanifold/wavefront-obj)",
 ]
 
 [[package]]
@@ -474,8 +474,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "wavefront_obj"
-version = "0.3.0"
-source = "git+https://github.com/stallmanifold/wavefront-obj#9616aeefc50e90d4e9c359bb21a32f9834f3cc12"
+version = "0.3.1"
+source = "git+https://github.com/stallmanifold/wavefront-obj#3e3a57830776e5c37414b6eaecc9b76a39ff1d37"
 dependencies = [
  "quickcheck 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -582,7 +582,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum unicode-xid 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
 "checksum utf8-ranges 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "796f7e48bef87609f7ade7e06495a87d5cd06c7866e6a5cbfceffc558a243737"
 "checksum version_check 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "914b1a6776c4c929a602fafd8bc742e06365d4bcbe48c30f9cca5824f70dc9dd"
-"checksum wavefront_obj 0.3.0 (git+https://github.com/stallmanifold/wavefront-obj)" = "<none>"
+"checksum wavefront_obj 0.3.1 (git+https://github.com/stallmanifold/wavefront-obj)" = "<none>"
 "checksum winapi 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)" = "92c1eb33641e276cfa214a0522acad57be5c56b10cb348b3c5117db75f3ac4b0"
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 "checksum winapi-util 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "afc5508759c5bf4285e61feb862b6083c8480aec864fa17a81fdec6f69b461ab"
