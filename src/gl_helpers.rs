@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use gl;
 use gl::types::{GLchar, GLenum, GLint, GLubyte, GLuint};
 use glfw;
