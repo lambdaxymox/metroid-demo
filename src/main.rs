@@ -80,7 +80,7 @@ fn shader_file<P: AsRef<Path>>(path: P) -> String {
 }
 
 fn asset_file<P: AsRef<Path>>(path: P) -> String {
-    String::from(Path::new(ASSET_PATH).join(path).to_str().unwrap())
+    format!("{}", Path::new(ASSET_PATH).join(path).display())
 }
 
 fn load_text_font_atlas() -> FontAtlas {
