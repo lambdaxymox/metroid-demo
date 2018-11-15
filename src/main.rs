@@ -80,7 +80,7 @@ fn shader_file<P: AsRef<Path>>(path: P) -> String {
 }
 
 fn asset_file(file: &str) -> String {
-    format!("{}/{}", ASSET_PATH, file)
+    String::from(Path::new(ASSET_PATH).join(path).to_str().unwrap())
 }
 
 
