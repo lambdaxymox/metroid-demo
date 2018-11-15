@@ -30,6 +30,7 @@ use stb_image::image::LoadResult;
 use std::mem;
 use std::ptr;
 use std::process;
+use std::path::Path;
 
 use font_atlas::FontAtlas;
 
@@ -74,8 +75,8 @@ const SHADER_PATH: &str = "shaders/420";
 const ASSET_PATH: &str = "assets";
 
 
-fn shader_file(file: &str) -> String {
-    format!("{}/{}", SHADER_PATH, file)
+fn shader_file<P: AsRef<Path>>(path: P) -> String {
+    String::from(Path::new(SHADER_PATH).join(path).to_str().unwrap())
 }
 
 fn asset_file(file: &str) -> String {
