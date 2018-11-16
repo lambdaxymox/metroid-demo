@@ -11,6 +11,7 @@ chrono = "0.4.6"
 serde = "1.0.80"
 serde_derive = "1.0.80"
 serde_json = "1.0.33"
+toml  = "0.4.8"
 simple_cgmath = { git = "https://github.com/stallmanifold/simple-cgmath" }
 wavefront_obj = { git = "https://github.com/stallmanifold/wavefront-obj" }
 

@@ -16,6 +16,7 @@ mod gl {
     include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
 }
 
+mod config;
 mod font_atlas;
 mod gl_helpers;
 mod camera;
