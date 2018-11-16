@@ -79,10 +79,6 @@ const SHADER_PATH: &str = "shaders/420";
 const ASSET_PATH: &str = "assets";
 
 
-fn shader_file<P: AsRef<Path>>(path: P) -> String {
-    format!("{}", Path::new(SHADER_PATH).join(path).display())
-}
-
 fn asset_file<P: AsRef<Path>>(path: P) -> String {
     format!("{}", Path::new(ASSET_PATH).join(path).display())
 }
