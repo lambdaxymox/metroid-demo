@@ -2,7 +2,7 @@ gl_log_file = "gl.log"
 
 skybox_panel = "skybox_panel.png"
 ground_plane_tex = "tile_rock_planet256x256.png"
-text_font_sheet = "font2048x2048.png"
+text_font_sheet = "text_font2048x2048.png"
 title_font_sheet = "title_font2048x2048.png"
 
 # Asset paths
@@ -23,5 +23,3 @@ shader_version = "330"
 [linux]
 # Linux
 shader_version = "420"
-
-
