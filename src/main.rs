@@ -67,14 +67,14 @@ const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
 
 // Shader paths.
-#[cfg(target_os = "macos")]
-const SHADER_PATH: &str = "shaders/330";
+//#[cfg(target_os = "macos")]
+//const SHADER_PATH: &str = "shaders/330";
 
-#[cfg(target_os = "windows")]
-const SHADER_PATH: &str = "shaders/330";
+//#[cfg(target_os = "windows")]
+//const SHADER_PATH: &str = "shaders/330";
 
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
-const SHADER_PATH: &str = "shaders/420";
+//#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+//const SHADER_PATH: &str = "shaders/420";
 
 
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
@@ -531,8 +531,11 @@ impl Game {
         Game { config: config, gl: gl_context }
     }
 
-    fn shader_file<P: AsRef<Path>>(&self, path: P) -> String {
-        format!("{}", Path::new(SHADER_PATH).join(path).display())
+    fn shader_file<P: AsRef<Path>>(&self, file: P) -> String {
+        let shader_path = Path::new(&self.config.shader_path);
+        let shader_version = Path::new(&self.config.shader_version);
+        let file_path = shader_path.join(shader_version).join(file);
+        format!("{}", file_path.display())
     }
 
     fn asset_file<P: AsRef<Path>>(&self, path: P) -> String {
