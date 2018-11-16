@@ -48,7 +48,6 @@ const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 const CONFIG_FILE: &str = "config/config.toml";
 
 // Textures.
-const CUBE_MAP: &str = "skybox_panel.png";
 const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
 
 // Text colors.
