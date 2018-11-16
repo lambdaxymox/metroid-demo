@@ -76,8 +76,6 @@ const SHADER_PATH: &str = "shaders/330";
 #[cfg(not(any(target_os = "macos", target_os = "windows")))]
 const SHADER_PATH: &str = "shaders/420";
 
-const ASSET_PATH: &str = "assets";
-
 
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
     font_atlas::load(&context.asset_file("font2048x2048.json")).unwrap()
@@ -538,7 +536,7 @@ impl Game {
     }
 
     fn asset_file<P: AsRef<Path>>(&self, path: P) -> String {
-        format!("{}", Path::new(ASSET_PATH).join(path).display())
+        format!("{}", Path::new(&self.config.asset_path).join(path).display())
     }
 }
 
