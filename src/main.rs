@@ -51,16 +51,6 @@ const CONFIG_FILE: &str = "config/config.toml";
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
 
-// Shader paths.
-//#[cfg(target_os = "macos")]
-//const SHADER_PATH: &str = "shaders/330";
-
-//#[cfg(target_os = "windows")]
-//const SHADER_PATH: &str = "shaders/330";
-
-//#[cfg(not(any(target_os = "macos", target_os = "windows")))]
-//const SHADER_PATH: &str = "shaders/420";
-
 
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
     font_atlas::load(&context.asset_file("text_font2048x2048.json")).unwrap()
