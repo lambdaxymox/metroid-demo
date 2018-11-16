@@ -609,9 +609,11 @@ fn main() {
 
     // Texture for the cube map.
     let mut cube_map_texture = 0;
+    let config = &context.config;
     create_cube_map(
-        &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP),
-        &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP),
+        &context.asset_file(&config.cube_map_front), &context.asset_file(&config.cube_map_back),
+        &context.asset_file(&config.cube_map_top),   &context.asset_file(&config.cube_map_bottom),
+        &context.asset_file(&config.cube_map_left),  &context.asset_file(&config.cube_map_right),
         &mut cube_map_texture
     );
     assert!(cube_map_texture > 0);
