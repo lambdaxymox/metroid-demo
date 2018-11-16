@@ -5,13 +5,19 @@ ground_plane_tex = "tile_rock_planet256x256.png"
 text_font_sheet = "font2048x2048.png"
 title_font_sheet = "title_font2048x2048.png"
 
+# Asset paths
 shader_path = "shaders"
+asset_path = "assets"
 
-# Shader paths
+# Platform specific parameters
+
 # MAC OS and Windows
+# shader_version = "330"
+
+# Windows
 # shader_version = "330"
 
 # Linux
 shader_version = "420"
 
-asset_path = "assets"
+
