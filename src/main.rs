@@ -57,8 +57,6 @@ const TOP: &str = CUBE_MAP;
 const BOTTOM: &str = CUBE_MAP;
 const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
 
-const TITLE_FONT_SHEET: &str = "title_font2048x2048.png";
-
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
@@ -603,7 +601,7 @@ fn main() {
 
     // Font sheet for the title text on the title screen.
     let mut title_screen_tex = 0;
-    load_texture(&context.asset_file(TITLE_FONT_SHEET), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&context.asset_file("title_font2048x2048.png"), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
     /* ------------------------- END TITLE SCREEN ------------------------- */
 
