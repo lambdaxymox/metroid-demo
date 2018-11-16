@@ -49,12 +49,6 @@ const CONFIG_FILE: &str = "config/config.toml";
 
 // Textures.
 const CUBE_MAP: &str = "skybox_panel.png";
-const FRONT: &str = CUBE_MAP;
-const BACK: &str = CUBE_MAP;
-const LEFT: &str = CUBE_MAP;
-const RIGHT: &str = CUBE_MAP;
-const TOP: &str = CUBE_MAP;
-const BOTTOM: &str = CUBE_MAP;
 const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
 
 // Text colors.
@@ -616,8 +610,8 @@ fn main() {
     // Texture for the cube map.
     let mut cube_map_texture = 0;
     create_cube_map(
-        &context.asset_file(FRONT), &context.asset_file(BACK), &context.asset_file(TOP),
-        &context.asset_file(BOTTOM), &context.asset_file(LEFT), &context.asset_file(RIGHT),
+        &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP),
+        &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP), &context.asset_file(CUBE_MAP),
         &mut cube_map_texture
     );
     assert!(cube_map_texture > 0);
