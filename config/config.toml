@@ -14,7 +14,6 @@ asset_path = "assets"
 # Platform specific parameters
 
 [macos]
-# MAC OS and Windows
 shader_version = "330"
 
 [windows]

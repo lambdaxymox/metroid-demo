@@ -268,7 +268,7 @@ fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &str) -> 
         eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", file_name);
     }
 
-    // copy image data into 'target' side of cube map
+    // Copy image data into the target side of the cube map.
     unsafe {
         gl::TexImage2D(
             side_target, 0, gl::RGBA as i32, width as i32, height as i32, 0, 
