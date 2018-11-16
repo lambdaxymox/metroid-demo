@@ -16,6 +16,7 @@ pub struct Config {
     pub text_font_sheet: PathBuf,
     pub title_font_sheet: PathBuf,
     pub shader_path: PathBuf,
+    pub shader_version: PathBuf,
     pub asset_path: PathBuf,
 }
 
