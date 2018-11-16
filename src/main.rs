@@ -79,10 +79,6 @@ const SHADER_PATH: &str = "shaders/420";
 const ASSET_PATH: &str = "assets";
 
 
-fn asset_file<P: AsRef<Path>>(path: P) -> String {
-    format!("{}", Path::new(ASSET_PATH).join(path).display())
-}
-
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
     font_atlas::load(&context.asset_file("font2048x2048.json")).unwrap()
 }
@@ -231,8 +227,8 @@ fn text_to_vbo(
 ///
 /// Load the vertex buffer object for the skybox.
 ///
-fn create_cube_map_geometry(shader: GLuint) -> GLuint {
-    let cube_map = obj::load_file(&asset_file("cube_map.obj")).unwrap();
+fn create_cube_map_geometry(context: &Game, shader: GLuint) -> GLuint {
+    let cube_map = obj::load_file(&context.asset_file("cube_map.obj")).unwrap();
 
     let mut cube_map_vbo = 0;
     unsafe {
@@ -388,8 +384,8 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
 ///
 /// Create the ground plane geometry.
 ///
-fn create_ground_plane_geometry(shader: GLuint) -> (GLuint, GLuint) {
-    let mesh = obj::load_file(&asset_file("ground_plane.obj")).unwrap();
+fn create_ground_plane_geometry(context: &Game, shader: GLuint) -> (GLuint, GLuint) {
+    let mesh = obj::load_file(&context.asset_file("ground_plane.obj")).unwrap();
 
     let mut gp_vp_vbo = 0;
     unsafe {
@@ -570,11 +566,11 @@ fn main() {
     
     let (
         ground_plane_points_vbo,
-        ground_plane_points_vao) = create_ground_plane_geometry(gp_sp);
+        ground_plane_points_vao) = create_ground_plane_geometry(&context, gp_sp);
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture(&asset_file(GROUND_PLANE_TEX), &mut gp_tex, gl::REPEAT);
+    load_texture(&context.asset_file(GROUND_PLANE_TEX), &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
     /* --------------------------- TITLE SCREEN --------------------------- */
@@ -594,7 +590,7 @@ fn main() {
 
     // Font sheet for the title screen text.
     let mut text_screen_tex = 0;
-    load_texture(&asset_file(TEXT_FONT_SHEET), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&context.asset_file(TEXT_FONT_SHEET), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(text_screen_tex > 0);
 
     // Title text.
@@ -609,7 +605,7 @@ fn main() {
 
     // Font sheet for the title text on the title screen.
     let mut title_screen_tex = 0;
-    load_texture(&asset_file(TITLE_FONT_SHEET), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&context.asset_file(TITLE_FONT_SHEET), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(title_screen_tex > 0);
     /* ------------------------- END TITLE SCREEN ------------------------- */
 
@@ -618,14 +614,14 @@ fn main() {
         cube_view_mat_location,
         cube_proj_mat_location) = create_cube_map_shaders(&context);
 
-    let cube_vao = create_cube_map_geometry(cube_sp);
+    let cube_vao = create_cube_map_geometry(&context, cube_sp);
     assert!(cube_vao > 0);
 
     // Texture for the cube map.
     let mut cube_map_texture = 0;
     create_cube_map(
-        &asset_file(FRONT), &asset_file(BACK), &asset_file(TOP),
-        &asset_file(BOTTOM), &asset_file(LEFT), &asset_file(RIGHT),
+        &context.asset_file(FRONT), &context.asset_file(BACK), &context.asset_file(TOP),
+        &context.asset_file(BOTTOM), &context.asset_file(LEFT), &context.asset_file(RIGHT),
         &mut cube_map_texture
     );
     assert!(cube_map_texture > 0);
