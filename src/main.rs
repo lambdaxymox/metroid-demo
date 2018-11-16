@@ -98,9 +98,11 @@ fn load_title_font_atlas() -> FontAtlas {
 ///
 /// Create the shaders for rendering text.
 ///
-fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
+fn create_title_screen_shaders(context: &Game) -> (GLuint, GLint) {
     let title_screen_sp = glh::create_program_from_files(
-        context, &shader_file("title_screen.vert.glsl"), &shader_file("title_screen.frag.glsl")
+        &context.gl,
+        &context.shader_file("title_screen.vert.glsl"),
+        &context.shader_file("title_screen.frag.glsl")
     );
     assert!(title_screen_sp > 0);
 
@@ -116,7 +118,7 @@ fn create_title_screen_shaders(context: &glh::GLContext) -> (GLuint, GLint) {
 /// Set up the geometry for rendering title screen text.
 ///
 fn create_title_screen_geometry(
-    context: &glh::GLContext, shader: GLuint,
+    context: &Game, shader: GLuint,
     font_atlas: &FontAtlas, text: &str,
     x_pos: f32, y_pos: f32, pixel_scale: f32) -> (GLuint, GLuint, GLuint, usize) {
     
@@ -132,7 +134,7 @@ fn create_title_screen_geometry(
 
     let mut string_point_count = 0;
     text_to_vbo(
-        &context, text, &font_atlas, 
+        &context.gl, text, &font_atlas,
         x_pos, y_pos, pixel_scale, 
         &mut string_vp_vbo, &mut string_vt_vbo, &mut string_point_count
     );
@@ -338,9 +340,11 @@ fn create_cube_map(
 ///
 /// Create the cube map shaders.
 ///
-fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
+fn create_cube_map_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     let cube_sp = glh::create_program_from_files(
-        &context, &shader_file("cube.vert.glsl"), &shader_file("cube.frag.glsl")
+        &context.gl,
+        &context.shader_file("cube.vert.glsl"),
+        &context.shader_file("cube.frag.glsl")
     );
     assert!(cube_sp > 0);
 
@@ -361,12 +365,14 @@ fn create_cube_map_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
 ///
 /// Create the ground plane shaders.
 ///
-fn create_ground_plane_shaders(context: &glh::GLContext) -> (GLuint, GLint, GLint) {
+fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. Also note how I
     // work out the texture coordinates, st, from the vertex point position.
     let gp_sp = glh::create_program_from_files(
-        context, &shader_file("ground_plane.vert.glsl"), &shader_file("ground_plane.frag.glsl")
+        &context.gl,
+        &context.shader_file("ground_plane.vert.glsl"),
+        &context.shader_file("ground_plane.frag.glsl")
     );
     assert!(gp_sp > 0);
 
@@ -525,11 +531,25 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
     }
 }
 
+struct Game {
+    config: config::Config,
+    gl: glh::GLContext,
+}
+
+impl Game {
+    fn new(config: config::Config, gl_context: glh::GLContext) -> Game {
+        Game { config: config, gl: gl_context }
+    }
+
+    fn shader_file<P: AsRef<Path>>(&self, path: P) -> String {
+        format!("{}", Path::new(SHADER_PATH).join(path).display())
+    }
+}
 
 #[allow(unused_variables)]
 fn main() {
     let config = config::load(CONFIG_FILE).unwrap();
-    let mut context = match glh::start_gl(720, 480, &config.gl_log_file) {
+    let gl_context = match glh::start_gl(720, 480, &config.gl_log_file) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
@@ -537,6 +557,8 @@ fn main() {
             process::exit(1);
         }
     };
+
+    let mut context = Game::new(config, gl_context);
 
     let text_font_atlas = load_text_font_atlas();
     let title_font_atlas = load_title_font_atlas();
@@ -608,7 +630,7 @@ fn main() {
     );
     assert!(cube_map_texture > 0);
 
-    let mut camera = create_camera(context.width, context.height);
+    let mut camera = create_camera(context.gl.width, context.gl.height);
 
     unsafe {
         gl::UseProgram(gp_sp);
@@ -630,23 +652,23 @@ fn main() {
         gl::CullFace(gl::BACK);
         gl::FrontFace(gl::CCW);
         gl::ClearColor(0.2, 0.2, 0.2, 1.0); // grey background to help spot mistakes
-        gl::Viewport(0, 0, context.width as i32, context.height as i32);
+        gl::Viewport(0, 0, context.gl.width as i32, context.gl.height as i32);
     }
 
     /* -------------------------- RENDERING LOOP --------------------------- */
-    while !context.window.should_close() {
-        let elapsed_seconds = glh::update_timers(&mut context);
-        glh::update_fps_counter(&mut context);
+    while !context.gl.window.should_close() {
+        let elapsed_seconds = glh::update_timers(&mut context.gl);
+        glh::update_fps_counter(&mut context.gl);
 
-        let (width, height) = context.window.get_framebuffer_size();
-        if (width != context.width as i32) && (height != context.height as i32) {
-            glfw_framebuffer_size_callback(&mut context, &mut camera, width as u32, height as u32);
+        let (width, height) = context.gl.window.get_framebuffer_size();
+        if (width != context.gl.width as i32) && (height != context.gl.height as i32) {
+            glfw_framebuffer_size_callback(&mut context.gl, &mut camera, width as u32, height as u32);
         }
 
         unsafe {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
             gl::ClearColor(0.2, 0.2, 0.2, 1.0);
-            gl::Viewport(0, 0, context.width as i32, context.height as i32);
+            gl::Viewport(0, 0, context.gl.width as i32, context.gl.height as i32);
 
             // Draw the sky box using the cube map texture.
             gl::DepthMask(gl::FALSE);
@@ -685,7 +707,7 @@ fn main() {
             gl::Enable(gl::DEPTH_TEST);
         }
 
-        context.glfw.poll_events();
+        context.gl.glfw.poll_events();
 
         /* ------------------------- UPDATE GAME STATE ------------------------ */
         // Camera control keys.
@@ -694,49 +716,49 @@ fn main() {
         let mut cam_yaw = 0.0;
         let mut cam_pitch = 0.0;
         let mut cam_roll = 0.0;
-        match context.window.get_key(Key::A) {
+        match context.gl.window.get_key(Key::A) {
             Action::Press | Action::Repeat => {
                 move_to.x -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::D) {
+        match context.gl.window.get_key(Key::D) {
             Action::Press | Action::Repeat => {
                 move_to.x += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::Q) {
+        match context.gl.window.get_key(Key::Q) {
             Action::Press | Action::Repeat => {
                 move_to.y += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::E) {
+        match context.gl.window.get_key(Key::E) {
             Action::Press | Action::Repeat => {
                 move_to.y -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::W) {
+        match context.gl.window.get_key(Key::W) {
             Action::Press | Action::Repeat => {
                 move_to.z -= camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::S) {
+        match context.gl.window.get_key(Key::S) {
             Action::Press | Action::Repeat => {
                 move_to.z += camera.cam_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
             }
             _ => {}
         }
-        match context.window.get_key(Key::Left) {
+        match context.gl.window.get_key(Key::Left) {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -745,7 +767,7 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Right) {
+        match context.gl.window.get_key(Key::Right) {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -754,7 +776,7 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Up) {
+        match context.gl.window.get_key(Key::Up) {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -763,7 +785,7 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Down) {
+        match context.gl.window.get_key(Key::Down) {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -772,7 +794,7 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Z) {
+        match context.gl.window.get_key(Key::Z) {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -781,7 +803,7 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::C) {
+        match context.gl.window.get_key(Key::C) {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
@@ -790,9 +812,9 @@ fn main() {
             }
             _ => {}
         }
-        match context.window.get_key(Key::Backspace) {
+        match context.gl.window.get_key(Key::Backspace) {
             Action::Press | Action::Repeat => {
-                reset_camera_to_default(&context, &mut camera);
+                reset_camera_to_default(&context.gl, &mut camera);
                 cam_moved = true;
             }
             _ => {}
@@ -823,15 +845,15 @@ fn main() {
         }
 
         // Check whether the user signaled GLFW to close the window.
-        match context.window.get_key(Key::Escape) {
+        match context.gl.window.get_key(Key::Escape) {
             Action::Press | Action::Repeat => {
-                context.window.set_should_close(true);
+                context.gl.window.set_should_close(true);
             }
             _ => {}
         }
         /* ----------------------- END UPDATE GAME STATE ----------------------- */
 
-        context.window.swap_buffers();
+        context.gl.window.swap_buffers();
     }
     /* ---------------------- END RENDERING LOOP ----------------------------- */
 }
