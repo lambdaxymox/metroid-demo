@@ -47,9 +47,6 @@ const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
 const CONFIG_FILE: &str = "config/config.toml";
 
-// Textures.
-const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
-
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
@@ -563,7 +560,7 @@ fn main() {
 
     // Texture for the ground plane.
     let mut gp_tex = 0;
-    load_texture(&context.asset_file(GROUND_PLANE_TEX), &mut gp_tex, gl::REPEAT);
+    load_texture(&context.asset_file("tile_rock_planet256x256.png"), &mut gp_tex, gl::REPEAT);
     assert!(gp_tex > 0);
 
     /* --------------------------- TITLE SCREEN --------------------------- */
