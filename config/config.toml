@@ -9,14 +9,18 @@ title_font_sheet = "title_font2048x2048.png"
 shader_path = "shaders"
 asset_path = "assets"
 
+
+[[platform]]
 # Platform specific parameters
 
+[macos]
 # MAC OS and Windows
-# shader_version = "330"
+shader_version = "330"
 
-# Windows
-# shader_version = "330"
+[windows]
+shader_version = "330"
 
+[linux]
 # Linux
 shader_version = "420"
 
