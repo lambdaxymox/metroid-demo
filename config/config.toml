@@ -7,11 +7,11 @@ title_font_sheet = "title_font2048x2048.png"
 
 # Asset paths
 shader_path = "shaders"
+shader_version = "420"
 asset_path = "assets"
 
-shader_version = "420"
 
-[[platform]]
+[platform]
 # Platform specific parameters.
 
 [platform.macos]
@@ -20,5 +20,5 @@ shader_version = "330"
 [platform.windows]
 shader_version = "330"
 
-[platformo.linux]
+[platform.linux]
 shader_version = "420"

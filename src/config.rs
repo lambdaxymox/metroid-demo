@@ -14,6 +14,7 @@ pub struct Config {
     pub shader_path: PathBuf,
     pub shader_version: PathBuf,
     pub asset_path: PathBuf,
+    platform: Platform,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
@@ -64,10 +65,33 @@ fn get_content<P: AsRef<Path>>(path: &P) -> Result<String, Error> {
     Ok(content)
 }
 
+
+#[cfg(target_os = "macos")]
+#[inline]
+fn __platform_config(config: &mut Config) {
+    config.shader_version = config.platform.macos.shader_version.clone();
+}
+
+#[cfg(target_os = "windows")]
+#[inline]
+fn __platform_config(config: &mut Config) {
+    config.shader_version = config.platform.windows.shader_version.clone();
+}
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+#[inline]
+fn __platform_config(config: &mut Config) {
+    config.shader_version = config.platform.linux.shader_version.clone();
+}
+
 pub fn load<P: AsRef<Path>>(path: P) -> Result<Config, Error> {
     let content = get_content(&path)?;
-    match toml::from_str(&content) {
-        Ok(config) => Ok(config),
-        Err(e) => Err(Error::Deserialize(e)),
-    }
+    let mut config = match toml::from_str(&content) {
+        Ok(val) => val,
+        Err(e) => return Err(Error::Deserialize(e)),
+    };
+
+    __platform_config(&mut config);
+
+    Ok(config)
 }
