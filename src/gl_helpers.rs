@@ -9,6 +9,7 @@ use std::fs::File;
 use std::io::{Read, BufReader};
 use std::sync::mpsc::Receiver;
 use std::ptr;
+use std::path::Path;
 use std::fmt;
 
 use logger::Logger;
@@ -257,12 +258,13 @@ pub fn update_fps_counter(context: &mut GLContext) {
 }
 
 
-pub fn parse_shader(file_name: &str, shader_str: &mut [u8]) -> Result<usize, String> {
+pub fn parse_shader<P: AsRef<Path>>(file_name: P, shader_str: &mut [u8]) -> Result<usize, String> {
     shader_str[0] = 0;
-    let file = match File::open(file_name) {
+    let file = match File::open(&file_name) {
         Ok(val) => val,
         Err(_) => {
-            return Err(format!("ERROR: opening file for reading: {}\n", file_name));
+            let disp = file_name.as_ref().display();
+            return Err(format!("ERROR: opening file for reading: {}\n", disp));
         }
     };
 
@@ -270,7 +272,8 @@ pub fn parse_shader(file_name: &str, shader_str: &mut [u8]) -> Result<usize, Str
     let bytes_read = match reader.read(shader_str) {
         Ok(val) => val,
         Err(_) => {
-            return Err(format!("ERROR: reading shader file {}\n", file_name));
+            let disp = file_name.as_ref().display();
+            return Err(format!("ERROR: reading shader file {}\n", disp));
         }
     };
 
@@ -315,8 +318,8 @@ pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
     ShaderLog { index: shader_index, log: log }
 }
 
-pub fn create_shader(context: &GLContext, file_name: &str, shader: &mut GLuint, gl_type: GLenum) -> bool {
-    log!(context.logger, "Creating shader from {}...\n", file_name);
+pub fn create_shader<P: AsRef<Path>>(context: &GLContext, file_name: P, shader: &mut GLuint, gl_type: GLenum) -> bool {
+    log!(context.logger, "Creating shader from {}...\n", file_name.as_ref().display());
 
     let mut shader_string = vec![0; MAX_SHADER_LENGTH];
     let bytes_read = match parse_shader(file_name, &mut shader_string) {
@@ -456,7 +459,9 @@ pub fn create_program(context: &GLContext, vertex_shader: GLuint, fragment_shade
 ///
 /// Compile and link a shader program directly from the files.
 ///
-pub fn create_program_from_files(context: &GLContext, vert_file_name: &str, frag_file_name: &str) -> GLuint {
+pub fn create_program_from_files<P, Q>(context: &GLContext, vert_file_name: P, frag_file_name: Q) -> GLuint
+    where P: AsRef<Path>, Q: AsRef<Path> {
+
     let mut vertex_shader = 0;
     let mut fragment_shader = 0;
     let mut program = 0;
