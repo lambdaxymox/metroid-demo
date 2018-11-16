@@ -47,9 +47,6 @@ const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
 const CONFIG_FILE: &str = "config/config.toml";
 
-// Log file.
-const GL_LOG_FILE: &str = "gl.log";
-
 // Textures.
 const CUBE_MAP: &str = "skybox_panel.png";
 const FRONT: &str = CUBE_MAP;
