@@ -44,7 +44,7 @@ use camera::Camera;
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
-const CONFIG: &str = "config/config.toml";
+const CONFIG_FILE: &str = "config/config.toml";
 
 // Log file.
 const GL_LOG_FILE: &str = "gl.log";
@@ -527,8 +527,8 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 
 #[allow(unused_variables)]
 fn main() {
-    let config = config::load(CONFIG);
-    let mut context = match glh::start_gl(720, 480, GL_LOG_FILE) {
+    let config = config::load(CONFIG_FILE).unwrap();
+    let mut context = match glh::start_gl(720, 480, &config.gl_log_file) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");

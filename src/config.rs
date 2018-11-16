@@ -5,7 +5,7 @@ use std::io::Read;
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Config {
-    pub gl_log_file: PathBuf,
+    pub gl_log_file: String,
     pub cube_map_front: PathBuf,
     pub cube_map_back: PathBuf,
     pub cube_map_left: PathBuf,
