@@ -16,6 +16,28 @@ pub struct Config {
     pub asset_path: PathBuf,
 }
 
+#[derive(Clone, Deserialize, Serialize)]
+struct Platform {
+    macos: MacOS,
+    windows: Windows,
+    linux: Linux,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+struct MacOS {
+    shader_version: PathBuf
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+struct Windows {
+    shader_version: PathBuf,
+}
+
+#[derive(Clone, Deserialize, Serialize)]
+struct Linux {
+    shader_version: PathBuf,
+}
+
 #[derive(Clone, Debug)]
 pub enum Error {
     ConfigFileNotFound(String),
