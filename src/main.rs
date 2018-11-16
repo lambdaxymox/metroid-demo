@@ -56,7 +56,7 @@ const RIGHT: &str = CUBE_MAP;
 const TOP: &str = CUBE_MAP;
 const BOTTOM: &str = CUBE_MAP;
 const GROUND_PLANE_TEX: &str = "tile_rock_planet256x256.png";
-const TEXT_FONT_SHEET: &str = "font2048x2048.png";
+
 const TITLE_FONT_SHEET: &str = "title_font2048x2048.png";
 
 // Text colors.
@@ -75,7 +75,7 @@ const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 
 
 
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
-    font_atlas::load(&context.asset_file("font2048x2048.json")).unwrap()
+    font_atlas::load(&context.asset_file("text_font2048x2048.json")).unwrap()
 }
 
 fn load_title_font_atlas(context: &Game) -> FontAtlas {
@@ -588,7 +588,7 @@ fn main() {
 
     // Font sheet for the title screen text.
     let mut text_screen_tex = 0;
-    load_texture(&context.asset_file(TEXT_FONT_SHEET), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
+    load_texture(&context.asset_file("text_font2048x2048.png"), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
     assert!(text_screen_tex > 0);
 
     // Title text.
