@@ -1,12 +1,6 @@
 gl_log_file = "gl.log"
 
-cube_map = "skybox_panel.png"
-cube_map_front = "skybox_panel.png"
-cube_map_back = "skybox_panel.png"
-cube_map_left = "skybox_panel.png"
-cube_map_right = "skybox_panel.png"
-cube_map_top = "skybox_panel.png"
-cube_map_bottom = "skybox_panel.png"
+skybox_panel = "skybox_panel.png"
 ground_plane_tex = "tile_rock_planet256x256.png"
 text_font_sheet = "font2048x2048.png"
 title_font_sheet = "title_font2048x2048.png"
