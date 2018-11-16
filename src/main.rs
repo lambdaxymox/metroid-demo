@@ -531,8 +531,7 @@ impl Game {
     }
 }
 
-#[allow(unused_variables)]
-fn main() {
+fn start() -> Game {
     let config = config::load(CONFIG_FILE).unwrap();
     let gl_context = match glh::start_gl(720, 480, &config.gl_log_file) {
         Ok(val) => val,
@@ -543,7 +542,12 @@ fn main() {
         }
     };
 
-    let mut context = Game::new(config, gl_context);
+    Game::new(config, gl_context)
+}
+
+#[allow(unused_variables)]
+fn main() {
+    let mut context = start();
 
     let text_font_atlas = load_text_font_atlas(&context);
     let title_font_atlas = load_title_font_atlas(&context);
