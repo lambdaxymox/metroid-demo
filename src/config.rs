@@ -37,7 +37,7 @@ fn get_content<P: AsRef<Path>>(path: &P) -> Result<String, Error> {
     };
 
     let mut content = String::new();
-    let bytes_read = match file.read_to_string(&mut content) {
+    let _bytes_read = match file.read_to_string(&mut content) {
         Ok(val) => val,
         Err(_) => {
             return Err(Error::CouldNotReadConfig(format!("{}", path.as_ref().display())));
