@@ -83,12 +83,12 @@ fn asset_file<P: AsRef<Path>>(path: P) -> String {
     format!("{}", Path::new(ASSET_PATH).join(path).display())
 }
 
-fn load_text_font_atlas() -> FontAtlas {
-    font_atlas::load(&asset_file("font2048x2048.json")).unwrap()
+fn load_text_font_atlas(context: &Game) -> FontAtlas {
+    font_atlas::load(&context.asset_file("font2048x2048.json")).unwrap()
 }
 
-fn load_title_font_atlas() -> FontAtlas {
-    font_atlas::load(&asset_file("title_font2048x2048.json")).unwrap()
+fn load_title_font_atlas(context: &Game) -> FontAtlas {
+    font_atlas::load(&context.asset_file("title_font2048x2048.json")).unwrap()
 }
 
 ///
@@ -540,6 +540,10 @@ impl Game {
     fn shader_file<P: AsRef<Path>>(&self, path: P) -> String {
         format!("{}", Path::new(SHADER_PATH).join(path).display())
     }
+
+    fn asset_file<P: AsRef<Path>>(&self, path: P) -> String {
+        format!("{}", Path::new(ASSET_PATH).join(path).display())
+    }
 }
 
 #[allow(unused_variables)]
@@ -556,8 +560,8 @@ fn main() {
 
     let mut context = Game::new(config, gl_context);
 
-    let text_font_atlas = load_text_font_atlas();
-    let title_font_atlas = load_title_font_atlas();
+    let text_font_atlas = load_text_font_atlas(&context);
+    let title_font_atlas = load_title_font_atlas(&context);
 
     let (
         gp_sp,
