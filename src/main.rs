@@ -68,7 +68,7 @@ fn create_title_screen_shaders(context: &Game) -> (GLuint, GLint) {
         &context.gl,
         &context.shader_file("title_screen.vert.glsl"),
         &context.shader_file("title_screen.frag.glsl")
-    );
+    ).unwrap();
     assert!(title_screen_sp > 0);
 
     let title_screen_sp_text_color_loc = unsafe { 
@@ -310,7 +310,7 @@ fn create_cube_map_shaders(context: &Game) -> (GLuint, GLint, GLint) {
         &context.gl,
         &context.shader_file("cube.vert.glsl"),
         &context.shader_file("cube.frag.glsl")
-    );
+    ).unwrap();
     assert!(cube_sp > 0);
 
     // NOTE: This view matrix should *NOT* contain camera translation.
@@ -338,7 +338,7 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
         &context.gl,
         &context.shader_file("ground_plane.vert.glsl"),
         &context.shader_file("ground_plane.frag.glsl")
-    );
+    ).unwrap();
     assert!(gp_sp > 0);
 
     let gp_view_mat_loc = unsafe { 
