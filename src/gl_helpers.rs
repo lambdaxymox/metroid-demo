@@ -511,8 +511,6 @@ pub fn create_program_from_files<P: AsRef<Path>, Q: AsRef<Path>>(
     context: &GLContext,
     vert_file_name: P, frag_file_name: Q) -> Result<GLuint, ShaderCompilationError> {
 
-    let mut program = 0;
-
     let vertex_shader = create_shader(context, vert_file_name, gl::VERTEX_SHADER)?;
     let fragment_shader = create_shader(context, frag_file_name, gl::FRAGMENT_SHADER)?;
     let program = create_program(context, vertex_shader, fragment_shader)?;
