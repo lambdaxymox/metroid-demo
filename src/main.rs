@@ -32,7 +32,7 @@ use stb_image::image::LoadResult;
 use std::mem;
 use std::ptr;
 use std::process;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use font_atlas::FontAtlas;
 
@@ -232,20 +232,22 @@ fn create_cube_map_geometry(context: &Game, shader: GLuint) -> GLuint {
 ///
 /// Load one of the cube map sides into a cube map texture.
 ///
-fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &str) -> bool {
+fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &Path) -> bool {
     unsafe {
         gl::BindTexture(gl::TEXTURE_CUBE_MAP, texture);
     }
 
     let force_channels = 4;
-    let image_data = match image::load_with_depth(file_name, force_channels, false) {
+    let image_data = match image::load_with_depth(&file_name, force_channels, false) {
         LoadResult::ImageU8(image_data) => image_data,
         LoadResult::Error(_) => {
-            eprintln!("ERROR: could not load {}", file_name);
+            let disp = file_name.display();
+            eprintln!("ERROR: could not load {}", disp);
             return false;
         }
         LoadResult::ImageF32(_) => {
-            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", file_name);
+            let disp = file_name.display();
+            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", disp);
             return false;
         }
     };
@@ -255,7 +257,8 @@ fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &str) -> 
 
     // Check that the image size is a power of two.
     if (width & (width - 1)) != 0 || (height & (height - 1)) != 0 {
-        eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", file_name);
+        let disp = file_name.display();
+        eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", disp);
     }
 
     // Copy image data into the target side of the cube map.
@@ -275,8 +278,8 @@ fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &str) -> 
 /// and then format texture.
 ///
 fn create_cube_map(
-    front: &str, back: &str, top: &str,
-    bottom: &str, left: &str, right: &str, tex_cube: &mut GLuint) {
+    front: &Path, back: &Path, top: &Path,
+    bottom: &Path, left: &Path, right: &Path, tex_cube: &mut GLuint) {
     
     // Generate a cube map texture.
     unsafe {
@@ -420,16 +423,20 @@ fn reset_camera_to_default(context: &glh::GLContext, camera: &mut Camera) {
 ///
 /// Load textures into graphics memory.
 ///
-fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
+fn load_texture<P: AsRef<Path>>(
+    file_name: P, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
+
     let force_channels = 4;
-    let mut image_data = match image::load_with_depth(file_name, force_channels, false) {
+    let mut image_data = match image::load_with_depth(&file_name, force_channels, false) {
         LoadResult::ImageU8(image_data) => image_data,
         LoadResult::Error(_) => {
-            eprintln!("ERROR: could not load {}", file_name);
+            let disp = file_name.as_ref().display();
+            eprintln!("ERROR: could not load {}", disp);
             return false;
         }
         LoadResult::ImageF32(_) => {
-            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", file_name);
+            let disp = file_name.as_ref().display();
+            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", disp);
             return false;
         }
     };
@@ -439,7 +446,8 @@ fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> boo
 
     // Check that the image size is a power of two.
     if (width & (width - 1)) != 0 || (height & (height - 1)) != 0 {
-        eprintln!("WARNING: texture {} is not power-of-2 dimensions", file_name);
+        let disp = file_name.as_ref().display();
+        eprintln!("WARNING: texture {} is not power-of-2 dimensions", disp);
     }
 
     let width_in_bytes = 4 *width;
@@ -506,15 +514,16 @@ impl Game {
         Game { config: config, gl: gl_context }
     }
 
-    fn shader_file<P: AsRef<Path>>(&self, file: P) -> String {
+    fn shader_file<P: AsRef<Path>>(&self, file: P) -> PathBuf {
         let shader_path = Path::new(&self.config.shader_path);
         let shader_version = Path::new(&self.config.shader_version);
         let file_path = shader_path.join(shader_version).join(file);
-        format!("{}", file_path.display())
+
+        file_path
     }
 
-    fn asset_file<P: AsRef<Path>>(&self, path: P) -> String {
-        format!("{}", Path::new(&self.config.asset_path).join(path).display())
+    fn asset_file<P: AsRef<Path>>(&self, path: P) -> PathBuf {
+        Path::new(&self.config.asset_path).join(path)
     }
 }
 
