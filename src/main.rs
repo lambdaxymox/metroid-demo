@@ -418,7 +418,7 @@ fn reset_camera_to_default(context: &glh::GLContext, camera: &mut Camera) {
 }
 
 ///
-/// Load textures.
+/// Load textures into graphics memory.
 ///
 fn load_texture(file_name: &str, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
     let force_channels = 4;
