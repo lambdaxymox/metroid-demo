@@ -29,6 +29,7 @@ use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 use stb_image::image;
 use stb_image::image::LoadResult;
 
+use std::env;
 use std::mem;
 use std::ptr;
 use std::process;
@@ -41,11 +42,27 @@ use cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
 
+
 // OpenGL extension constants.
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
-const CONFIG_FILE: &str = "config/config.toml";
+#[cfg(not(feature = "build_for_install"))]
+const CONFIG_HOME: &str = "config";
+
+#[cfg(feature = "build_for_install")]
+const CONFIG_HOME: &str = ".config";
+
+#[cfg(feature = "build_for_install")]
+const LOCAL_HOME: &str = ".local";
+
+#[cfg(feature = "build_for_install")]
+const DATA_DIR: &str = "share/metroid-demo";
+
+#[cfg(feature = "build_for_install")]
+const BIN_DIR: &str = "bin";
+
+const CONFIG_FILE: &str = "metroid-demo.toml";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
@@ -527,8 +544,24 @@ impl Game {
     }
 }
 
+#[cfg(feature = "build_for_install")]
+#[inline]
+fn config_path() -> PathBuf {
+    let home = Path::new(env::var("HOME").unwrap());
+    let rel_path = Path::new(CONFIG_HOME).join(Path::new(CONFIG_FILE));
+
+    home.join(rel_path)
+}
+
+#[cfg(not(feature = "build_for_install"))]
+#[inline]
+fn config_path() -> PathBuf {
+    Path::new(CONFIG_HOME).join(Path::new(CONFIG_FILE))
+}
+
 fn start() -> Game {
-    let config = config::load(CONFIG_FILE).unwrap();
+    let path = config_path();
+    let config = config::load(path).unwrap();
     let gl_context = match glh::start_gl(720, 480, &config.gl_log_file) {
         Ok(val) => val,
         Err(e) => {

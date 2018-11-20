@@ -3,6 +3,7 @@ name = "metroid-demo"
 version = "1.0.0"
 authors = ["Stallmanifold <stallmanifold@gmail.com>"]
 build = "build.rs"
+description = "OpenGL tech demo."
 
 [dependencies]
 glfw = "0.25.0"
@@ -20,3 +21,6 @@ gl_generator = "0.10.0"
 
 [profile.dev]
 debug = true
+
+[features]
+build_for_install =[]
