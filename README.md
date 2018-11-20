@@ -5,7 +5,7 @@ An OpenGL tech demo with a sky box, some geometry, bitmapped font rendering, and
 ## Compilation And Operation
 Fork the demo and enter
 ```bash
-cargo build
+cargo build --release
 ```
 to build it, and then
 ```bash
