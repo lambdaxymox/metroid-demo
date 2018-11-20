@@ -13,7 +13,6 @@ use std::path::Path;
 use std::fmt;
 
 use logger::Logger;
-use config::Config;
 
 
 // 256 Kilobytes.

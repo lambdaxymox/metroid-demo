@@ -1,6 +1,5 @@
 gl_log_file = "gl.log"
 
-text_font_sheet = "text_font2048x2048.png"
 title_font_sheet = "title_font2048x2048.png"
 
 # Asset paths
