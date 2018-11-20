@@ -29,7 +29,6 @@ use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 use stb_image::image;
 use stb_image::image::LoadResult;
 
-use std::env;
 use std::mem;
 use std::ptr;
 use std::process;
@@ -54,13 +53,10 @@ const CONFIG_HOME: &str = "config";
 const CONFIG_HOME: &str = ".config";
 
 #[cfg(feature = "build_for_install")]
-const LOCAL_HOME: &str = ".local";
+const DATA_DIR: &str = ".local/share/metroid-demo";
 
 #[cfg(feature = "build_for_install")]
-const DATA_DIR: &str = "share/metroid-demo";
-
-#[cfg(feature = "build_for_install")]
-const BIN_DIR: &str = "bin";
+const BIN_DIR: &str = ".local/bin";
 
 const CONFIG_FILE: &str = "metroid-demo.toml";
 
@@ -522,12 +518,12 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 }
 
 struct Game {
-    config: config::Config,
+    config: config::ProgramConfig,
     gl: glh::GLContext,
 }
 
 impl Game {
-    fn new(config: config::Config, gl_context: glh::GLContext) -> Game {
+    fn new(config: config::ProgramConfig, gl_context: glh::GLContext) -> Game {
         Game { config: config, gl: gl_context }
     }
 
@@ -546,22 +542,34 @@ impl Game {
 
 #[cfg(feature = "build_for_install")]
 #[inline]
-fn config_path() -> PathBuf {
+fn __path_config() -> config::PathConfig {
     let home = Path::new(env::var("HOME").unwrap());
-    let rel_path = Path::new(CONFIG_HOME).join(Path::new(CONFIG_FILE));
+    let config_home = Path::new(CONFIG_HOME);
+    let bin_dir = Path::new(BIN_DIR);
+    let data_dir = Path::new(DATA_DIR);
 
-    home.join(rel_path)
+    config::PathConfig::new(
+        home.join(config_home), home.join(bin_dir), home.join(data_dir)
+    )
 }
 
 #[cfg(not(feature = "build_for_install"))]
 #[inline]
-fn config_path() -> PathBuf {
-    Path::new(CONFIG_HOME).join(Path::new(CONFIG_FILE))
+fn __path_config() -> config::PathConfig {
+    config::PathConfig::new(
+        PathBuf::from(CONFIG_HOME), PathBuf::from("."), PathBuf::from(".")
+    )
+}
+
+fn load_config() -> config::ProgramConfig {
+    let path_config = __path_config();
+    let file_config = config::load(path_config.config_home.join(CONFIG_FILE)).unwrap();
+
+    config::ProgramConfig::new(path_config, file_config)
 }
 
 fn start() -> Game {
-    let path = config_path();
-    let config = config::load(path).unwrap();
+    let config = load_config();
     let gl_context = match glh::start_gl(720, 480, &config.log_file) {
         Ok(val) => val,
         Err(e) => {
