@@ -6,7 +6,7 @@ use toml;
 
 #[derive(Clone, Deserialize, Serialize)]
 pub struct Config {
-    pub gl_log_file: String,
+    pub log_file: String,
     pub shader_path: PathBuf,
     pub shader_version: PathBuf,
     pub asset_path: PathBuf,

@@ -1,5 +1,5 @@
 # Open GL log file name.
-gl_log_file = "gl.log"
+log_file = "metroid-demo.log"
 
 # Asset paths
 asset_path = "assets"

@@ -562,7 +562,7 @@ fn config_path() -> PathBuf {
 fn start() -> Game {
     let path = config_path();
     let config = config::load(path).unwrap();
-    let gl_context = match glh::start_gl(720, 480, &config.gl_log_file) {
+    let gl_context = match glh::start_gl(720, 480, &config.log_file) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
