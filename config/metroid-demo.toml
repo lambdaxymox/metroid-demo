@@ -1,12 +1,12 @@
+# Open GL log file name.
 gl_log_file = "gl.log"
 
-title_font_sheet = "title_font2048x2048.png"
-
 # Asset paths
-shader_path = "shaders"
-shader_version = "420"
 asset_path = "assets"
 
+# Shader paths.
+shader_path = "shaders"
+shader_version = "420"
 
 [platform]
 # Platform specific parameters.
