@@ -643,9 +643,9 @@ fn main() {
     let mut cube_map_texture = 0;
     let config = &context.config;
     create_cube_map(
-        &context.asset_file(&config.skybox_panel), &context.asset_file(&config.skybox_panel),
-        &context.asset_file(&config.skybox_panel), &context.asset_file(&config.skybox_panel),
-        &context.asset_file(&config.skybox_panel), &context.asset_file(&config.skybox_panel),
+        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
+        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
+        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
         &mut cube_map_texture
     );
     assert!(cube_map_texture > 0);
