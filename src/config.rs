@@ -119,7 +119,7 @@ pub struct ProgramConfig {
     pub config_home: PathBuf,
     pub bin_dir: PathBuf,
     pub data_dir: PathBuf,
-    pub log_file: String,
+    pub log_file: PathBuf,
     pub shader_path: PathBuf,
     pub shader_version: PathBuf,
     pub asset_path: PathBuf,
@@ -130,11 +130,11 @@ impl ProgramConfig {
         Self {
             config_home: path_config.config_home,
             bin_dir: path_config.bin_dir,
-            data_dir: path_config.data_dir,
-            log_file: file_config.log_file,
-            shader_path: file_config.shader_path,
+            data_dir: path_config.data_dir.clone(),
+            log_file: path_config.data_dir.join(Path::new(&file_config.log_file)),
+            shader_path: path_config.data_dir.join(file_config.shader_path),
             shader_version: file_config.shader_version,
-            asset_path: file_config.asset_path,
+            asset_path: path_config.data_dir.join(file_config.asset_path),
         }
     }
 }
