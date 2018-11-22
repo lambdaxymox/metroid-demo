@@ -29,6 +29,7 @@ use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 use stb_image::image;
 use stb_image::image::LoadResult;
 
+use std::env;
 use std::mem;
 use std::ptr;
 use std::process;
@@ -543,7 +544,8 @@ impl Game {
 #[cfg(feature = "build_for_install")]
 #[inline]
 fn __path_config() -> config::PathConfig {
-    let home = Path::new(env::var("HOME").unwrap());
+    let st = env::var("HOME").unwrap();
+    let home = Path::new(&st);
     let config_home = Path::new(CONFIG_HOME);
     let bin_dir = Path::new(BIN_DIR);
     let data_dir = Path::new(DATA_DIR);
