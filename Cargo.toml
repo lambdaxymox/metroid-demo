@@ -23,4 +23,4 @@ gl_generator = "0.10.0"
 debug = true
 
 [features]
-build_for_install =[]
+build_for_install = []
