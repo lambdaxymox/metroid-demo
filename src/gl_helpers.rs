@@ -436,7 +436,8 @@ pub fn program_info_log(index: GLuint) -> ProgramLog {
 
 ///
 /// Validate that the shader program `sp` can execute with the current OpenGL program state.
-/// Use this for information purposes in application development.
+/// Use this for information purposes in application development. Return `true` if the program and
+/// OpenGL state contain no errors.
 ///
 pub fn validate_program(logger: &Logger, sp: GLuint) -> bool {
     let mut params = -1;
