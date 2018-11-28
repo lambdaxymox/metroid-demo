@@ -288,6 +288,9 @@ impl fmt::Display for ShaderCompilationError {
     }
 }
 
+///
+/// Load a shader source file.
+///
 pub fn parse_shader<P: AsRef<Path>>(
     file_name: P, shader_str: &mut [u8]) -> Result<usize, ShaderCompilationError> {
 
@@ -350,6 +353,9 @@ pub fn shader_info_log(shader_index: GLuint) -> ShaderLog {
     ShaderLog { index: shader_index, log: log }
 }
 
+///
+/// Create a shader from source files.
+///
 pub fn create_shader<P: AsRef<Path>>(
     context: &GLContext,
     file_name: P, kind: GLenum) -> Result<GLuint, ShaderCompilationError> {
