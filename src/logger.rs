@@ -2,18 +2,19 @@ use chrono::prelude::Utc;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use std::fmt;
+use std::path::Path;
 
 
-pub struct Logger {
+pub struct FileLogger {
     log_file: String,
 }
 
-impl Logger {
+impl FileLogger {
     ///
     /// Start a new log file with the time and date at the top.
     ///
-    fn new(log_file: &str) -> Logger {
-        Logger {
+    fn new(log_file: &str) -> FileLogger {
+        FileLogger {
             log_file: String::from(log_file),
         }
     }
@@ -93,19 +94,19 @@ impl Logger {
     }
 }
 
-impl<'a> From<&'a str> for Logger {
-    fn from(log_file: &'a str) -> Logger {
-        Logger::new(log_file)
+impl<'a> From<&'a str> for FileLogger {
+    fn from(log_file: &'a str) -> FileLogger {
+        FileLogger::new(log_file)
     }
 }
 
-impl Drop for Logger {
+impl Drop for FileLogger {
     fn drop(&mut self) {
         self.finalize();
     }
 }
 
-impl fmt::Write for Logger {
+impl fmt::Write for FileLogger {
     fn write_str(&mut self, s: &str) -> Result<(), fmt::Error> {
         match self.log(s) {
             true => Ok(()),
@@ -113,6 +114,26 @@ impl fmt::Write for Logger {
         }
     }
 }
+
+///
+/// Initialize a file logger with the specified logging level.
+///
+pub fn init_with_level<P: AsRef<Path>>(
+    log_file: P, level: log::Level) -> Result<(), log::SetLoggerError> {
+
+    let logger = FileLogger::new(log_file, level);
+    log::set_boxed_logger(Box::new(logger))?;
+    log::set_max_level(level.to_level_filter());
+    Ok(())
+}
+
+///
+/// Initialize a file logger that logs all messages by default.
+///
+pub fn init<P: AsRef<Path>>(log_file: P) -> Result<(), log::SetLoggerError> {
+    init_with_level(log_file, log::Level::Trace)
+}
+
 
 #[macro_export]
 macro_rules! log {

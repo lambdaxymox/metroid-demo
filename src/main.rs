@@ -6,12 +6,11 @@ extern crate wavefront;
 extern crate serde;
 extern crate serde_json;
 extern crate toml;
+extern crate log;
+extern crate file_logger;
 
 #[macro_use]
 extern crate serde_derive;
-
-#[macro_use]
-mod logger;
 
 mod gl {
     include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
@@ -41,6 +40,7 @@ use gl_helpers as glh;
 use cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
+use log::{info};
 
 
 // OpenGL extension constants.
@@ -570,9 +570,19 @@ fn load_config() -> config::ProgramConfig {
     config::ProgramConfig::new(path_config, file_config)
 }
 
+///
+/// Initialize the logger.
+///
+fn init_logger(log_file: &str) {
+    file_logger::init(log_file).expect("Failed to initialize logger.");
+    info!("OpenGL application log.");
+    info!("build version: ??? ?? ???? ??:??:??\n\n");
+}
+
 fn start() -> Game {
     let config = load_config();
-    let gl_context = match glh::start_gl(720, 480, &config.log_file) {
+    init_logger(config.log_file.to_str().unwrap());
+    let gl_context = match glh::start_gl(720, 480) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to Initialize OpenGL context. Got error:");
