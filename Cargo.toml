@@ -8,7 +8,6 @@ description = "OpenGL tech demo."
 [dependencies]
 glfw = "0.25.0"
 stb_image = "0.2.2"
-chrono = "0.4.6"
 log = "0.4.6"
 serde = "1.0.80"
 serde_derive = "1.0.80"
