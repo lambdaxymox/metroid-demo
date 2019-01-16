@@ -355,10 +355,10 @@ fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage
 }
 
 ///
-/// Create a cube map texture. Load all 6 sides of a cube map from images, 
+/// Load a cube map texture onto the GPU. Load all 6 sides of a cube map from images,
 /// and then format texture.
 ///
-fn create_cube_map(
+fn load_cube_map(
     front: &TexImage2D, back: &TexImage2D, top: &TexImage2D,
     bottom: &TexImage2D, left: &TexImage2D, right: &TexImage2D, tex_cube: &mut GLuint) {
     
@@ -384,6 +384,24 @@ fn create_cube_map(
         gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
         gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
     }
+}
+
+///
+/// Create a cube map texture. Load all 6 sides of a cube map from images,
+/// and then format texture.
+///
+fn create_cube_map(context: &Game) -> GLuint {
+    let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
+    let vec = arr_to_vec(&arr[0], 25507);
+    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let mut tex = 0;
+    load_cube_map(
+        &tex_image, &tex_image, &tex_image, &tex_image, &tex_image, &tex_image,
+        &mut tex
+    );
+    assert!(tex > 0);
+
+    tex
 }
 
 ///
@@ -665,16 +683,7 @@ fn main() {
     assert!(cube_vao > 0);
 
     // Texture for the cube map.
-    let cube_arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
-    let cube_vec = arr_to_vec(&cube_arr[0], 25507);
-    let cube_tex_image = texture::load_from_memory(&cube_vec).unwrap();
-    let mut cube_map_texture = 0;
-    create_cube_map(
-        &cube_tex_image, &cube_tex_image,
-        &cube_tex_image, &cube_tex_image,
-        &cube_tex_image, &cube_tex_image,
-        &mut cube_map_texture
-    );
+    let cube_map_texture = create_cube_map(&context);
     assert!(cube_map_texture > 0);
 
     let mut camera = create_camera(context.gl.width, context.gl.height);
