@@ -28,6 +28,7 @@ use stb_image::image;
 use stb_image::image::LoadResult;
 
 use std::env;
+use std::io;
 use std::mem;
 use std::ptr;
 use std::process;
@@ -113,13 +114,30 @@ macro_rules! include_shader {
     }
 }
 
+fn arr_to_vec(ptr: *const u8, length: usize) -> Vec<u8> {
+    let mut vec = vec![0 as u8; length];
+    for i in 0..length {
+        vec[i] = unsafe { *((ptr as usize + i) as *const u8) };
+    }
+
+    vec
+}
 
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
-    font_atlas::load_file(&context.asset_file("text_font2048x2048.json")).unwrap()
+    let arr: &'static [u8; 4147] = include_asset!("text_font2048x2048.json");
+    let vec = arr_to_vec(&arr[0], 4147);
+    let mut reader = io::Cursor::new(vec);
+
+    font_atlas::load_reader(&mut reader).unwrap()
 }
 
 fn load_title_font_atlas(context: &Game) -> FontAtlas {
-    font_atlas::load_file(&context.asset_file("title_font2048x2048.json")).unwrap()
+    //font_atlas::load_file(&context.asset_file("title_font2048x2048.json")).unwrap()
+    let arr: &'static [u8; 3537] = include_asset!("title_font2048x2048.json");
+    let vec = arr_to_vec(&arr[0], 3537);
+    let mut reader = io::Cursor::new(vec);
+
+    font_atlas::load_reader(&mut reader).unwrap()
 }
 
 ///
