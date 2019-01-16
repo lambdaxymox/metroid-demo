@@ -15,11 +15,12 @@ mod gl {
     include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
 }
 
-mod config;
+//mod config;
 mod font_atlas;
 mod gl_help;
 mod camera;
 mod obj;
+mod texture;
 
 use glfw::{Action, Context, Key};
 use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
@@ -41,25 +42,18 @@ use cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
 use log::{info};
+use texture::TexImage2D;
 
 
 // OpenGL extension constants.
 const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
+#[cfg(feature = "build_for_install")]
+const LOG_FILE: &str = "/tmp/triforces-demo.log";
+
 #[cfg(not(feature = "build_for_install"))]
-const CONFIG_HOME: &str = "config";
-
-#[cfg(feature = "build_for_install")]
-const CONFIG_HOME: &str = ".config";
-
-#[cfg(feature = "build_for_install")]
-const DATA_DIR: &str = ".local/share/metroid-demo";
-
-#[cfg(feature = "build_for_install")]
-const BIN_DIR: &str = ".local/bin";
-
-const CONFIG_FILE: &str = "metroid-demo.toml";
+const LOG_FILE: &str = "triforces-demo.log";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
@@ -209,6 +203,26 @@ fn create_title_screen_geometry(
     (string_vp_vbo, string_vt_vbo, string_vao, string_point_count)
 }
 
+fn create_title_screen_texture(context: &Game) -> GLuint {
+    let arr: &'static [u8; 56573] = include_asset!("title_font2048x2048.png");
+    let vec = arr_to_vec(&arr[0], 56573);
+    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
+    assert!(tex > 0);
+
+    tex
+}
+
+fn create_text_texture(context: &Game) -> GLuint {
+    let arr: &'static [u8; 21182] = include_asset!("text_font2048x2048.png");
+    let vec = arr_to_vec(&arr[0], 21182);
+    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
+    assert!(tex > 0);
+
+    tex
+}
+
 ///
 /// Print a string to the GLFW screen with the given font.
 ///
@@ -316,33 +330,26 @@ fn create_cube_map_geometry(context: &Game, shader: GLuint) -> GLuint {
 ///
 /// Load one of the cube map sides into a cube map texture.
 ///
-fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &Path) -> bool {
+fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage2D) -> bool {
     unsafe {
-        gl::BindTexture(gl::TEXTURE_CUBE_MAP, texture);
+        gl::BindTexture(gl::TEXTURE_CUBE_MAP, handle);
     }
 
+    /*
     let force_channels = 4;
     let image_data = match image::load_with_depth(&file_name, force_channels, false) {
         LoadResult::ImageU8(image_data) => image_data,
-        LoadResult::Error(_) => {
-            let disp = file_name.display();
-            eprintln!("ERROR: could not load {}", disp);
-            return false;
-        }
-        LoadResult::ImageF32(_) => {
-            let disp = file_name.display();
-            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", disp);
-            return false;
-        }
+        LoadResult::Error(_) => return false,
+        LoadResult::ImageF32(_) => return false,
     };
+    */
 
     let width = image_data.width;
     let height = image_data.height;
 
     // Check that the image size is a power of two.
     if (width & (width - 1)) != 0 || (height & (height - 1)) != 0 {
-        let disp = file_name.display();
-        eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", disp);
+        eprintln!("WARNING: Texture {} lacks dimensions that are a power of two", handle);
     }
 
     // Copy image data into the target side of the cube map.
@@ -362,8 +369,8 @@ fn load_cube_map_side(texture: GLuint, side_target: GLenum, file_name: &Path) ->
 /// and then format texture.
 ///
 fn create_cube_map(
-    front: &Path, back: &Path, top: &Path,
-    bottom: &Path, left: &Path, right: &Path, tex_cube: &mut GLuint) {
+    front: &TexImage2D, back: &TexImage2D, top: &TexImage2D,
+    bottom: &TexImage2D, left: &TexImage2D, right: &TexImage2D, tex_cube: &mut GLuint) {
     
     // Generate a cube map texture.
     unsafe {
@@ -484,6 +491,19 @@ fn create_ground_plane_geometry(context: &Game, shader: GLuint) -> (GLuint, GLui
 }
 
 ///
+/// Create the ground plane texture.
+///
+fn create_ground_plane_texture(context: &Game) -> GLuint {
+    let arr: &'static [u8; 21306] = include_asset!("tile_rock_planet256x256.png");
+    let vec = arr_to_vec(&arr[0], 21306);
+    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex = load_texture(&tex_image, gl::REPEAT).unwrap();
+    assert!(tex > 0);
+
+    tex
+}
+
+///
 /// Initialize the camera to default position and orientation.
 ///
 fn create_camera(width: u32, height: u32) -> Camera {
@@ -512,53 +532,18 @@ fn reset_camera_to_default(context: &glh::GLState, camera: &mut Camera) {
 }
 
 ///
-/// Load textures into graphics memory.
+/// Load texture image into the GPU.
 ///
-fn load_texture<P: AsRef<Path>>(
-    file_name: P, tex: &mut GLuint, wrapping_mode: GLuint) -> bool {
-
-    let force_channels = 4;
-    let mut image_data = match image::load_with_depth(&file_name, force_channels, false) {
-        LoadResult::ImageU8(image_data) => image_data,
-        LoadResult::Error(_) => {
-            let disp = file_name.as_ref().display();
-            eprintln!("ERROR: could not load {}", disp);
-            return false;
-        }
-        LoadResult::ImageF32(_) => {
-            let disp = file_name.as_ref().display();
-            eprintln!("ERROR: Tried to load an image as byte vectors, got f32: {}", disp);
-            return false;
-        }
-    };
-
-    let width = image_data.width;
-    let height = image_data.height;
-
-    // Check that the image size is a power of two.
-    if (width & (width - 1)) != 0 || (height & (height - 1)) != 0 {
-        let disp = file_name.as_ref().display();
-        eprintln!("WARNING: texture {} is not power-of-2 dimensions", disp);
-    }
-
-    let width_in_bytes = 4 *width;
-    let half_height = height / 2;
-    for row in 0..half_height {
-        for col in 0..width_in_bytes {
-            let temp = image_data.data[row * width_in_bytes + col];
-            image_data.data[row * width_in_bytes + col] = image_data.data[((height - row - 1) * width_in_bytes) + col];
-            image_data.data[((height - row - 1) * width_in_bytes) + col] = temp;
-        }
-    }
-
+fn load_texture(tex_data: &TexImage2D, wrapping_mode: GLuint) -> Result<GLuint, String> {
+    let mut tex = 0;
     unsafe {
-        gl::GenTextures(1, tex);
+        gl::GenTextures(1, &mut tex);
         gl::ActiveTexture(gl::TEXTURE0);
-        gl::BindTexture(gl::TEXTURE_2D, *tex);
+        gl::BindTexture(gl::TEXTURE_2D, tex);
         gl::TexImage2D(
-            gl::TEXTURE_2D, 0, gl::RGBA as i32, width as i32, height as i32, 0, 
-            gl::RGBA, gl::UNSIGNED_BYTE, 
-            image_data.data.as_ptr() as *const GLvoid
+            gl::TEXTURE_2D, 0, gl::RGBA as i32, tex_data.width as i32, tex_data.height as i32, 0,
+            gl::RGBA, gl::UNSIGNED_BYTE,
+            tex_data.as_ptr() as *const GLvoid
         );
         gl::GenerateMipmap(gl::TEXTURE_2D);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, wrapping_mode as GLint);
@@ -566,6 +551,7 @@ fn load_texture<P: AsRef<Path>>(
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as GLint);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as GLint);
     }
+    assert!(tex > 0);
 
     let mut max_aniso = 0.0;
     unsafe {
@@ -574,7 +560,7 @@ fn load_texture<P: AsRef<Path>>(
         gl::TexParameterf(gl::TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_aniso);
     }
 
-    true
+    Ok(tex)
 }
 
 ///
@@ -596,69 +582,27 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLState, camera: &mut Camer
 }
 
 struct Game {
-    config: config::ProgramConfig,
     gl: glh::GLState,
 }
 
 impl Game {
-    fn new(config: config::ProgramConfig, gl_context: glh::GLState) -> Game {
-        Game { config: config, gl: gl_context }
+    fn new(gl_context: glh::GLState) -> Game {
+        Game { gl: gl_context }
     }
-
-    fn shader_file<P: AsRef<Path>>(&self, file: P) -> PathBuf {
-        let shader_path = Path::new(&self.config.shader_path);
-        let shader_version = Path::new(&self.config.shader_version);
-        let file_path = shader_path.join(shader_version).join(file);
-
-        file_path
-    }
-
-    fn asset_file<P: AsRef<Path>>(&self, path: P) -> PathBuf {
-        Path::new(&self.config.asset_path).join(path)
-    }
-}
-
-#[cfg(feature = "build_for_install")]
-#[inline]
-fn __path_config() -> config::PathConfig {
-    let st = env::var("HOME").unwrap();
-    let home = Path::new(&st);
-    let config_home = Path::new(CONFIG_HOME);
-    let bin_dir = Path::new(BIN_DIR);
-    let data_dir = Path::new(DATA_DIR);
-
-    config::PathConfig::new(
-        home.join(config_home), home.join(bin_dir), home.join(data_dir)
-    )
-}
-
-#[cfg(not(feature = "build_for_install"))]
-#[inline]
-fn __path_config() -> config::PathConfig {
-    config::PathConfig::new(
-        PathBuf::from(CONFIG_HOME), PathBuf::from("."), PathBuf::from(".")
-    )
-}
-
-fn load_config() -> config::ProgramConfig {
-    let path_config = __path_config();
-    let file_config = config::load(path_config.config_home.join(CONFIG_FILE)).unwrap();
-
-    config::ProgramConfig::new(path_config, file_config)
 }
 
 ///
 /// Initialize the logger.
 ///
 fn init_logger(log_file: &str) {
+    eprintln!("Logging is stored in file: {}", log_file);
     file_logger::init(log_file).expect("Failed to initialize logger.");
     info!("OpenGL application log.");
     info!("build version: ??? ?? ???? ??:??:??\n\n");
 }
 
 fn start() -> Game {
-    let config = load_config();
-    init_logger(config.log_file.to_str().unwrap());
+    init_logger(LOG_FILE);
     let gl_context = match glh::start_gl(720, 480) {
         Ok(val) => val,
         Err(e) => {
@@ -668,7 +612,7 @@ fn start() -> Game {
         }
     };
 
-    Game::new(config, gl_context)
+    Game::new(gl_context)
 }
 
 #[allow(unused_variables)]
@@ -688,9 +632,7 @@ fn main() {
         ground_plane_points_vao) = create_ground_plane_geometry(&context, gp_sp);
 
     // Texture for the ground plane.
-    let mut gp_tex = 0;
-    load_texture(&context.asset_file("tile_rock_planet256x256.png"), &mut gp_tex, gl::REPEAT);
-    assert!(gp_tex > 0);
+    let gp_tex = create_ground_plane_texture(&context);
 
     /* --------------------------- TITLE SCREEN --------------------------- */
     let (
@@ -708,9 +650,7 @@ fn main() {
     );
 
     // Font sheet for the title screen text.
-    let mut text_screen_tex = 0;
-    load_texture(&context.asset_file("text_font2048x2048.png"), &mut text_screen_tex, gl::CLAMP_TO_EDGE);
-    assert!(text_screen_tex > 0);
+    let text_screen_tex = create_text_texture(&context);
 
     // Title text.
     let (
@@ -723,9 +663,7 @@ fn main() {
     );
 
     // Font sheet for the title text on the title screen.
-    let mut title_screen_tex = 0;
-    load_texture(&context.asset_file("title_font2048x2048.png"), &mut title_screen_tex, gl::CLAMP_TO_EDGE);
-    assert!(title_screen_tex > 0);
+    let title_screen_tex = create_title_screen_texture(&context);
     /* ------------------------- END TITLE SCREEN ------------------------- */
 
     let (
@@ -737,12 +675,14 @@ fn main() {
     assert!(cube_vao > 0);
 
     // Texture for the cube map.
+    let cube_arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
+    let cube_vec = arr_to_vec(&cube_arr[0], 25507);
+    let cube_tex_image = texture::load_from_memory(&cube_vec).unwrap();
     let mut cube_map_texture = 0;
-    let config = &context.config;
     create_cube_map(
-        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
-        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
-        &context.asset_file("skybox_panel.png"), &context.asset_file("skybox_panel.png"),
+        &cube_tex_image, &cube_tex_image,
+        &cube_tex_image, &cube_tex_image,
+        &cube_tex_image, &cube_tex_image,
         &mut cube_map_texture
     );
     assert!(cube_map_texture > 0);
@@ -969,7 +909,6 @@ fn main() {
             _ => {}
         }
         /* ----------------------- END UPDATE GAME STATE ----------------------- */
-
         context.gl.window.swap_buffers();
     }
     /* ---------------------- END RENDERING LOOP ----------------------------- */
