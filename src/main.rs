@@ -65,12 +65,61 @@ const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
 const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
 
 
+macro_rules! concat_path {
+    ($fragment:expr) => {
+        concat!($fragment, "/")
+    };
+    ($fragment:expr, $($fragments:expr),+) => {
+        concat!($fragment, "/", concat_path!($($fragments),+))
+    }
+}
+
+macro_rules! asset_file {
+    ($asset:expr) => {
+        concat!(concat_path!("..", "assets"), $asset)
+    }
+}
+
+macro_rules! include_asset {
+    ($asset:expr) => {
+        include_bytes!(asset_file!($asset))
+    }
+}
+
+#[cfg(target_os = "mac_os")]
+macro_rules! shader_file {
+    ($asset:expr) => {
+        concat!(concat_path!("..", "shaders", "330"), $asset)
+    }
+}
+
+#[cfg(target_os = "windows")]
+macro_rules! shader_file {
+    ($asset:expr) => {
+        concat!(concat_path!("..", "assets"), $asset)
+    }
+}
+
+#[cfg(not(any(target_os = "macos", target_os = "windows")))]
+macro_rules! shader_file {
+    ($shader:expr) => {
+        concat!(concat_path!("..", "shaders", "420"), $shader)
+    }
+}
+
+macro_rules! include_shader {
+    ($shader:expr) => {
+        include_str!(shader_file!($shader))
+    }
+}
+
+
 fn load_text_font_atlas(context: &Game) -> FontAtlas {
-    font_atlas::load(&context.asset_file("text_font2048x2048.json")).unwrap()
+    font_atlas::load_file(&context.asset_file("text_font2048x2048.json")).unwrap()
 }
 
 fn load_title_font_atlas(context: &Game) -> FontAtlas {
-    font_atlas::load(&context.asset_file("title_font2048x2048.json")).unwrap()
+    font_atlas::load_file(&context.asset_file("title_font2048x2048.json")).unwrap()
 }
 
 ///
