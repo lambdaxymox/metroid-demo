@@ -282,7 +282,10 @@ fn text_to_vbo(
 /// Load the vertex buffer object for the skybox.
 ///
 fn create_cube_map_geometry(context: &Game, shader: GLuint) -> GLuint {
-    let cube_map = obj::load_file(&context.asset_file("cube_map.obj")).unwrap();
+    let arr: &'static [u8; 1525] = include_asset!("cube_map.obj");
+    let vec = arr_to_vec(&arr[0], 1525);
+    let mut reader = io::Cursor::new(vec);
+    let cube_map = obj::load(&mut reader).unwrap();
 
     let mut cube_map_vbo = 0;
     unsafe {
