@@ -110,7 +110,7 @@ fn arr_to_vec(ptr: *const u8, length: usize) -> Vec<u8> {
     vec
 }
 
-fn load_text_font_atlas(context: &Game) -> FontAtlas {
+fn load_text_font_atlas(_context: &Game) -> FontAtlas {
     let arr: &'static [u8; 4147] = include_asset!("text_font2048x2048.json");
     let vec = arr_to_vec(&arr[0], 4147);
     let mut reader = io::Cursor::new(vec);
@@ -118,7 +118,7 @@ fn load_text_font_atlas(context: &Game) -> FontAtlas {
     font_atlas::load_reader(&mut reader).unwrap()
 }
 
-fn load_title_font_atlas(context: &Game) -> FontAtlas {
+fn load_title_font_atlas(_context: &Game) -> FontAtlas {
     let arr: &'static [u8; 3537] = include_asset!("title_font2048x2048.json");
     let vec = arr_to_vec(&arr[0], 3537);
     let mut reader = io::Cursor::new(vec);
@@ -196,7 +196,7 @@ fn create_title_screen_geometry(
     (string_vp_vbo, string_vt_vbo, string_vao, string_point_count)
 }
 
-fn create_title_screen_texture(context: &Game) -> GLuint {
+fn create_title_screen_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 56573] = include_asset!("title_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 56573);
     let tex_image = texture::load_from_memory(&vec).unwrap();
@@ -206,7 +206,7 @@ fn create_title_screen_texture(context: &Game) -> GLuint {
     tex
 }
 
-fn create_text_texture(context: &Game) -> GLuint {
+fn create_text_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21182] = include_asset!("text_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 21182);
     let tex_image = texture::load_from_memory(&vec).unwrap();
@@ -288,7 +288,7 @@ fn text_to_vbo(
 ///
 /// Load the vertex buffer object for the skybox.
 ///
-fn create_cube_map_geometry(context: &Game, shader: GLuint) -> GLuint {
+fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
     let arr: &'static [u8; 1525] = include_asset!("cube_map.obj");
     let vec = arr_to_vec(&arr[0], 1525);
     let mut reader = io::Cursor::new(vec);
@@ -388,7 +388,7 @@ fn load_cube_map(
 /// Create a cube map texture. Load all 6 sides of a cube map from images,
 /// and then format texture.
 ///
-fn create_cube_map(context: &Game) -> GLuint {
+fn create_cube_map(_context: &Game) -> GLuint {
     let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
     let vec = arr_to_vec(&arr[0], 25507);
     let tex_image = texture::load_from_memory(&vec).unwrap();
@@ -460,7 +460,7 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
 ///
 /// Create the ground plane geometry.
 ///
-fn create_ground_plane_geometry(context: &Game, shader: GLuint) -> (GLuint, GLuint) {
+fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLuint) {
     let arr: &'static [u8; 363] = include_asset!("ground_plane.obj");
     let vec = arr_to_vec(&arr[0], 363);
     let mut reader = io::Cursor::new(vec);
@@ -498,7 +498,7 @@ fn create_ground_plane_geometry(context: &Game, shader: GLuint) -> (GLuint, GLui
 ///
 /// Create the ground plane texture.
 ///
-fn create_ground_plane_texture(context: &Game) -> GLuint {
+fn create_ground_plane_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21306] = include_asset!("tile_rock_planet256x256.png");
     let vec = arr_to_vec(&arr[0], 21306);
     let tex_image = texture::load_from_memory(&vec).unwrap();
