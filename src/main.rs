@@ -143,10 +143,12 @@ fn load_title_font_atlas(context: &Game) -> FontAtlas {
 /// Create the shaders for rendering text.
 ///
 fn create_title_screen_shaders(context: &Game) -> (GLuint, GLint) {
-    let title_screen_sp = glh::create_program_from_files(
+    let mut vert_reader = io::Cursor::new(include_shader!("title_screen.vert.glsl"));
+    let mut frag_reader = io::Cursor::new(include_shader!("title_screen.frag.glsl"));
+    let title_screen_sp = glh::create_program_from_reader(
         &context.gl,
-        &context.shader_file("title_screen.vert.glsl"),
-        &context.shader_file("title_screen.frag.glsl")
+        &mut vert_reader, "title_screen.vert.glsl",
+        &mut frag_reader, "title_screen.frag.glsl"
     ).unwrap();
     assert!(title_screen_sp > 0);
 
@@ -388,10 +390,12 @@ fn create_cube_map(
 /// Create the cube map shaders.
 ///
 fn create_cube_map_shaders(context: &Game) -> (GLuint, GLint, GLint) {
-    let cube_sp = glh::create_program_from_files(
+    let mut vert_reader = io::Cursor::new(include_shader!("cube.vert.glsl"));
+    let mut frag_reader = io::Cursor::new(include_shader!("cube.frag.glsl"));
+    let cube_sp = glh::create_program_from_reader(
         &context.gl,
-        &context.shader_file("cube.vert.glsl"),
-        &context.shader_file("cube.frag.glsl")
+        &mut vert_reader, "cube.vert.glsl",
+        &mut frag_reader, "cube.frag.glsl"
     ).unwrap();
     assert!(cube_sp > 0);
 
@@ -416,10 +420,12 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. Also note how I
     // work out the texture coordinates, st, from the vertex point position.
-    let gp_sp = glh::create_program_from_files(
+    let mut vert_reader = io::Cursor::new(include_shader!("ground_plane.vert.glsl"));
+    let mut frag_reader = io::Cursor::new(include_shader!("ground_plane.frag.glsl"));
+    let gp_sp = glh::create_program_from_reader(
         &context.gl,
-        &context.shader_file("ground_plane.vert.glsl"),
-        &context.shader_file("ground_plane.frag.glsl")
+        &mut vert_reader, "ground_plane.vert.glsl",
+        &mut frag_reader, "ground_plane.frag.glsl"
     ).unwrap();
     assert!(gp_sp > 0);
 
