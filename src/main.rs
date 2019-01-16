@@ -334,15 +334,6 @@ fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage
         gl::BindTexture(gl::TEXTURE_CUBE_MAP, handle);
     }
 
-    /*
-    let force_channels = 4;
-    let image_data = match image::load_with_depth(&file_name, force_channels, false) {
-        LoadResult::ImageU8(image_data) => image_data,
-        LoadResult::Error(_) => return false,
-        LoadResult::ImageF32(_) => return false,
-    };
-    */
-
     let width = image_data.width;
     let height = image_data.height;
 
