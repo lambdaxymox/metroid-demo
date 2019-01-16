@@ -1,7 +1,9 @@
 #![allow(dead_code)]
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io;
+use std::io::BufReader;
 use std::path::Path;
+
 use wavefront::obj;
 use wavefront::obj::{Element, VTNTriple};
 
@@ -69,7 +71,7 @@ impl ObjMesh {
     }
 }
 
-pub fn load<R: BufRead>(reader: &mut R) -> Result<ObjMesh, String> {
+pub fn load<R: io::Read>(reader: &mut R) -> Result<ObjMesh, String> {
     let object_set = obj::parse(reader).expect("File not found.");
     let object = &object_set[0];
 
@@ -117,6 +119,11 @@ pub fn load<R: BufRead>(reader: &mut R) -> Result<ObjMesh, String> {
     Ok(ObjMesh::new(vertices, tex_coords, normals))
 }
 
+pub fn load_from_memory(buffer: &[u8]) -> Result<ObjMesh, String> {
+    let mut reader = BufReader::new(buffer);
+    load(&mut reader)
+}
+
 pub fn load_file<P: AsRef<Path>>(path: P) -> Result<ObjMesh, String> {
     let file = match File::open(path.as_ref()) {
         Ok(handle) => handle,
@@ -128,6 +135,7 @@ pub fn load_file<P: AsRef<Path>>(path: P) -> Result<ObjMesh, String> {
     let mut reader = BufReader::new(file);
     load(&mut reader)
 }
+
 
 #[cfg(test)]
 mod loader_tests {
