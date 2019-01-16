@@ -17,7 +17,6 @@ mod gl {
 
 mod config;
 mod font_atlas;
-//mod gl_helpers;
 mod gl_help;
 mod camera;
 mod obj;
