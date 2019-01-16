@@ -4,7 +4,6 @@ extern crate cgmath;
 extern crate wavefront;
 extern crate serde;
 extern crate serde_json;
-extern crate toml;
 extern crate log;
 extern crate file_logger;
 
@@ -24,15 +23,10 @@ mod texture;
 use glfw::{Action, Context, Key};
 use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
 
-use stb_image::image;
-use stb_image::image::LoadResult;
-
-use std::env;
 use std::io;
 use std::mem;
 use std::ptr;
 use std::process;
-use std::path::{Path, PathBuf};
 
 use font_atlas::FontAtlas;
 
