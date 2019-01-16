@@ -132,7 +132,6 @@ fn load_text_font_atlas(context: &Game) -> FontAtlas {
 }
 
 fn load_title_font_atlas(context: &Game) -> FontAtlas {
-    //font_atlas::load_file(&context.asset_file("title_font2048x2048.json")).unwrap()
     let arr: &'static [u8; 3537] = include_asset!("title_font2048x2048.json");
     let vec = arr_to_vec(&arr[0], 3537);
     let mut reader = io::Cursor::new(vec);
