@@ -360,21 +360,23 @@ fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage
 ///
 fn load_cube_map(
     front: &TexImage2D, back: &TexImage2D, top: &TexImage2D,
-    bottom: &TexImage2D, left: &TexImage2D, right: &TexImage2D, tex_cube: &mut GLuint) {
-    
+    bottom: &TexImage2D, left: &TexImage2D, right: &TexImage2D) -> GLuint {
+
+    let mut tex = 0;
     // Generate a cube map texture.
     unsafe {
         gl::ActiveTexture(gl::TEXTURE0);
-        gl::GenTextures(1, tex_cube);
+        gl::GenTextures(1, &mut tex);
     }
+    assert!(tex > 0);
 
     // Load each image and copy it into a side of the cube-map texture.
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_Z, front);
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_Z, back);
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_Y, top);
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_Y, bottom);
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_NEGATIVE_X, left);
-    load_cube_map_side(*tex_cube, gl::TEXTURE_CUBE_MAP_POSITIVE_X, right);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_NEGATIVE_Z, front);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_POSITIVE_Z, back);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_POSITIVE_Y, top);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_NEGATIVE_Y, bottom);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_NEGATIVE_X, left);
+    load_cube_map_side(tex, gl::TEXTURE_CUBE_MAP_POSITIVE_X, right);
     
     // Format the cube map texture.
     unsafe {
@@ -384,6 +386,8 @@ fn load_cube_map(
         gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_S, gl::CLAMP_TO_EDGE as i32);
         gl::TexParameteri(gl::TEXTURE_CUBE_MAP, gl::TEXTURE_WRAP_T, gl::CLAMP_TO_EDGE as i32);
     }
+
+    tex
 }
 
 ///
@@ -394,10 +398,9 @@ fn create_cube_map(context: &Game) -> GLuint {
     let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
     let vec = arr_to_vec(&arr[0], 25507);
     let tex_image = texture::load_from_memory(&vec).unwrap();
-    let mut tex = 0;
-    load_cube_map(
+
+    let tex = load_cube_map(
         &tex_image, &tex_image, &tex_image, &tex_image, &tex_image, &tex_image,
-        &mut tex
     );
     assert!(tex > 0);
 
