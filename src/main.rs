@@ -17,7 +17,8 @@ mod gl {
 
 mod config;
 mod font_atlas;
-mod gl_helpers;
+//mod gl_helpers;
+mod gl_help;
 mod camera;
 mod obj;
 
@@ -35,7 +36,7 @@ use std::path::{Path, PathBuf};
 
 use font_atlas::FontAtlas;
 
-use gl_helpers as glh;
+use gl_help as glh;
 use cgmath as math;
 use math::{Matrix4, Quaternion, AsArray};
 use camera::Camera;
@@ -145,7 +146,7 @@ fn create_title_screen_geometry(
 /// Print a string to the GLFW screen with the given font.
 ///
 fn text_to_vbo(
-    context: &glh::GLContext, st: &str, atlas: &FontAtlas,
+    context: &glh::GLState, st: &str, atlas: &FontAtlas,
     start_x: f32, start_y: f32, scale_px: f32,
     points_vbo: &mut GLuint, texcoords_vbo: &mut GLuint, point_count: &mut usize) {
 
@@ -427,7 +428,7 @@ fn create_camera(width: u32, height: u32) -> Camera {
     Camera::new(near, far, fov, aspect, cam_speed, cam_yaw_speed, cam_pos, fwd, rgt, up, axis)
 }
 
-fn reset_camera_to_default(context: &glh::GLContext, camera: &mut Camera) {
+fn reset_camera_to_default(context: &glh::GLState, camera: &mut Camera) {
     let width = context.width;
     let height = context.height;
     *camera = create_camera(width, height);
@@ -505,7 +506,7 @@ fn load_texture<P: AsRef<Path>>(
 /// handle window resizing in our state updates on the application side. Run this function 
 /// whenever the frame buffer is resized.
 /// 
-fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Camera, width: u32, height: u32) {
+fn glfw_framebuffer_size_callback(context: &mut glh::GLState, camera: &mut Camera, width: u32, height: u32) {
     context.width = width;
     context.height = height;
 
@@ -519,11 +520,11 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLContext, camera: &mut Cam
 
 struct Game {
     config: config::ProgramConfig,
-    gl: glh::GLContext,
+    gl: glh::GLState,
 }
 
 impl Game {
-    fn new(config: config::ProgramConfig, gl_context: glh::GLContext) -> Game {
+    fn new(config: config::ProgramConfig, gl_context: glh::GLState) -> Game {
         Game { config: config, gl: gl_context }
     }
 
