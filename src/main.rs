@@ -32,7 +32,7 @@ use font_atlas::FontAtlas;
 
 use gl_help as glh;
 use cgmath as math;
-use math::{Matrix4, Quaternion, AsArray};
+use math::{Matrix4, Quaternion, Array};
 use camera::Camera;
 use log::{info};
 use texture::TexImage2D;

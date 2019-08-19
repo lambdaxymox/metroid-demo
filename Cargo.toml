@@ -13,7 +13,7 @@ serde = "1.0.80"
 serde_derive = "1.0.80"
 serde_json = "1.0.33"
 file_logger = { git = "https://github.com/stallmanifold/file-logger" }
-simple_cgmath = { git = "https://github.com/stallmanifold/simple-cgmath" }
+lean_cgmath = { git = "https://github.com/stallmanifold/lean-cgmath" }
 wavefront_obj = { git = "https://github.com/stallmanifold/wavefront-obj" }
 
 [build-dependencies]
