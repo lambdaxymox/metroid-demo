@@ -31,7 +31,7 @@ impl Camera {
         let proj_mat = math::perspective((fov, aspect, near, far));
         let trans_mat_inv = Matrix4::from_translation(cam_pos);
         let rot_mat_inv = Matrix4::from(axis);
-        let view_mat = rot_mat_inv.inverse() * trans_mat_inv.inverse();
+        let view_mat = rot_mat_inv.inverse().unwrap() * trans_mat_inv.inverse().unwrap();
 
         Camera {
             near: near,

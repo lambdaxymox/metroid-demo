@@ -693,7 +693,10 @@ fn main() {
 
     unsafe {
         gl::UseProgram(cube_sp);
-        gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, camera.rot_mat_inv.inverse().as_ptr());
+        gl::UniformMatrix4fv(
+            cube_view_mat_location, 1, gl::FALSE, 
+            camera.rot_mat_inv.inverse().unwrap().as_ptr()
+        );
         gl::UniformMatrix4fv(cube_proj_mat_location, 1, gl::FALSE, camera.proj_mat.as_ptr());
     }
 
@@ -886,14 +889,17 @@ fn main() {
             camera.cam_pos += math::vec3(camera.rgt) *  move_to.x;
             camera.trans_mat_inv = Matrix4::from_translation(camera.cam_pos);
 
-            camera.view_mat = camera.rot_mat_inv.inverse() * camera.trans_mat_inv.inverse();
+            camera.view_mat = camera.rot_mat_inv.inverse().unwrap() * camera.trans_mat_inv.inverse().unwrap();
             unsafe {
                 gl::UseProgram(gp_sp);
                 gl::UniformMatrix4fv(gp_view_mat_loc, 1, gl::FALSE, camera.view_mat.as_ptr());
 
                 // Cube map view matrix has rotation, but not translation. It moves with the camera.
                 gl::UseProgram(cube_sp);
-                gl::UniformMatrix4fv(cube_view_mat_location, 1, gl::FALSE, camera.rot_mat_inv.inverse().as_ptr());
+                gl::UniformMatrix4fv(
+                    cube_view_mat_location, 1, gl::FALSE, 
+                    camera.rot_mat_inv.inverse().unwrap().as_ptr()
+                );
             }
         }
 
