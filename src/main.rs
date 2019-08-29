@@ -583,7 +583,7 @@ fn main() {
         title_vao,
         title_points
     ) = create_title_screen_geometry(
-        &context, title_screen_sp, &title_font_atlas, "STALLMANIFOLD", -0.90, 0.4, 256.0
+        &context, title_screen_sp, &title_font_atlas, "LAMBDAXYMOX", -0.80, 0.4, 256.0
     );
 
     // Font sheet for the title text on the title screen.
@@ -791,6 +791,12 @@ fn main() {
             Action::Press | Action::Repeat => {
                 reset_camera_to_default(&context.gl, &mut camera);
                 cam_moved = true;
+            }
+            _ => {}
+        }
+        match context.gl.window.get_key(Key::Enter) {
+            Action::Press | Action::Repeat => {
+                println!("ENTER key pressed.");
             }
             _ => {}
         }
