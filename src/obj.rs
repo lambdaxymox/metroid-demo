@@ -8,11 +8,9 @@ use wavefront_obj as obj;
 use wavefront_obj::{Element, VTNTriple};
 
 
-///
 /// An `ObjMesh` is a model space representation of a 3D geometric figure.
 /// You typically generate one from parsing a Wavefront *.obj file into
 /// an `ObjMesh`.
-///
 #[derive(Clone, Debug, PartialEq)]
 pub struct ObjMesh {
     pub points: Vec<[f32; 3]>,
@@ -21,9 +19,7 @@ pub struct ObjMesh {
 }
 
 impl ObjMesh {
-    ///
     /// Generate a new mesh object.
-    ///
     pub fn new(points: Vec<[f32; 3]>, tex_coords: Vec<[f32; 2]>, normals: Vec<[f32; 3]>) -> ObjMesh {
         ObjMesh {
             points: points,
@@ -32,39 +28,31 @@ impl ObjMesh {
         }
     }
 
-    ///
     /// Present the points map as an array slice. This function can be used
     /// to present the internal array buffer to OpenGL or another Graphics
     /// system for rendering.
-    ///
     #[inline]
     pub fn points(&self) -> &[[f32; 3]] {
         &self.points
     }
 
-    ///
     /// Present the texture map as an array slice. This function can be used
     /// to present the internal array buffer to OpenGL or another Graphics
     /// system for rendering.
-    ///
     #[inline]
     pub fn tex_coords(&self) -> &[[f32; 2]] {
         &self.tex_coords
     }
 
-    ///
     /// Present the normal vector map as an array slice. This function can be used
     /// to present the internal array buffer to OpenGL or another Graphics
     /// system for rendering.
-    ///
     #[inline]
     pub fn normals(&self) -> &[[f32; 3]] {
         &self.normals
     }
 
-    ///
     /// Get the number of vertices in the mesh.
-    ///
     #[inline]
     pub fn len(&self) -> usize {
         self.points.len()

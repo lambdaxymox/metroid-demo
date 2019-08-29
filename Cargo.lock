@@ -217,7 +217,7 @@ dependencies = [
 
 [[package]]
 name = "metroid-demo"
-version = "1.2.6"
+version = "1.2.7"
 dependencies = [
  "file_logger 0.4.3 (git+https://github.com/lambdaxymox/file-logger)",
  "gl_generator 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",

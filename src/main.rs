@@ -49,8 +49,8 @@ const LOG_FILE: &str = "/tmp/metroid-demo.log";
 const LOG_FILE: &str = "metroid-demo.log";
 
 // Text colors.
-const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
-const TEXT_COLOR: [f32; 3] = [139 as f32 / 255 as f32, 193 as f32 / 255 as f32, 248 as f32 / 255 as f32];
+const TITLE_COLOR: [f32; 3] = [1_f32, 1_f32, 1_f32];
+const TEXT_COLOR: [f32; 3] = [139_f32 / 255_f32, 193_f32 / 255_f32, 248_f32 / 255_f32];
 
 
 macro_rules! concat_path {
@@ -126,9 +126,7 @@ fn load_title_font_atlas(_context: &Game) -> FontAtlas {
     font_atlas::load_reader(&mut reader).unwrap()
 }
 
-///
 /// Create the shaders for rendering text.
-///
 fn create_title_screen_shaders(context: &Game) -> (GLuint, GLint) {
     let mut vert_reader = io::Cursor::new(include_shader!("title_screen.vert.glsl"));
     let mut frag_reader = io::Cursor::new(include_shader!("title_screen.frag.glsl"));
@@ -147,9 +145,7 @@ fn create_title_screen_shaders(context: &Game) -> (GLuint, GLint) {
     (title_screen_sp, title_screen_sp_text_color_loc)
 }
 
-///
 /// Set up the geometry for rendering title screen text.
-///
 fn create_title_screen_geometry(
     context: &Game, shader: GLuint,
     font_atlas: &FontAtlas, text: &str,
@@ -216,9 +212,7 @@ fn create_text_texture(_context: &Game) -> GLuint {
     tex
 }
 
-///
 /// Print a string to the GLFW screen with the given font.
-///
 fn text_to_vbo(
     context: &glh::GLState, st: &str, atlas: &FontAtlas,
     start_x: f32, start_y: f32, scale_px: f32,
@@ -285,9 +279,7 @@ fn text_to_vbo(
     *point_count = 6 * st.len();
 }
 
-///
 /// Load the vertex buffer object for the skybox.
-///
 fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
     let arr: &'static [u8; 1525] = include_asset!("cube_map.obj");
     let vec = arr_to_vec(&arr[0], 1525);
@@ -320,9 +312,7 @@ fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
     cube_map_vao
 }
 
-///
 /// Load one of the cube map sides into a cube map texture.
-///
 fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage2D) -> bool {
     unsafe {
         gl::BindTexture(gl::TEXTURE_CUBE_MAP, handle);
@@ -348,10 +338,8 @@ fn load_cube_map_side(handle: GLuint, side_target: GLenum, image_data: &TexImage
     true
 }
 
-///
 /// Load a cube map texture onto the GPU. Load all 6 sides of a cube map from images,
 /// and then format texture.
-///
 fn load_cube_map(
     front: &TexImage2D, back: &TexImage2D, top: &TexImage2D,
     bottom: &TexImage2D, left: &TexImage2D, right: &TexImage2D) -> GLuint {
@@ -384,10 +372,8 @@ fn load_cube_map(
     tex
 }
 
-///
 /// Create a cube map texture. Load all 6 sides of a cube map from images,
 /// and then format texture.
-///
 fn create_cube_map(_context: &Game) -> GLuint {
     let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
     let vec = arr_to_vec(&arr[0], 25507);
@@ -401,9 +387,7 @@ fn create_cube_map(_context: &Game) -> GLuint {
     tex
 }
 
-///
 /// Create the cube map shaders.
-///
 fn create_cube_map_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     let mut vert_reader = io::Cursor::new(include_shader!("cube.vert.glsl"));
     let mut frag_reader = io::Cursor::new(include_shader!("cube.frag.glsl"));
@@ -428,9 +412,7 @@ fn create_cube_map_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     (cube_sp, cube_view_mat_location, cube_proj_mat_location)
 }
 
-///
 /// Create the ground plane shaders.
-///
 fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     // Here I used negative y from the buffer as the z value so that it was on
     // the floor but also that the 'front' was on the top side. Also note how I
@@ -457,9 +439,7 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
     (gp_sp, gp_view_mat_loc, gp_proj_mat_loc)
 }
 
-///
 /// Create the ground plane geometry.
-///
 fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLuint) {
     let arr: &'static [u8; 363] = include_asset!("ground_plane.obj");
     let vec = arr_to_vec(&arr[0], 363);
@@ -495,9 +475,7 @@ fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLu
     (gp_vp_vbo, gp_vp_vao)
 }
 
-///
 /// Create the ground plane texture.
-///
 fn create_ground_plane_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21306] = include_asset!("tile_rock_planet256x256.png");
     let vec = arr_to_vec(&arr[0], 21306);
@@ -508,9 +486,7 @@ fn create_ground_plane_texture(_context: &Game) -> GLuint {
     tex
 }
 
-///
 /// Initialize the camera to default position and orientation.
-///
 fn create_camera(width: u32, height: u32) -> Camera {
     let near = 0.1;
     let far = 100.0;
@@ -536,9 +512,7 @@ fn reset_camera_to_default(context: &glh::GLState, camera: &mut Camera) {
     *camera = create_camera(width, height);
 }
 
-///
 /// Load texture image into the GPU.
-///
 fn load_texture(tex_data: &TexImage2D, wrapping_mode: GLuint) -> Result<GLuint, String> {
     let mut tex = 0;
     unsafe {
@@ -568,12 +542,10 @@ fn load_texture(tex_data: &TexImage2D, wrapping_mode: GLuint) -> Result<GLuint, 
     Ok(tex)
 }
 
-///
 /// The GLFW frame buffer size callback function. This is normally set using 
 /// the GLFW `glfwSetFramebufferSizeCallback` function, but instead we explicitly
 /// handle window resizing in our state updates on the application side. Run this function 
 /// whenever the frame buffer is resized.
-/// 
 fn glfw_framebuffer_size_callback(context: &mut glh::GLState, camera: &mut Camera, width: u32, height: u32) {
     context.width = width;
     context.height = height;
@@ -596,9 +568,7 @@ impl Game {
     }
 }
 
-///
 /// Initialize the logger.
-///
 fn init_logger(log_file: &str) {
     eprintln!("Logging is stored in file: {}", log_file);
     file_logger::init(log_file).expect("Failed to initialize logger.");
