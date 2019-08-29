@@ -43,10 +43,10 @@ const GL_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FE;
 const GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT: u32 = 0x84FF;
 
 #[cfg(feature = "build_for_install")]
-const LOG_FILE: &str = "/tmp/triforces-demo.log";
+const LOG_FILE: &str = "/tmp/metroid-demo.log";
 
 #[cfg(not(feature = "build_for_install"))]
-const LOG_FILE: &str = "triforces-demo.log";
+const LOG_FILE: &str = "metroid-demo.log";
 
 // Text colors.
 const TITLE_COLOR: [f32; 3] = [1.0, 1.0, 1.0];
