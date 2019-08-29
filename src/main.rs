@@ -236,7 +236,7 @@ fn text_to_vbo(
 
 /// Load the vertex buffer object for the skybox.
 fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
-    let cube_map = include!("../cube_map.obj.in");
+    let cube_map = include_code!("cube_map.obj.in");
 
     let mut cube_map_vbo = 0;
     unsafe {
@@ -393,7 +393,7 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
 
 /// Create the ground plane geometry.
 fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLuint) {
-    let mesh = include!("../ground_plane.obj.in");
+    let mesh = include_code!("ground_plane.obj.in");
 
     let mut gp_vp_vbo = 0;
     unsafe {

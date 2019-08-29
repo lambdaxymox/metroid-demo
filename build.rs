@@ -7,10 +7,21 @@ use mini_obj as obj;
 use std::env;
 use std::io;
 use std::io::Write;
+use std::fs;
 use std::fs::File;
-use std::path::Path;
+use std::path::{Path, PathBuf};
+
+const CODE_FRAGMENTS: &str = ".code_fragments";
 
 
+fn create_code_fragment_directory() -> PathBuf {
+    let code_path = Path::new(".").join(CODE_FRAGMENTS);
+    if !code_path.exists() {
+        fs::create_dir(&code_path).unwrap();
+    }
+
+    code_path
+}
 
 fn generate_code_fragment<P: AsRef<Path>>(path: P) -> String {
     let model = obj::load_file(path).unwrap();
@@ -19,13 +30,12 @@ fn generate_code_fragment<P: AsRef<Path>>(path: P) -> String {
     fragment
 }
 
-fn write_code_fragment(fragment: &str, fragment_name: &str) -> io::Result<()> {
-    let path = Path::new(".").join(fragment_name);
+fn write_code_fragment<P: AsRef<Path>>(code_path: P, fragment_name: &str, fragment: &str) -> io::Result<()> {
+    let path = code_path.as_ref().join(fragment_name);
     let mut file = File::create(&path)?;
     file.write_all(fragment.as_bytes())?;
     file.sync_all()
 }
-
 
 #[cfg(target_os = "macos")]
 fn register_gl_api(file: &mut File) {
@@ -49,11 +59,13 @@ fn register_gl_api(file: &mut File) {
 }
 
 fn main() {
+    let code_path = create_code_fragment_directory();
+
     let cube_map = generate_code_fragment("assets/cube_map.obj");
-    write_code_fragment(&cube_map, "cube_map.obj.in").unwrap();
+    write_code_fragment(&code_path, "cube_map.obj.in", &cube_map).unwrap();
 
     let ground_plane = generate_code_fragment("assets/ground_plane.obj");
-    write_code_fragment(&ground_plane, "ground_plane.obj.in").unwrap();
+    write_code_fragment(&code_path, "ground_plane.obj.in", &ground_plane).unwrap();
 
     let dest = env::var("OUT_DIR").unwrap();
     let mut file = File::create(&Path::new(&dest).join("gl_bindings.rs")).unwrap();
