@@ -54,6 +54,9 @@ fn main() {
 
     register_gl_api(&mut file);
 
-    let fragment = generate_code_fragment("assets/cube_map.obj");
-    write_code_fragment(&fragment, "cube_map.obj.in").unwrap();
+    let cube_map = generate_code_fragment("assets/cube_map.obj");
+    write_code_fragment(&cube_map, "cube_map.obj.in").unwrap();
+
+    let cube_map = generate_code_fragment("assets/ground_plane.obj");
+    write_code_fragment(&cube_map, "ground_plane.obj.in").unwrap();
 }
