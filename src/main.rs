@@ -2,6 +2,7 @@ extern crate glfw;
 extern crate stb_image;
 extern crate cgmath;
 extern crate wavefront_obj;
+extern crate mini_obj;
 extern crate serde;
 extern crate serde_json;
 extern crate log;
@@ -17,7 +18,7 @@ mod gl {
 mod font_atlas;
 mod gl_help;
 mod camera;
-mod obj;
+//mod obj;
 mod texture;
 
 use glfw::{Action, Context, Key};
@@ -32,6 +33,7 @@ use font_atlas::FontAtlas;
 
 use gl_help as glh;
 use cgmath as math;
+use mini_obj as obj;
 use math::{Matrix4, Quaternion, Array};
 use camera::Camera;
 use log::{info};
@@ -281,10 +283,13 @@ fn text_to_vbo(
 
 /// Load the vertex buffer object for the skybox.
 fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
+    /*
     let arr: &'static [u8; 1525] = include_asset!("cube_map.obj");
     let vec = arr_to_vec(&arr[0], 1525);
     let mut reader = io::Cursor::new(vec);
     let cube_map = obj::load(&mut reader).unwrap();
+    */
+    let cube_map = include!("../cube_map.obj.in");
 
     let mut cube_map_vbo = 0;
     unsafe {
