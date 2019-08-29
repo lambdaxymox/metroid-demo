@@ -1,7 +1,6 @@
 extern crate glfw;
 extern crate stb_image;
 extern crate cgmath;
-extern crate wavefront_obj;
 extern crate mini_obj;
 extern crate serde;
 extern crate serde_json;
