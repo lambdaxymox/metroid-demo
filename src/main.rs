@@ -236,12 +236,6 @@ fn text_to_vbo(
 
 /// Load the vertex buffer object for the skybox.
 fn create_cube_map_geometry(_context: &Game, shader: GLuint) -> GLuint {
-    /*
-    let arr: &'static [u8; 1525] = include_asset!("cube_map.obj");
-    let vec = arr_to_vec(&arr[0], 1525);
-    let mut reader = io::Cursor::new(vec);
-    let cube_map = obj::load(&mut reader).unwrap();
-    */
     let cube_map = include!("../cube_map.obj.in");
 
     let mut cube_map_vbo = 0;
@@ -399,12 +393,6 @@ fn create_ground_plane_shaders(context: &Game) -> (GLuint, GLint, GLint) {
 
 /// Create the ground plane geometry.
 fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLuint) {
-    /*
-    let arr: &'static [u8; 363] = include_asset!("ground_plane.obj");
-    let vec = arr_to_vec(&arr[0], 363);
-    let mut reader = io::Cursor::new(vec);
-    let mesh = obj::load(&mut reader).unwrap();
-    */
     let mesh = include!("../ground_plane.obj.in");
 
     let mut gp_vp_vbo = 0;
