@@ -1,6 +1,6 @@
 [package]
 name = "metroid-demo"
-version = "1.2.10"
+version = "1.2.11"
 authors = ["LambdaXymox <lambda.xymox@gmail.com>"]
 build = "build.rs"
 description = "OpenGL tech demo."
@@ -14,11 +14,11 @@ serde_derive = "1.0.80"
 serde_json = "1.0.33"
 file_logger = { git = "https://github.com/lambdaxymox/file-logger" }
 lean_cgmath = { version = "0.6.0", git = "https://github.com/lambdaxymox/lean-cgmath" }
-mini_obj = { git = "https://github.com/lambdaxymox/mini_obj" }
+mini_obj = { git = "https://github.com/lambdaxymox/mini-obj" }
 
 [build-dependencies]
 gl_generator = "0.10.0"
-mini_obj = { git = "https://github.com/lambdaxymox/mini_obj" }
+mini_obj = { git = "https://github.com/lambdaxymox/mini-obj" }
 
 [profile.dev]
 debug = true
