@@ -49,14 +49,14 @@ fn register_gl_api(file: &mut File) {
 }
 
 fn main() {
+    let cube_map = generate_code_fragment("assets/cube_map.obj");
+    write_code_fragment(&cube_map, "cube_map.obj.in").unwrap();
+
+    let ground_plane = generate_code_fragment("assets/ground_plane.obj");
+    write_code_fragment(&ground_plane, "ground_plane.obj.in").unwrap();
+
     let dest = env::var("OUT_DIR").unwrap();
     let mut file = File::create(&Path::new(&dest).join("gl_bindings.rs")).unwrap();
 
     register_gl_api(&mut file);
-
-    let cube_map = generate_code_fragment("assets/cube_map.obj");
-    write_code_fragment(&cube_map, "cube_map.obj.in").unwrap();
-
-    let cube_map = generate_code_fragment("assets/ground_plane.obj");
-    write_code_fragment(&cube_map, "ground_plane.obj.in").unwrap();
 }
