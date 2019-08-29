@@ -15,10 +15,12 @@ mod gl {
     include!(concat!(env!("OUT_DIR"), "/gl_bindings.rs"));
 }
 
+#[macro_use]
+mod macros;
+
 mod font_atlas;
 mod gl_help;
 mod camera;
-//mod obj;
 mod texture;
 
 use glfw::{Action, Context, Key};
@@ -54,54 +56,6 @@ const LOG_FILE: &str = "metroid-demo.log";
 const TITLE_COLOR: [f32; 3] = [1_f32, 1_f32, 1_f32];
 const TEXT_COLOR: [f32; 3] = [139_f32 / 255_f32, 193_f32 / 255_f32, 248_f32 / 255_f32];
 
-
-macro_rules! concat_path {
-    ($fragment:expr) => {
-        concat!($fragment, "/")
-    };
-    ($fragment:expr, $($fragments:expr),+) => {
-        concat!($fragment, "/", concat_path!($($fragments),+))
-    }
-}
-
-macro_rules! asset_file {
-    ($asset:expr) => {
-        concat!(concat_path!("..", "assets"), $asset)
-    }
-}
-
-macro_rules! include_asset {
-    ($asset:expr) => {
-        include_bytes!(asset_file!($asset))
-    }
-}
-
-#[cfg(target_os = "mac_os")]
-macro_rules! shader_file {
-    ($asset:expr) => {
-        concat!(concat_path!("..", "shaders", "330"), $asset)
-    }
-}
-
-#[cfg(target_os = "windows")]
-macro_rules! shader_file {
-    ($asset:expr) => {
-        concat!(concat_path!("..", "assets"), $asset)
-    }
-}
-
-#[cfg(not(any(target_os = "macos", target_os = "windows")))]
-macro_rules! shader_file {
-    ($shader:expr) => {
-        concat!(concat_path!("..", "shaders", "420"), $shader)
-    }
-}
-
-macro_rules! include_shader {
-    ($shader:expr) => {
-        include_str!(shader_file!($shader))
-    }
-}
 
 fn arr_to_vec(ptr: *const u8, length: usize) -> Vec<u8> {
     let mut vec = vec![0 as u8; length];
