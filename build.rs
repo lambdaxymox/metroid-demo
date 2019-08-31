@@ -23,7 +23,7 @@ fn create_code_fragment_directory() -> PathBuf {
     code_path
 }
 
-fn generate_code_fragment<P: AsRef<Path>>(path: P) -> String {
+fn generate_code_fragment_obj<P: AsRef<Path>>(path: P) -> String {
     let model = obj::load_file(path).unwrap();
     let fragment = obj::to_rust_code(&model);
 
@@ -61,10 +61,10 @@ fn register_gl_api(file: &mut File) {
 fn main() {
     let code_path = create_code_fragment_directory();
 
-    let cube_map = generate_code_fragment("assets/cube_map.obj");
+    let cube_map = generate_code_fragment_obj("assets/cube_map.obj");
     write_code_fragment(&code_path, "cube_map.obj.in", &cube_map).unwrap();
 
-    let ground_plane = generate_code_fragment("assets/ground_plane.obj");
+    let ground_plane = generate_code_fragment_obj("assets/ground_plane.obj");
     write_code_fragment(&code_path, "ground_plane.obj.in", &ground_plane).unwrap();
 
     let dest = env::var("OUT_DIR").unwrap();

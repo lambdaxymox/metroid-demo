@@ -202,7 +202,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "metroid-demo"
-version = "1.2.17"
+version = "1.2.18"
 dependencies = [
  "file_logger 0.4.3 (git+https://github.com/lambdaxymox/file-logger)",
  "gl_generator 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
