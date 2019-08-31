@@ -1,13 +1,12 @@
 [package]
 name = "metroid-demo"
-version = "1.2.16"
+version = "1.2.17"
 authors = ["LambdaXymox <lambda.xymox@gmail.com>"]
 build = "build.rs"
 description = "OpenGL tech demo."
 
 [dependencies]
 glfw = "0.25.0"
-stb_image = "0.2.2"
 log = "0.4.6"
 serde = "1.0.80"
 serde_derive = "1.0.80"

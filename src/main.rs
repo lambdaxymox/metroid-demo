@@ -1,5 +1,4 @@
 extern crate glfw;
-extern crate stb_image;
 extern crate cgmath;
 extern crate mini_obj;
 extern crate teximage2d;
