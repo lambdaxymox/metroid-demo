@@ -33,7 +33,6 @@ use font_atlas::FontAtlas;
 
 use gl_help as glh;
 use cgmath as math;
-use mini_obj as obj;
 use math::{Matrix4, Quaternion, Array};
 use camera::Camera;
 use log::{info};
