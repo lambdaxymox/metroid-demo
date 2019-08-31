@@ -2,6 +2,7 @@ extern crate glfw;
 extern crate stb_image;
 extern crate cgmath;
 extern crate mini_obj;
+extern crate teximage2d;
 extern crate serde;
 extern crate serde_json;
 extern crate log;
@@ -20,7 +21,6 @@ mod macros;
 mod font_atlas;
 mod gl_help;
 mod camera;
-mod texture;
 
 use glfw::{Action, Context, Key};
 use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
@@ -38,7 +38,7 @@ use mini_obj as obj;
 use math::{Matrix4, Quaternion, Array};
 use camera::Camera;
 use log::{info};
-use texture::TexImage2D;
+use teximage2d::TexImage2D;
 
 
 // OpenGL extension constants.
@@ -150,7 +150,7 @@ fn create_title_screen_geometry(
 fn create_title_screen_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 56573] = include_asset!("title_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 56573);
-    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
     let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
     assert!(tex > 0);
 
@@ -160,7 +160,7 @@ fn create_title_screen_texture(_context: &Game) -> GLuint {
 fn create_text_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21182] = include_asset!("text_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 21182);
-    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
     let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
     assert!(tex > 0);
 
@@ -329,7 +329,7 @@ fn load_cube_map(
 fn create_cube_map(_context: &Game) -> GLuint {
     let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
     let vec = arr_to_vec(&arr[0], 25507);
-    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
 
     let tex = load_cube_map(
         &tex_image, &tex_image, &tex_image, &tex_image, &tex_image, &tex_image,
@@ -428,7 +428,7 @@ fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLu
 fn create_ground_plane_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21306] = include_asset!("tile_rock_planet256x256.png");
     let vec = arr_to_vec(&arr[0], 21306);
-    let tex_image = texture::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
     let tex = load_texture(&tex_image, gl::REPEAT).unwrap();
     assert!(tex > 0);
 
