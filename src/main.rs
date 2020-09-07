@@ -1,5 +1,5 @@
 extern crate glfw;
-extern crate cgmath;
+extern crate gdmath;
 extern crate mini_obj;
 extern crate teximage2d;
 extern crate serde;
@@ -22,8 +22,12 @@ mod gl_help;
 mod camera;
 
 use glfw::{Action, Context, Key};
-use gl::types::{GLenum, GLfloat, GLint, GLsizeiptr, GLvoid, GLuint};
-
+use gl::types::{
+    GLenum, 
+    GLfloat, 
+    GLint, 
+    GLsizeiptr, GLvoid, GLuint
+};
 use std::io;
 use std::mem;
 use std::ptr;
@@ -32,10 +36,17 @@ use std::process;
 use font_atlas::FontAtlas;
 
 use gl_help as glh;
-use cgmath as math;
-use math::{Matrix4, Quaternion, Array};
+use gdmath::{
+    Degrees, 
+    Matrix4, 
+    Quaternion, 
+    Storage, 
+    InvertibleSquareMatrix
+};
 use camera::Camera;
-use log::{info};
+use log::{
+    info
+};
 use teximage2d::TexImage2D;
 
 
@@ -148,7 +159,7 @@ fn create_title_screen_geometry(
 fn create_title_screen_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 56573] = include_asset!("title_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 56573);
-    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap().image;
     let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
     assert!(tex > 0);
 
@@ -158,7 +169,7 @@ fn create_title_screen_texture(_context: &Game) -> GLuint {
 fn create_text_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21182] = include_asset!("text_font2048x2048.png");
     let vec = arr_to_vec(&arr[0], 21182);
-    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap().image;
     let tex = load_texture(&tex_image, gl::CLAMP_TO_EDGE).unwrap();
     assert!(tex > 0);
 
@@ -327,7 +338,7 @@ fn load_cube_map(
 fn create_cube_map(_context: &Game) -> GLuint {
     let arr: &'static [u8; 25507] = include_asset!("skybox_panel.png");
     let vec = arr_to_vec(&arr[0], 25507);
-    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap().image;
 
     let tex = load_cube_map(
         &tex_image, &tex_image, &tex_image, &tex_image, &tex_image, &tex_image,
@@ -426,7 +437,7 @@ fn create_ground_plane_geometry(_context: &Game, shader: GLuint) -> (GLuint, GLu
 fn create_ground_plane_texture(_context: &Game) -> GLuint {
     let arr: &'static [u8; 21306] = include_asset!("tile_rock_planet256x256.png");
     let vec = arr_to_vec(&arr[0], 21306);
-    let tex_image = teximage2d::load_from_memory(&vec).unwrap();
+    let tex_image = teximage2d::load_from_memory(&vec).unwrap().image;
     let tex = load_texture(&tex_image, gl::REPEAT).unwrap();
     assert!(tex > 0);
 
@@ -443,10 +454,10 @@ fn create_camera(width: u32, height: u32) -> Camera {
     let cam_speed: GLfloat = 3.0;
     let cam_yaw_speed: GLfloat = 50.0;
 
-    let fwd = math::vec4((0.0, 0.98, -0.19, 0.0));
-    let rgt = math::vec4((1.0, 0.0,  0.0, 0.0));
-    let up  = math::vec4((0.0, 0.22,  0.98, 0.0));
-    let cam_pos = math::vec3((0.0, -6.81, 3.96));
+    let fwd = gdmath::vec4((0.0, 0.98, -0.19, 0.0));
+    let rgt = gdmath::vec4((1.0, 0.0,  0.0, 0.0));
+    let up  = gdmath::vec4((0.0, 0.22,  0.98, 0.0));
+    let cam_pos = gdmath::vec3((0.0, -6.81, 3.96));
     
     let axis = Quaternion::new(0.77, 0.64, 0.0, 0.0);
 
@@ -499,7 +510,7 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLState, camera: &mut Camer
 
     let aspect = context.width as f32 / context.height as f32;
     camera.aspect = aspect;
-    camera.proj_mat = math::perspective((camera.fov, aspect, camera.near, camera.far));
+    camera.proj_mat = gdmath::perspective((Degrees(camera.fov), aspect, camera.near, camera.far));
     unsafe {
         gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
@@ -685,7 +696,7 @@ fn main() {
         /* ------------------------- UPDATE GAME STATE ------------------------ */
         // Camera control keys.
         let mut cam_moved = false;
-        let mut move_to = math::vec3((0.0, 0.0, 0.0));
+        let mut move_to = gdmath::vec3((0.0, 0.0, 0.0));
         let mut cam_yaw = 0.0;
         let mut cam_pitch = 0.0;
         let mut cam_roll = 0.0;
@@ -735,7 +746,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Quaternion::from_axis_deg(cam_yaw, math::vec3(camera.up));
+                let q_yaw = Quaternion::from_axis_deg(Degrees(cam_yaw), gdmath::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -744,7 +755,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Quaternion::from_axis_deg(cam_yaw, math::vec3(camera.up));
+                let q_yaw = Quaternion::from_axis_deg(Degrees(cam_yaw), gdmath::vec3(camera.up));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -753,7 +764,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Quaternion::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
+                let q_pitch = Quaternion::from_axis_deg(Degrees(cam_pitch), gdmath::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -762,7 +773,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Quaternion::from_axis_deg(cam_pitch, math::vec3(camera.rgt));
+                let q_pitch = Quaternion::from_axis_deg(Degrees(cam_pitch), gdmath::vec3(camera.rgt));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -771,7 +782,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
+                let q_roll = Quaternion::from_axis_deg(Degrees(cam_roll), gdmath::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -780,7 +791,7 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Quaternion::from_axis_deg(cam_roll, math::vec3(camera.fwd));
+                let q_roll = Quaternion::from_axis_deg(Degrees(cam_roll), gdmath::vec3(camera.fwd));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -803,13 +814,13 @@ fn main() {
         if cam_moved {
             // Recalculate local axes so we can move fwd in the direction the camera is pointing.
             camera.rot_mat_inv = Matrix4::from(camera.axis);
-            camera.fwd = camera.rot_mat_inv * math::vec4((0.0, 0.0, -1.0, 0.0));
-            camera.rgt = camera.rot_mat_inv * math::vec4((1.0, 0.0,  0.0, 0.0));
-            camera.up  = camera.rot_mat_inv * math::vec4((0.0, 1.0,  0.0, 0.0));
+            camera.fwd = camera.rot_mat_inv * gdmath::vec4((0.0, 0.0, -1.0, 0.0));
+            camera.rgt = camera.rot_mat_inv * gdmath::vec4((1.0, 0.0,  0.0, 0.0));
+            camera.up  = camera.rot_mat_inv * gdmath::vec4((0.0, 1.0,  0.0, 0.0));
 
-            camera.cam_pos += math::vec3(camera.fwd) * -move_to.z;
-            camera.cam_pos += math::vec3(camera.up)  *  move_to.y;
-            camera.cam_pos += math::vec3(camera.rgt) *  move_to.x;
+            camera.cam_pos += gdmath::vec3(camera.fwd) * -move_to.z;
+            camera.cam_pos += gdmath::vec3(camera.up)  *  move_to.y;
+            camera.cam_pos += gdmath::vec3(camera.rgt) *  move_to.x;
             camera.trans_mat_inv = Matrix4::from_translation(camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse().unwrap() * camera.trans_mat_inv.inverse().unwrap();
