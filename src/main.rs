@@ -1,5 +1,5 @@
 extern crate glfw;
-extern crate gdmath;
+extern crate cglinalg;
 extern crate mini_obj;
 extern crate teximage2d;
 extern crate serde;
@@ -21,12 +21,18 @@ mod font_atlas;
 mod gl_help;
 mod camera;
 
-use glfw::{Action, Context, Key};
+use glfw::{
+    Action, 
+    Context, 
+    Key
+};
 use gl::types::{
     GLenum, 
     GLfloat, 
     GLint, 
-    GLsizeiptr, GLvoid, GLuint
+    GLsizeiptr, 
+    GLvoid, 
+    GLuint
 };
 use std::io;
 use std::mem;
@@ -36,12 +42,15 @@ use std::process;
 use font_atlas::FontAtlas;
 
 use gl_help as glh;
-use gdmath::{
+use cglinalg::{
     Degrees, 
     Matrix4, 
     Quaternion, 
-    Storage, 
-    InvertibleSquareMatrix
+    Array, 
+    InvertibleSquareMatrix,
+    Vector3,
+    Vector4,
+    Unit,
 };
 use camera::Camera;
 use log::{
@@ -454,10 +463,10 @@ fn create_camera(width: u32, height: u32) -> Camera {
     let cam_speed: GLfloat = 3.0;
     let cam_yaw_speed: GLfloat = 50.0;
 
-    let fwd = gdmath::vec4((0.0, 0.98, -0.19, 0.0));
-    let rgt = gdmath::vec4((1.0, 0.0,  0.0, 0.0));
-    let up  = gdmath::vec4((0.0, 0.22,  0.98, 0.0));
-    let cam_pos = gdmath::vec3((0.0, -6.81, 3.96));
+    let fwd = Vector4::new(0.0, 0.98, -0.19, 0.0);
+    let rgt = Vector4::new(1.0, 0.0,  0.0, 0.0);
+    let up  = Vector4::new(0.0, 0.22,  0.98, 0.0);
+    let cam_pos = Vector3::new(0.0, -6.81, 3.96);
     
     let axis = Quaternion::new(0.77, 0.64, 0.0, 0.0);
 
@@ -510,7 +519,7 @@ fn glfw_framebuffer_size_callback(context: &mut glh::GLState, camera: &mut Camer
 
     let aspect = context.width as f32 / context.height as f32;
     camera.aspect = aspect;
-    camera.proj_mat = gdmath::perspective((Degrees(camera.fov), aspect, camera.near, camera.far));
+    camera.proj_mat = Matrix4::from_perspective_fov(Degrees(camera.fov), aspect, camera.near, camera.far);
     unsafe {
         gl::Viewport(0, 0, context.width as i32, context.height as i32);
     }
@@ -696,7 +705,7 @@ fn main() {
         /* ------------------------- UPDATE GAME STATE ------------------------ */
         // Camera control keys.
         let mut cam_moved = false;
-        let mut move_to = gdmath::vec3((0.0, 0.0, 0.0));
+        let mut move_to = Vector3::new(0.0, 0.0, 0.0);
         let mut cam_yaw = 0.0;
         let mut cam_pitch = 0.0;
         let mut cam_roll = 0.0;
@@ -746,7 +755,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Quaternion::from_axis_angle(gdmath::vec3(camera.up), Degrees(cam_yaw));
+                let yaw_axis = Unit::from_value(camera.up.contract());
+                let q_yaw = Quaternion::from_axis_angle(&yaw_axis, Degrees(cam_yaw));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -755,7 +765,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_yaw -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_yaw = Quaternion::from_axis_angle(gdmath::vec3(camera.up), Degrees(cam_yaw));
+                let yaw_axis = Unit::from_value(camera.up.contract());
+                let q_yaw = Quaternion::from_axis_angle(&yaw_axis, Degrees(cam_yaw));
                 camera.axis = q_yaw * &camera.axis;
             }
             _ => {}
@@ -764,7 +775,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Quaternion::from_axis_angle(gdmath::vec3(camera.rgt), Degrees(cam_pitch));
+                let pitch_axis = Unit::from_value(camera.rgt.contract());
+                let q_pitch = Quaternion::from_axis_angle(&pitch_axis, Degrees(cam_pitch));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -773,7 +785,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_pitch -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_pitch = Quaternion::from_axis_angle(gdmath::vec3(camera.rgt), Degrees(cam_pitch));
+                let pitch_axis = Unit::from_value(camera.rgt.contract());
+                let q_pitch = Quaternion::from_axis_angle(&pitch_axis, Degrees(cam_pitch));
                 camera.axis = q_pitch * &camera.axis;
             }
             _ => {}
@@ -782,7 +795,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll -= camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Quaternion::from_axis_angle(gdmath::vec3(camera.fwd), Degrees(cam_roll));
+                let roll_axis = Unit::from_value(camera.fwd.contract());
+                let q_roll = Quaternion::from_axis_angle(&roll_axis, Degrees(cam_roll));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -791,7 +805,8 @@ fn main() {
             Action::Press | Action::Repeat => {
                 cam_roll += camera.cam_yaw_speed * (elapsed_seconds as GLfloat);
                 cam_moved = true;
-                let q_roll = Quaternion::from_axis_angle(gdmath::vec3(camera.fwd), Degrees(cam_roll));
+                let roll_axis = Unit::from_value(camera.fwd.contract());
+                let q_roll = Quaternion::from_axis_angle(&roll_axis, Degrees(cam_roll));
                 camera.axis = q_roll * &camera.axis;
             }
             _ => {}
@@ -814,14 +829,14 @@ fn main() {
         if cam_moved {
             // Recalculate local axes so we can move fwd in the direction the camera is pointing.
             camera.rot_mat_inv = Matrix4::from(camera.axis);
-            camera.fwd = camera.rot_mat_inv * gdmath::vec4((0.0, 0.0, -1.0, 0.0));
-            camera.rgt = camera.rot_mat_inv * gdmath::vec4((1.0, 0.0,  0.0, 0.0));
-            camera.up  = camera.rot_mat_inv * gdmath::vec4((0.0, 1.0,  0.0, 0.0));
+            camera.fwd = camera.rot_mat_inv * Vector4::new(0.0, 0.0, -1.0, 0.0);
+            camera.rgt = camera.rot_mat_inv * Vector4::new(1.0, 0.0,  0.0, 0.0);
+            camera.up  = camera.rot_mat_inv * Vector4::new(0.0, 1.0,  0.0, 0.0);
 
-            camera.cam_pos += gdmath::vec3(camera.fwd) * -move_to.z;
-            camera.cam_pos += gdmath::vec3(camera.up)  *  move_to.y;
-            camera.cam_pos += gdmath::vec3(camera.rgt) *  move_to.x;
-            camera.trans_mat_inv = Matrix4::from_translation(camera.cam_pos);
+            camera.cam_pos += camera.fwd.contract() * -move_to.z;
+            camera.cam_pos += camera.up.contract()  *  move_to.y;
+            camera.cam_pos += camera.rgt.contract() *  move_to.x;
+            camera.trans_mat_inv = Matrix4::from_affine_translation(camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse().unwrap() * camera.trans_mat_inv.inverse().unwrap();
             unsafe {
