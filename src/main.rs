@@ -836,7 +836,7 @@ fn main() {
             camera.cam_pos += camera.fwd.contract() * -move_to.z;
             camera.cam_pos += camera.up.contract()  *  move_to.y;
             camera.cam_pos += camera.rgt.contract() *  move_to.x;
-            camera.trans_mat_inv = Matrix4::from_affine_translation(camera.cam_pos);
+            camera.trans_mat_inv = Matrix4::from_affine_translation(&camera.cam_pos);
 
             camera.view_mat = camera.rot_mat_inv.inverse().unwrap() * camera.trans_mat_inv.inverse().unwrap();
             unsafe {
