@@ -1,9 +1,10 @@
 [package]
 name = "metroid-demo"
-version = "1.2.21"
+version = "1.2.22"
 authors = ["LambdaXymox <lambda.xymox@gmail.com>"]
 build = "build.rs"
 description = "OpenGL tech demo."
+edition = "2018"
 
 [dependencies]
 glfw = "0.25.0"
@@ -17,7 +18,7 @@ mini_obj = { git = "https://github.com/lambdaxymox/mini-obj" }
 teximage2d = { git = "https://github.com/lambdaxymox/teximage2d" }
 
 [build-dependencies]
-gl_generator = "0.10.0"
+gl_generator = "0.14.0"
 mini_obj = { git = "https://github.com/lambdaxymox/mini-obj" }
 
 [profile.dev]
