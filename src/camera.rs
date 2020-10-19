@@ -4,7 +4,6 @@ use cglinalg::{
     Vector4, 
     Matrix4, 
     Quaternion, 
-    InvertibleSquareMatrix
 };
 
 

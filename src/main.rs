@@ -46,8 +46,6 @@ use cglinalg::{
     Degrees, 
     Matrix4, 
     Quaternion, 
-    Array, 
-    InvertibleSquareMatrix,
     Vector3,
     Vector4,
     Unit,
