@@ -1,6 +1,6 @@
 [package]
 name = "metroid-demo"
-version = "1.2.25"
+version = "1.2.26"
 authors = ["LambdaXymox <lambda.xymox@gmail.com>"]
 build = "build.rs"
 description = "OpenGL tech demo."
