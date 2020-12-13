@@ -1,6 +1,6 @@
 [package]
 name = "metroid-demo"
-version = "1.2.26"
+version = "1.2.27"
 authors = ["LambdaXymox <lambda.xymox@gmail.com>"]
 build = "build.rs"
 description = "OpenGL tech demo."
@@ -8,10 +8,10 @@ edition = "2018"
 
 [dependencies]
 glfw = "0.25.0"
-log = "0.4.6"
-serde = "1.0.80"
-serde_derive = "1.0.80"
-serde_json = "1.0.33"
+log = "0.4.11"
+serde = "1.0.118"
+serde_derive = "1.0.118"
+serde_json = "1.0.60"
 file_logger = { git = "https://github.com/lambdaxymox/file-logger" }
 cglinalg = { git = "https://github.com/lambdaxymox/cglinalg" }
 mini_obj = { git = "https://github.com/lambdaxymox/mini-obj" }
